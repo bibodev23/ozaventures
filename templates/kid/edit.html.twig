@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Kid{% endblock %}
+
+{% block body %}
+    <h1>Edit Kid</h1>
+
+    {{ include('kid/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_kid_index') }}">back to list</a>
+
+    {{ include('kid/_delete_form.html.twig') }}
+{% endblock %}

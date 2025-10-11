@@ -1,0 +1,107 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+* li {
+  list-style: none;
+}
+* a {
+  text-decoration: none;
+  color: inherit;
+}
+* button {
+  cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+  nav .desktop {
+    display: none;
+  }
+}
+@media screen and (min-width: 600px) {
+  .page-login {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+  }
+  .page-login .background {
+    background: linear-gradient(135deg, #73C8A9, #64b3f4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 50%;
+  }
+  .page-login .background img {
+    width: 500px;
+    height: auto;
+  }
+  .page-login .form {
+    height: 100%;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .page-login .form form {
+    width: 400px;
+    border: 1px solid rgba(0, 0, 0, 0.2588235294);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .page-login .form form .input:not(.agree-terms) {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .page-login .form form .input:not(.agree-terms) label {
+    font-weight: bold;
+  }
+  .page-login .form form .input:not(.agree-terms) input {
+    padding: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2588235294);
+    border-radius: 12px;
+  }
+  .page-login .form form .btn-submit {
+    padding: 10px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #73C8A9, #64b3f4);
+    color: #fff;
+    font-weight: bold;
+  }
+  .container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+  nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: 300px;
+    background: linear-gradient(135deg, #73C8A9, #64b3f4);
+  }
+  nav img {
+    width: 100%;
+    height: auto;
+  }
+  nav .mobile {
+    display: none;
+  }
+  nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+}/*# sourceMappingURL=app.css.map */

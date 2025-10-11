@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        {% block stylesheets %}
+        {% endblock %}
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+        <div class="container">
+        <nav>
+            <a href="{{path('app_home')}}" class="logo-container"><img src="{{asset('images/logo.png')}}" alt=""></a>
+            <div class="desktop">
+                <ul>
+                     <li><a href="{{ path('app_kid_index')}}">Liste des enfants</a></li>
+                    <li><a href="{{path('app_kid_new')}}">Enregistrer un enfant</a></li>
+                    <li><a href="{{path('app_outing_index')}}">Liste des sorties</a></li>
+                    <li><a href="{{path('app_outing_new')}}">Nouvelle sortie</a></li>
+                    <li><a href=""></a></li>
+                </ul>                
+            </div>
+            <div class="mobile">
+                <div class="burger">
+
+                </div>
+                <ul>
+                    <li><a href="{{ path('app_kid_index')}}">Liste des enfants</a></li>
+                    <li><a href="{{path('app_kid_new')}}">Enregistrer un enfant</a></li>
+                    <li><a href="{{path('app_outing_index')}}">Liste des sorties</a></li>
+                    <li><a href="{{path('app_outing_new')}}">Nouvelle sortie</a></li>
+                </ul>    
+            </div>
+        </nav>
+        {% if is_granted('ROLE_ANIMATOR') %}
+            {% block body %}{% endblock %}
+        {% else %}
+            <div>Votre compte sera prochainement validé</div>
+        {% endif %}
+        
+        </div>
+    </body>
+</html>
