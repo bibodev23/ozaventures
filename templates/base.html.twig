@@ -37,7 +37,7 @@
                 </ul>    
             </div>
         </nav>
-        {% if is_granted('ROLE_ANIMATOR') %}
+        {% if is_granted('ROLE_ANIMATOR') or is_granted('ROLE_ADMIN') %}
             {% block body %}{% endblock %}
         {% else %}
             <div>Votre compte sera prochainement validé</div>
