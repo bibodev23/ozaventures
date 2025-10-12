@@ -35,7 +35,7 @@ services:
   database:
     image: mysql:8.0
     environment:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: Tropico.86
           MYSQL_DATABASE: app
           MYSQL_USER: ozdatabase
           MYSQL_PASSWORD: ozdatabase
@@ -57,7 +57,7 @@ services:
     container_name: oz-phpmyadmin
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     environment:
       PMA_HOST: database
       PMA_PORT: 3306
