@@ -104,19 +104,21 @@ COPY --link composer.* symfony.* ./
 RUN set -eux; \
 	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
 
-# Install Node & Yarn
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs && corepack enable
+# Installer Node.js (pour compiler les assets)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs
 
-# Installation des dépendances front
-COPY package.json yarn.lock ./
-RUN corepack enable && yarn install --frozen-lockfile
+
+# Installer les dépendances front avec npm
+COPY package*.json ./
+RUN npm ci --no-audit --no-fund
 
 # Copie du reste des sources après le build front
 COPY --link . ./
 RUN rm -Rf frankenphp/
 
 # Build des assets avant compilation Symfony
-RUN yarn encore production
+RUN npm run build
 
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
