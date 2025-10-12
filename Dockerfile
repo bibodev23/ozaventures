@@ -94,7 +94,7 @@ CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch" ]
 FROM frankenphp_base AS frankenphp_prod
 
 ENV APP_ENV=prod
-
+ENV DATABASE_URL="mysql://dummy:dummy@dummy:3306/dummy" 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 COPY --link frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
@@ -112,6 +112,6 @@ RUN set -eux; \
 	mkdir -p var/cache var/log; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
 	composer dump-env prod; \
-	php bin/console asset-map:compile; \
+	php bin/console asset-map:compile || true; \
 	composer run-script --no-dev post-install-cmd || true; \
 	chmod +x bin/console; sync;
