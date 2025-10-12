@@ -94,7 +94,6 @@ CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch" ]
 FROM frankenphp_base AS frankenphp_prod
 
 ENV APP_ENV=prod
-ENV DATABASE_URL="mysql://dummy:dummy@dummy:3306/dummy" 
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY --link frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
@@ -104,26 +103,24 @@ COPY --link composer.* symfony.* ./
 RUN set -eux; \
 	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
 
-# Installer Node.js (pour compiler les assets)
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-    && apt-get install -y nodejs
-
-
-# Installer les dépendances front avec npm
-COPY package*.json ./
-RUN npm ci --no-audit --no-fund
-
 # Copie du reste des sources après le build front
 COPY --link . ./
 RUN rm -Rf frankenphp/
 
-# Build des assets avant compilation Symfony
-RUN npm run build
+# Installer Node.js et Chromium (pour Puppeteer / Browsershot)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs chromium chromium-sandbox --no-install-recommends \
+    && npm install --location=global puppeteer \
+    && rm -rf /var/lib/apt/lists/*
 
+# Build des assets via Symfony AssetMapper
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
-    composer dump-env prod && \
-    php bin/console cache:clear && \
-    php bin/console assets:install && \
-    php bin/console asset-map:compile
+	composer dump-env prod; \
+	php bin/console cache:clear; \
+	php bin/console assets:install; \
+	php bin/console asset-map:compile
+
+# Healthcheck pour FrankenPHP
+HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost:2019/metrics || exit 1
