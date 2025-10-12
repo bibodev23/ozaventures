@@ -95,8 +95,8 @@ FROM frankenphp_base AS frankenphp_prod
 
 ENV APP_ENV=prod
 ENV DATABASE_URL="mysql://dummy:dummy@dummy:3306/dummy" 
-RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY --link frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
 
 # prevent the reinstallation of vendors at every changes in the source code
@@ -104,14 +104,24 @@ COPY --link composer.* symfony.* ./
 RUN set -eux; \
 	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
 
-# copy sources
+# Install Node & Yarn
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs && corepack enable
+
+# Installation des dépendances front
+COPY package.json yarn.lock ./
+RUN corepack enable && yarn install --frozen-lockfile
+
+# Copie du reste des sources après le build front
 COPY --link . ./
 RUN rm -Rf frankenphp/
+
+# Build des assets avant compilation Symfony
+RUN yarn encore production
 
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
-	composer dump-env prod; \
-	php bin/console asset-map:compile || true; \
-	composer run-script --no-dev post-install-cmd || true; \
-	chmod +x bin/console; sync;
+    composer dump-env prod && \
+    php bin/console cache:clear && \
+    php bin/console assets:install && \
+    php bin/console asset-map:compile
