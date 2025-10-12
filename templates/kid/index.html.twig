@@ -1,30 +1,34 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Kid index{% endblock %}
+{% block title %}Liste des enfants{% endblock %}
+
+{% block classPage %}kid-index{% endblock %}
+
+{% block header %}
+	<h1>Liste des enfants</h1>
+        <a href="{{path('app_kid_new')}}" class="btn green">Nouvelle fiche</a>
+{% endblock %}
 
 {% block body %}
-    <h1>Kid index</h1>
-
-    <table class="table">
+    <h2>Groupe des 3 à 5 ans</h2>
+    <table class="table table-kids">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Firstname</th>
-                <th>Lastname</th>
+                <th>Prénom</th>
+                <th>Nom</th>
                 <th>Age</th>
                 <th>actions</th>
             </tr>
         </thead>
         <tbody>
-        {% for kid in kids %}
+        {% for kid in kids3To5 %}
             <tr>
-                <td>{{ kid.id }}</td>
                 <td>{{ kid.firstname }}</td>
                 <td>{{ kid.lastname }}</td>
                 <td>{{ kid.age }}</td>
                 <td>
-                    <a href="{{ path('app_kid_show', {'id': kid.id}) }}">show</a>
-                    <a href="{{ path('app_kid_edit', {'id': kid.id}) }}">edit</a>
+                    <a href="{{ path('app_kid_show', {'id': kid.id}) }}">Voir</a>
+                    <a href="{{ path('app_kid_edit', {'id': kid.id}) }}">Éditer</a>
                 </td>
             </tr>
         {% else %}
@@ -35,5 +39,32 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_kid_new') }}">Create new</a>
+    <h2>Groupe des 6 à 12 ans</h2>
+        <table class="table table-kids">
+        <thead>
+            <tr>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Age</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for kid in kids6To12 %}
+            <tr>
+                <td>{{ kid.firstname }}</td>
+                <td>{{ kid.lastname }}</td>
+                <td>{{ kid.age }}</td>
+                <td>
+                    <a href="{{ path('app_kid_show', {'id': kid.id}) }}">Voir</a>
+                    <a href="{{ path('app_kid_edit', {'id': kid.id}) }}">Éditer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

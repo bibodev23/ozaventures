@@ -1,4 +1,53 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    <div class="input">
+    {{ form_label(form.title) }}
+        {{ form_widget(form.title) }}
+    </div>
+    <div class="input">
+    {{ form_label(form.location) }}
+        {{ form_widget(form.location) }}
+    </div>
+    <div class="input">
+    {{ form_label(form.date) }}
+        {{ form_widget(form.date) }}
+    </div>
+    <div class="two-columns">
+
+    <div class="input">
+    {{ form_label(form.timeGo) }}
+        {{ form_widget(form.timeGo) }}
+    </div>
+    <div class="input">
+    {{ form_label(form.timeBack) }}
+        {{ form_widget(form.timeBack) }}
+    </div>
+    </div>
+
+    <div class="input">
+    {{ form_label(form.animators) }}
+        {{ form_widget(form.animators) }}
+    </div>
+    <div class="input">
+    {{ form_label(form.babies) }}
+     {% for child in form.babies %}
+        <div class="chexbock">
+            {{ form_widget(child) }}
+            {{ form_label(child, null, {label_attr: {'class': 'checkbox-label'}}) }}
+        </div>
+    {% endfor %}
+    </div>
+    <div class="input">
+        {{ form_label(form.children) }}
+     {% for child in form.children %}
+        <div class="chexbock">
+            {{ form_widget(child) }}
+            {{ form_label(child, null, {label_attr: {'class': 'checkbox-label'}}) }}
+        </div>
+    {% endfor %}
+    </div>
+    <div class="input">
+    {{ form_label(form.notes) }}
+        {{ form_widget(form.notes) }}
+    </div>
+    <button class="btn green">{{ button_label|default('Enregistrer') }}</button>
 {{ form_end(form) }}

@@ -49,27 +49,24 @@ RUN install-php-extensions pdo_mysql
 COPY --link frankenphp/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/
 COPY --link --chmod=755 frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 COPY --link frankenphp/Caddyfile /etc/frankenphp/Caddyfile
-# Installation de Node.js (ici version 22 LTS)
+
 RUN curl -sL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs
 
-# Installation des dépendances système pour Puppeteer/Chrome
+# Installation de Chromium et des dépendances nécessaires
 RUN apt-get update && apt-get install -y \
-    libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 \
-    libexpat1 libfontconfig1 libgcc1 libgdk-pixbuf-2.0-0 libglib2.0-0 \
-    libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 libpangocairo-1.0-0 \
-    libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 \
-    libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 \
-    libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation \
-    lsb-release xdg-utils wget \
-    libgbm-dev libxshmfence-dev libatk-bridge2.0-0 \
+    chromium \
+    chromium-sandbox \
+    --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Installation de Puppeteer globalement
-RUN npm install --location=global --unsafe-perm puppeteer
+# Définir le chemin vers Chromium pour Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Installation du binaire Chrome
-RUN npx puppeteer browsers install chrome
+# Installation de Puppeteer globalement
+RUN npm install --location=global puppeteer
+
 ENTRYPOINT ["docker-entrypoint"]
 
 HEALTHCHECK --start-period=60s CMD curl -f http://localhost:2019/metrics || exit 1

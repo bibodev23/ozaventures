@@ -1,13 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Kid{% endblock %}
+{% block title %}Édition fiche{% endblock %}
+
+{% block classPage %}kid-edit{% endblock %}
+
+{% block header %}
+    <h1>Édition fiche {{kid.firstname}} {{kid.lastname}}</h1>
+{% endblock %}
 
 {% block body %}
-    <h1>Edit Kid</h1>
-
-    {{ include('kid/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_kid_index') }}">back to list</a>
-
-    {{ include('kid/_delete_form.html.twig') }}
+    {{ include('kid/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+    <div class="list-actions">
+        <a href="{{ path('app_kid_index') }}" class="btn">Retour à la liste</a>
+        {{ include('kid/_delete_form.html.twig') }}
+    </div>
 {% endblock %}

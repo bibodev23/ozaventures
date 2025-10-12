@@ -1,11 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Kid{% endblock %}
-
+{% block title %}Nouvelle fiche{% endblock %}
+    {% block classPage %}kid-new{% endblock %}
+{% block header %}
+    <h1>Nouvelle fiche</h1>
+{% endblock %}
 {% block body %}
-    <h1>Create new Kid</h1>
-
     {{ include('kid/_form.html.twig') }}
 
-    <a href="{{ path('app_kid_index') }}">back to list</a>
+    <a href="{{ path('app_kid_index') }}" class="btn margin-top">Retour à la liste</a>
 {% endblock %}

@@ -1,26 +1,54 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Outing{% endblock %}
+{% block title %}
+	{{outing.title}}
+{% endblock %}
+{% block classPage %}outing-show
+{% endblock %}
+{% block header %}
 
+	<h1>Sortie :
+		{{outing.title}}</h1>
+        <a href="{{path('app_outing_download', {'id': outing.id})}}" class="btn yellow">Imprimer</a>
+{% endblock %}
 {% block body %}
-    <h1>Outing</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ outing.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ outing.title }}</td>
-            </tr>
-        </tbody>
-    </table>
+	<table class="table row">
+		<tbody>
+			<tr>
+				<th>Lieu</th>
+				<td>{{ outing.location }}</td>
+			</tr>
+			<tr>
+				<th>Date</th>
+				<td>{{ outing.date|date('d-m-Y') }}</td>
+			</tr>
+			<tr>
+				<th>heure de départ</th>
+				<td>{{ outing.timeGo|date('H:i') }}</td>
+			</tr>
+			<tr>
+				<th>Heure de retour</th>
+				<td>{{ outing.timeBack|date('H:i') }}</td>
+			</tr>
+			<tr>
+				<th>Informations</th>
+				<td>{{ outing.notes }}</td>
+			</tr>
+		</tbody>
+	</table>
+	<h2>Enfants</h2>
+	<ul>
+		{% for kid in outing.kids %}
+			<li>
+				<a href="{{ path('app_kid_show', {'id': kid.id}) }}">{{ kid.firstname }}</a>
+			</li>
+		{% endfor %}
+	</ul>
+	<div class="list-actions">
+		<a href="{{ path('app_outing_index') }}" class="btn">Retour à la liste</a>
+		<a href="{{ path('app_outing_edit', {'id': outing.id}) }}" class="btn green">Modifier</a>
+		{{ include('outing/_delete_form.html.twig') }}
+	</div>
 
-    <a href="{{ path('app_outing_index') }}">back to list</a>
-
-    <a href="{{ path('app_outing_edit', {'id': outing.id}) }}">edit</a>
-
-    {{ include('outing/_delete_form.html.twig') }}
 {% endblock %}

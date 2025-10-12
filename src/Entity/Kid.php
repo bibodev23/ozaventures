@@ -30,6 +30,9 @@ class Kid
     #[ORM\ManyToMany(targetEntity: Outing::class, mappedBy: 'kids')]
     private Collection $outings;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $notes = null;
+
     public function __construct()
     {
         $this->outings = new ArrayCollection();
@@ -99,6 +102,18 @@ class Kid
         if ($this->outings->removeElement($outing)) {
             $outing->removeKid($this);
         }
+
+        return $this;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(?string $notes): static
+    {
+        $this->notes = $notes;
 
         return $this;
     }

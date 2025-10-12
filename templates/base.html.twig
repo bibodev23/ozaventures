@@ -18,11 +18,14 @@
             <a href="{{path('app_home')}}" class="logo-container"><img src="{{asset('images/logo.png')}}" alt=""></a>
             <div class="desktop">
                 <ul>
-                     <li><a href="{{ path('app_kid_index')}}">Liste des enfants</a></li>
+                    {% if is_granted('ROLE_MANAGER')%}
+                    <li><a href="">Plannings</a></li>
+                    <li><a href="{{ path('app_kid_index')}}">Liste des enfants</a></li>
                     <li><a href="{{path('app_kid_new')}}">Enregistrer un enfant</a></li>
+                    {% endif %}
                     <li><a href="{{path('app_outing_index')}}">Liste des sorties</a></li>
                     <li><a href="{{path('app_outing_new')}}">Nouvelle sortie</a></li>
-                    <li><a href=""></a></li>
+                    <li class="logout"><a href="{{path('app_logout')}}">Se déconnecter</a></li>
                 </ul>                
             </div>
             <div class="mobile">
@@ -30,15 +33,27 @@
 
                 </div>
                 <ul>
+                    {% if is_granted('ROLE_MANAGER')%}
+                    <li><a href="">Plannings</a></li>
                     <li><a href="{{ path('app_kid_index')}}">Liste des enfants</a></li>
                     <li><a href="{{path('app_kid_new')}}">Enregistrer un enfant</a></li>
+                    {% endif %}
                     <li><a href="{{path('app_outing_index')}}">Liste des sorties</a></li>
                     <li><a href="{{path('app_outing_new')}}">Nouvelle sortie</a></li>
+                    <li class="logout"><a href="{{path('app_logout')}}">Se déconnecter</a></li>
                 </ul>    
             </div>
         </nav>
         {% if is_granted('ROLE_ANIMATOR')%}
-            {% block body %}{% endblock %}
+            <div class="page page-{% block classPage %} {% endblock %}">
+                <div class="header">
+                    {% block header %} {% endblock %}
+                </div>
+                <div class="main">
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+           
         {% else %}
             <div>Votre compte sera prochainement validé</div>
         {% endif %}

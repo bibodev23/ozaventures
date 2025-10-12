@@ -6,6 +6,9 @@ use App\Entity\Outing;
 use App\Form\OutingType;
 use App\Repository\OutingRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use PhpParser\ErrorHandler\Collecting;
+use PhpParser\Node\Expr\Cast\Void_;
+use Spatie\Browsershot\Browsershot;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +33,17 @@ final class OutingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $children = $form->get('children')->getData();
+            /** @var Collecting $babies */
+            $babies = $form->get('babies')->getData();
+
+            foreach ($children as $child) {
+                $outing->addKid($child);
+            }
+
+            foreach ($babies as $baby) {
+                $outing->addKid($baby);
+            }
             $entityManager->persist($outing);
             $entityManager->flush();
 
@@ -77,5 +91,32 @@ final class OutingController extends AbstractController
         }
 
         return $this->redirectToRoute('app_outing_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/download', name:'app_outing_download', methods: ['GET'])]
+    public function download(Outing $outing): Response
+    {
+        $thmlContent = $this->renderView('outing/show.html.twig', [
+            'outing' => $outing,
+        ]);
+
+        $pdf = Browsershot::html($thmlContent)
+            ->noSandbox()
+            ->waitUntilNetworkIdle()
+            ->showBackground()
+            ->emulateMedia('screen')
+            ->orientation('portrait')
+            ->format('A4')
+            ->showBackground()
+            ->setOption('waintUntil', 'networkidle0')
+            ->timeout(60)
+            ->pdf();
+
+        $filename = sprintf('sortie-%s.pdf', $outing->getId());
+        return new Response($pdf, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="outing.pdf"',
+            'Cache-Control' => 'no-store',
+        ]);
     }
 }

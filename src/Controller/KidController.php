@@ -17,8 +17,11 @@ final class KidController extends AbstractController
     #[Route(name: 'app_kid_index', methods: ['GET'])]
     public function index(KidRepository $kidRepository): Response
     {
+        $kids3To5 = $kidRepository->listKids3To5YearsOld();
+        $kids6To12 = $kidRepository->listKids6To12YearsOld();
         return $this->render('kid/index.html.twig', [
-            'kids' => $kidRepository->findAll(),
+            'kids3To5' => $kids3To5,
+            'kids6To12' => $kids6To12,
         ]);
     }
 

@@ -15,6 +15,41 @@ class KidRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Kid::class);
     }
+    /**
+     * Récupère tous les enfants de 3 à 5 ans
+     * 
+     * @return Kid[]
+     */
+    public function listKids3To5YearsOld(): array
+    {
+        return $this->createQueryBuilder('k')
+            ->andWhere('k.age >= :minAge')
+            ->andWhere('k.age <= :maxAge')
+            ->setParameter('minAge', 3)
+            ->setParameter('maxAge', 5)
+            ->orderBy('k.lastname', 'ASC')
+            ->addOrderBy('k.firstname', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Récupère tous les enfants de 6 à 12 ans
+     * 
+     * @return Kid[]
+     */
+    public function listKids6To12YearsOld(): array
+    {
+        return $this->createQueryBuilder('k')
+            ->andWhere('k.age >= :minAge')
+            ->andWhere('k.age <= :maxAge')
+            ->setParameter('minAge', 6)
+            ->setParameter('maxAge', 12)
+            ->orderBy('k.lastname', 'ASC')
+            ->addOrderBy('k.firstname', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
     //    /**
     //     * @return Kid[] Returns an array of Kid objects

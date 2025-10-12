@@ -1,4 +1,20 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+<div class="input">
+    {{ form_label(form.firstname, "Prénom") }}
+    {{ form_widget(form.firstname) }}
+</div>
+<div class="input">
+    {{ form_label(form.lastname, "Nom") }}
+    {{ form_widget(form.lastname) }}
+</div>
+<div class="input">
+    {{ form_label(form.age, "Age") }}
+    {{ form_widget(form.age) }}
+</div>
+<div class="input">
+    {{ form_label(form.age, "Notes") }}
+    {{ form_widget(form.notes) }}
+</div>
+
+    <button class="btn green">{{ button_label|default('Enregistrer') }}</button>
 {{ form_end(form) }}
