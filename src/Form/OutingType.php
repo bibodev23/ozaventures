@@ -41,7 +41,7 @@ class OutingType extends AbstractType
             ])
             ->add('kids', EntityType::class, [
                 'class' => Kid::class,
-                'label' => 'Enfants',
+                'label' => ' ',
                 'choice_label' => 'firstname',
                 'multiple' => true,
                 'expanded' => true,

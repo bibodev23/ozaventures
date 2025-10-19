@@ -20,7 +20,7 @@
 				<td>{{ user.username|capitalize }}</td>
 			</tr>
 			<tr>
-				<th>Roles</th>
+				<th>Rôle(s)</th>
 				<td>
 					{% for role in user.roles %}
 						
@@ -30,7 +30,7 @@
 			</tr>
 		</tbody>
 	</table>
-	<h2>Historiques des tâches assignées</h2>
+	<h2>Historique des tâches assignées</h2>
 	<table class="table row">
 		<tbody>
 			{% for task in user.tasks %}
@@ -41,7 +41,7 @@
 			{% endfor %}
 		</tbody>
 	</table>
-	<h2>Historiques des sorties</h2>
+	<h2>Historique des sorties</h2>
 	<table class="table row">
 		<tbody>
 			{% for outing in user.outings %}

@@ -125,7 +125,6 @@ form {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    margin-top: 20px;
     .two-columns {
         display: flex;
         gap: 20px;
@@ -281,6 +280,12 @@ form {
         }
     }
     .page {
+        &:not(.page-login) {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+    }
         .header {
             display: flex;
             align-items: center;
@@ -512,9 +517,9 @@ form {
             padding: 10px;
             height: 100%;
             .header {
-                margin-bottom: 20px;
                 h1 {
                     font-size: 20px;
+                    text-align: center;
                 }
             }
             .main {
@@ -558,12 +563,7 @@ form {
     .page {
         width: 100%;
     }
-    .page:not(.page-login) {
-        display: flex;
-        flex-direction: column;
-        gap: 40px;
-        padding: 20px;
-    }
+
     .main {
         height: 100%;
         display: flex;

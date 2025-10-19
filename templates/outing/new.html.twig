@@ -6,9 +6,7 @@
     <h1>Nouvelle sortie</h1>
 {% endblock %}
 {% block body %}
-
+{# <a href="{{ path('app_outing_index') }}" class="btn">Retour à la liste</a> #}
     {{ include('outing/_form.html.twig') }}
-
-    <a href="{{ path('app_outing_index') }}" class="btn">Retour à la liste</a>
 
 {% endblock %}

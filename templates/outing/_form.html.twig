@@ -33,8 +33,8 @@
 	{% endfor %}
 </div>
 <div class="input">
-	{{ form_label(form.kids) }}
-	<h5>3–5 ans</h5>
+	{{ form_label(form.kids, "Groupe") }}
+	<h3>3–5 ans</h3>
 	{% for child in form.kids %}
 		{% if child.vars.attr['data-group'] == '3-5' %}
 			<div class="checkbox">
@@ -44,7 +44,7 @@
 		{% endif %}
 	{% endfor %}
 
-	<h5>6–12 ans</h5>
+	<h3>6–12 ans</h3>
 	{% for child in form.kids %}
 		{% if child.vars.attr['data-group'] == '6-12' %}
 			<div class="checkbox">
