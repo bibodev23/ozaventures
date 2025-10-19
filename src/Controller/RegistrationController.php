@@ -30,7 +30,6 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // do anything else you need here, like send an email
             $this->addFlash('success','Votre compte sera prochainement validé');
             return $this->redirectToRoute('app_login');
         }

@@ -16,7 +16,9 @@ class KidType extends AbstractType
             ->add('firstname')
             ->add('lastname')
             ->add('age')
-            ->add('notes', TextareaType::class)
+            ->add('notes', TextareaType::class, [
+                'required' => false
+            ])
         ;
     }
 

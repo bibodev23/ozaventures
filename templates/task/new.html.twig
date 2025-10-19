@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tâche du jour{% endblock %}
+{% block classPage %}task-new{% endblock %}
+{% block header %}
+     <h1>Tâche du jour</h1>
+{% endblock %}
+{% block body %}
+    {{ include('task/_form.html.twig') }}
+{% endblock %}

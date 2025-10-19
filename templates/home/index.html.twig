@@ -1,16 +1,44 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Hello HomeController!
+{% endblock %}
 
+{% block classPage %}dashboard
+{% endblock %}
+{% block header %}
+	<h1>Tabeau de bord</h1>
+{% endblock %}
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Tabeau de bord</h1>
-    <p>Nombre d'enfants : {{ numberOfKids }}</p>
-    <h2>Planning du jour</h2>
+	<h3>Nombre d'enfants :
+		{{ numberOfKids }}</h3>
+	<h3>Nombre d'animateurs :
+		{{ numberOfUsers }}</h3>
+<div class="list-container">
+{% set currentDate = null %}
+
+{% for task in tasks %}
+	{% set day = task.date|date('Y-m-d') %}
+	{% if day != currentDate %}
+		{% set currentDate = day %}
+        <div class="list-day">
+		<h3>Tâches du
+			{{ task.date|date('d F Y') }}</h3>
+		<ul>
+		{% endif %}
+
+		<li><span>{{ task.title.label }}</span>
+			:
+			{{ task.user.username|capitalize }}</li>
+
+		{# Si prochaine itération est une nouvelle date, on ferme la liste #}
+		{% set next = tasks[loop.index] ?? null %}
+		{% if next is null or next.date|date('Y-m-d') != currentDate %}
+		</ul>
+        </div>
+	{% endif %}
+{% else %}
+	<p>Aucune tâche.</p>
+{% endfor %}
 </div>
 {% endblock %}

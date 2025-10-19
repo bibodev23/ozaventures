@@ -6,7 +6,7 @@
 
 {% block header %}
 	<h1>Liste des enfants</h1>
-        <a href="{{path('app_kid_new')}}" class="btn green">Nouvelle fiche</a>
+        <a href="{{path('app_kid_new')}}" class="btn green svg">{{ ux_icon('tabler:plus') }}</a>
 {% endblock %}
 
 {% block body %}
@@ -33,7 +33,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">no records found</td>
+                <td colspan="5">Pas de résultat</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -62,7 +62,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">no records found</td>
+                <td colspan="5">Pas de résultat</td>
             </tr>
         {% endfor %}
         </tbody>

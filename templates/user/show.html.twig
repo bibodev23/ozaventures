@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Utilisateur
+{% endblock %}
+{% block classPage %}user-show
+{% endblock %}
+{% block header %}
+	<h1>Animateur</h1>
+{% endblock %}
+{% block body %}
+	{% set roleLabels = {
+  'ROLE_MANAGER': 'Direction',
+  'ROLE_ANIMATOR': 'Animateur',
+  'ROLE_USER': 'Utilisateur'
+} %}
+	<table class="table row">
+		<tbody>
+			<tr>
+				<th>Identifiant</th>
+				<td>{{ user.username|capitalize }}</td>
+			</tr>
+			<tr>
+				<th>Roles</th>
+				<td>
+					{% for role in user.roles %}
+						
+						{{ loop.first ? '' :'&' }} {{ roleLabels[role] ?? role }}
+					{% endfor %}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<h2>Historiques des tâches assignées</h2>
+	<table class="table row">
+		<tbody>
+			{% for task in user.tasks %}
+				<tr>
+					<th>{{task.title.label}}</th>
+					<td>{{task.date|date('d/m/Y')}}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<h2>Historiques des sorties</h2>
+	<table class="table row">
+		<tbody>
+			{% for outing in user.outings %}
+				<tr>
+					<th>{{outing.title}}</th>
+					<td>{{outing.date|date('d/m/Y')}}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<div class="list-actions">
+		<a href="{{ path('app_user_index') }}" class="btn">Retour à la liste</a>
+		{{ include('user/_delete_form.html.twig') }}
+	</div>
+{% endblock %}

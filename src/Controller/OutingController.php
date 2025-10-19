@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Outing;
+use App\Entity\User;
 use App\Form\OutingType;
 use App\Repository\OutingRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,22 +29,15 @@ final class OutingController extends AbstractController
     #[Route('/new', name: 'app_outing_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
         $outing = new Outing();
         $form = $this->createForm(OutingType::class, $outing);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $children = $form->get('children')->getData();
-            /** @var Collecting $babies */
-            $babies = $form->get('babies')->getData();
-
-            foreach ($children as $child) {
-                $outing->addKid($child);
-            }
-
-            foreach ($babies as $baby) {
-                $outing->addKid($baby);
-            }
+            $outing->setCreatedAt(new \DateTimeImmutable());
+            $outing->setCreatedBy($user);
             $entityManager->persist($outing);
             $entityManager->flush();
 
@@ -56,21 +50,17 @@ final class OutingController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_outing_show', methods: ['GET'])]
-    public function show(Outing $outing): Response
-    {
-        return $this->render('outing/show.html.twig', [
-            'outing' => $outing,
-        ]);
-    }
-
     #[Route('/{id}/edit', name: 'app_outing_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Outing $outing, EntityManagerInterface $entityManager): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
         $form = $this->createForm(OutingType::class, $outing);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $outing->setUpdatedAt(new \DateTime());
+            $outing->setUpdatedBy($user);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_outing_index', [], Response::HTTP_SEE_OTHER);
@@ -79,6 +69,14 @@ final class OutingController extends AbstractController
         return $this->render('outing/edit.html.twig', [
             'outing' => $outing,
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_outing_show', methods: ['GET'])]
+    public function show(Outing $outing): Response
+    {
+        return $this->render('outing/show.html.twig', [
+            'outing' => $outing,
         ]);
     }
 
@@ -96,7 +94,7 @@ final class OutingController extends AbstractController
     #[Route('/{id}/download', name:'app_outing_download', methods: ['GET'])]
     public function download(Outing $outing): Response
     {
-        $thmlContent = $this->renderView('outing/show.html.twig', [
+        $thmlContent = $this->renderView('outing/pdf.html.twig', [
             'outing' => $outing,
         ]);
 
@@ -106,7 +104,7 @@ final class OutingController extends AbstractController
             ->showBackground()
             ->emulateMedia('screen')
             ->orientation('portrait')
-            ->format('A4')
+            ->format('A3')
             ->showBackground()
             ->setOption('waintUntil', 'networkidle0')
             ->timeout(60)

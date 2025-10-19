@@ -11,15 +11,17 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $faker = Faker\Factory::create('fr_FR') ;
+        $faker = Faker\Factory::create('fr_FR');
         
-        for ($i = 0; $i < 80; $i++) {
+        for ($i = 0; $i < 23; $i++) {
             $kid = new Kid() ;
             $kid->setFirstname($faker->firstName()) ;
             $kid->setLastname($faker->lastName()) ;
             $kid->setAge($faker->numberBetween(3, 12)) ;
+            $kid->assignAgeGroup();
             $manager->persist($kid);
         }
+
         $manager->flush();
     }
 }

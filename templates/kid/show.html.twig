@@ -26,6 +26,15 @@
             </tr>
         </tbody>
     </table>
+    <div>
+    <h3>Historique des sorties</h3>
+    <ul>
+    {% for outing in kid.outings %}
+        <li><a href="{{ path('app_outing_show', {'id': outing.id}) }}">{{outing.title}} le {{outing.date|date("d/m/Y")}}</a></li>
+    {% endfor %}
+    </ul>
+    </div>
+    
     <div class="list-actions">
         <a href="{{ path('app_kid_index') }}" class="btn">Retour à la liste</a>
         <a href="{{ path('app_kid_edit', {'id': kid.id}) }}" class="btn green">Modifier</a>

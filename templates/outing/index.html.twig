@@ -4,7 +4,7 @@
 {% block classPage %}outing-index{% endblock %}
 {% block header %}
     <h1>Liste des sorties</h1>
-    <a href="{{ path('app_outing_new') }}" class="btn green">Nouvelle sortie</a>
+    <a href="{{ path('app_outing_new') }}" title="Nouvelle sortie" class="btn green svg">{{ ux_icon('tabler:plus') }}</a>
 {% endblock %}
 {% block body %}
     <table class="table">
@@ -12,19 +12,19 @@
             <tr>
                 <th>Titre</th>
                 <th>Date</th>
-                <th>Nombre d'enfants</th>
-                <th>actions</th>
+                <th>Enfants</th>
+                <th class="not-mobile">Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for outing in outings %}
                 <tr>
-                    <td>{{ outing.title }}</td>
+                    <td><a href="{{ path('app_outing_show', {'id': outing.id}) }}">{{ outing.title }}</a></td>
                     <td>10/10/2025</td>
                     <td>{{outing.kids.count}}</td>
-                    <td>
-                        <a href="{{ path('app_outing_show', {'id': outing.id}) }}">Voir</a>
-                        <a href="{{ path('app_outing_edit', {'id': outing.id}) }}">Modifier</a>
+                    <td class="not-mobile">
+                        <a href="{{ path('app_outing_show', {'id': outing.id}) }}">{{ ux_icon('tabler:eye') }}</a>
+                        <a href="{{ path('app_outing_edit', {'id': outing.id}) }}">{{ ux_icon('tabler:edit') }}</a>
                     </td>
                 </tr>
             {% else %}

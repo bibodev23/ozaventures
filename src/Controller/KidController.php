@@ -33,6 +33,7 @@ final class KidController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $kid->assignAgeGroup();
             $entityManager->persist($kid);
             $entityManager->flush();
 
@@ -60,6 +61,7 @@ final class KidController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $kid->assignAgeGroup();
             $entityManager->flush();
 
             return $this->redirectToRoute('app_kid_index', [], Response::HTTP_SEE_OTHER);

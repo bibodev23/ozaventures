@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Task
+{% endblock %}
+{% block classPage %}task-show
+{% endblock %}
+{% block header %}
+	<h1>{{ task.title.label }} du {{ task.date ? task.date|date('d-m-y') : '' }}</h1>
+{% endblock %}
+{% block body %}
+	<table class="table row">
+		<tbody>
+			<tr>
+				<th>Date</th>
+				<td>{{ task.date ? task.date|date('d-m-Y') : '' }}</td>
+			</tr>
+			<tr>
+				<th>Titre</th>
+				<td>{{ task.title.label }}</td>
+			</tr>
+                        <tr>
+                <th>Animateur(s)</th>
+                <td>    {% for u in task.users %}
+      {{ loop.first ? '' : '& ' }}{{ u.username|capitalize }}
+    {% endfor %}</td>
+            </tr>
+		</tbody>
+	</table>
+	<div class="list-actions">
+		<a href="{{ path('app_task_index') }}" class="btn">Retour</a>
+
+		<a href="{{ path('app_task_edit', {'id': task.id}) }}" class="btn green">Modifier</a>
+
+		{{ include('task/_delete_form.html.twig') }}
+	</div>
+
+{% endblock %}

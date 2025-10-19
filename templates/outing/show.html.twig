@@ -9,7 +9,7 @@
 
 	<h1>Sortie :
 		{{outing.title}}</h1>
-        <a href="{{path('app_outing_download', {'id': outing.id})}}" class="btn yellow">Imprimer</a>
+	<a href="{{path('app_outing_download', {'id': outing.id})}}" class="btn green svg white">{{ ux_icon('tabler:printer') }}Imprimer</a>
 {% endblock %}
 {% block body %}
 
@@ -24,6 +24,10 @@
 				<td>{{ outing.date|date('d-m-Y') }}</td>
 			</tr>
 			<tr>
+				<th>Nombre d'enfants</th>
+				<td>{{outing.kids.count}}</td>
+			</tr>
+			<tr>
 				<th>heure de départ</th>
 				<td>{{ outing.timeGo|date('H:i') }}</td>
 			</tr>
@@ -32,23 +36,58 @@
 				<td>{{ outing.timeBack|date('H:i') }}</td>
 			</tr>
 			<tr>
+				<th>Créée par</th>
+				<td>{{ outing.createdBy.username|capitalize }}</td>
+			</tr>
+			{% if outing.updatedAt %}
+				<tr>
+					<th>Mise à jour par</th>
+					<td>{{ outing.updatedBY.username|capitalize }}</td>
+				</tr>
+			{% endif %}
+			<tr>
 				<th>Informations</th>
-				<td>{{ outing.notes }}</td>
+				<td>{{ outing.notes ? outing.notes : "Rien à prévoir" }}</td>
 			</tr>
 		</tbody>
 	</table>
-	<h2>Enfants</h2>
-	<ul>
-		{% for kid in outing.kids %}
-			<li>
-				<a href="{{ path('app_kid_show', {'id': kid.id}) }}">{{ kid.firstname }}</a>
-			</li>
-		{% endfor %}
-	</ul>
-	<div class="list-actions">
-		<a href="{{ path('app_outing_index') }}" class="btn">Retour à la liste</a>
-		<a href="{{ path('app_outing_edit', {'id': outing.id}) }}" class="btn green">Modifier</a>
-		{{ include('outing/_delete_form.html.twig') }}
-	</div>
+	<div>
+		<h3>Animateurs</h3>
+		<ul>
+			{% for animator in outing.animators %}
+				<li>
+					{{ animator.username|capitalize }}
+				{% endfor %}
+			</ul>
+		</div>
+		<div>
+			<h3>Enfants</h3>
 
-{% endblock %}
+			{% set kids_3_5 = outing.kids|filter(k => k.age >= 3 and k.age <= 5) %}
+			{% set kids_6_12 = outing.kids|filter(k => k.age >= 6 and k.age <= 12) %}
+			{% if kids_3_5 is not empty %}
+				<h3>3–5 ans</h3>
+				<ul>
+					{% for kid in kids_3_5 %}
+						<li><a href="{{path('app_kid_show', {'id': kid.id})}}">{{ kid.firstname }}</a></li>
+					{% endfor %}
+				</ul>
+			{% endif %}
+
+			{% if kids_6_12 is not empty %}
+				<h3>6–12 ans</h3>
+				<ul>
+					{% for kid in kids_6_12 %}
+						<li><a href="{{path('app_kid_show', {'id': kid.id})}}">{{ kid.firstname }}</a></li>
+					{% endfor %}
+				</ul>
+			{% endif %}
+
+		</div>
+		<div class="list-actions">
+			<a href="{{ path('app_outing_index') }}" class="btn">Retour</a>
+			<a href="{{ path('app_outing_edit', {'id': outing.id}) }}" class="btn green">Modifier</a>
+			{{ include('outing/_delete_form.html.twig') }}
+		</div>
+
+	{% endblock %}

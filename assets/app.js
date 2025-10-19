@@ -6,4 +6,13 @@
  */
 import './styles/app.css';
 
+
+
+  document.addEventListener("DOMContentLoaded", function () {
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+    const menuMobile = document.querySelector(".toggle")
+    const nav = document.querySelector("nav")
+    menuMobile.addEventListener("click", () => {
+        nav.classList.toggle("active")
+    })
+});

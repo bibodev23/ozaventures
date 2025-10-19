@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sortie - {{ outing.title }}</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+        :root {
+            --primary: #00bf63;
+            --secondary: #0077b6;
+            --accent: #f5cb68;
+            --text: #2c3e50;
+            --bg-light: #f8f9fa;
+            --shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        @media print {
+            @page {
+                size: A3 portrait;
+                margin: 20mm;
+            }
+
+            body {
+                margin: 0;
+                background: white;
+            }
+
+            .page {
+                box-shadow: none;
+                margin: 0;
+            }
+        }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            background: var(--bg-light);
+            color: var(--text);
+            margin: 0;
+            padding: 30px;
+        }
+
+        .page {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 400mm;
+            margin: auto;
+            box-shadow: var(--shadow);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 70px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 24px;
+            color: #555;
+        }
+
+        .info-card {
+            background: #eafaf1;
+            border-left: 8px solid var(--primary);
+            padding: 25px 35px;
+            border-radius: 8px;
+            margin-bottom: 50px;
+        }
+
+        .info-card h2 {
+            color: var(--primary);
+            font-size: 38px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 20px;
+        }
+
+        table th, table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            text-align: left;
+            background: var(--secondary);
+            color: white;
+            width: 30%;
+        }
+
+        /* Groupes enfants */
+        .group-section {
+            margin-bottom: 40px;
+        }
+
+        .group-title {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .group-3-5 { background: #74c69d; }
+        .group-6-12 { background: #4ea8de; }
+        .group-other { background: #adb5bd; }
+
+        .kids-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .kid-card {
+            padding: 15px 20px;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: var(--shadow);
+            font-weight: 500;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        .kid-card small {
+            display: block;
+            font-size: 16px;
+            color: #666;
+        }
+
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <div class="header">
+        <h1>{{ outing.title }}</h1>
+    </div>
+
+    <div class="info-card">
+        <h2>Informations de la sortie</h2>
+        <table>
+            <tr><th>Date</th><td>{{ outing.date|date('d/m/Y') }}</td></tr>
+            <tr><th>Lieu</th><td>{{ outing.location }}</td></tr>
+            <tr><th>Heure de départ</th><td>{{ outing.timeGo|date('H:i') }}</td></tr>
+            <tr><th>Heure de retour</th><td>{{ outing.timeBack|date('H:i') }}</td></tr>
+            <tr><th>Notes</th><td>{{ outing.notes }}</td></tr>
+        </table>
+    </div>
+
+    {% set kids_3_5 = outing.kids|filter(k => k.age >= 3 and k.age <= 5) %}
+    {% set kids_6_12 = outing.kids|filter(k => k.age >= 6 and k.age <= 12) %}
+    {% set kids_other = outing.kids|filter(k => k.age < 3 or k.age > 12) %}
+
+    <div class="group-section">
+        <div class="group-title group-3-5">Enfants 3–5 ans ({{ kids_3_5|length }})</div>
+        <div class="kids-grid">
+            {% for kid in kids_3_5 %}
+                <div class="kid-card">
+                    {{ kid.firstname }}
+                </div>
+            {% else %}
+                <div><p>Aucun enfant dans cette tranche d'âge.</p></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="group-section">
+        <div class="group-title group-6-12">Enfants 6–12 ans ({{ kids_6_12|length }})</div>
+        <div class="kids-grid">
+            {% for kid in kids_6_12 %}
+                <div class="kid-card">
+                    {{ kid.firstname }}
+                </div>
+            {% else %}
+                <div>
+                    <p>Aucun enfant dans cette tranche d'âge.</p>
+                </div>
+                
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

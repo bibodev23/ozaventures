@@ -1,63 +1,72 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>
+			{% block title %}Welcome!
+			{% endblock %}
+		</title>
+		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>"> {% block stylesheets %}{% endblock %}
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        <div class="container">
-        <nav>
-            <a href="{{path('app_home')}}" class="logo-container"><img src="{{asset('images/logo.png')}}" alt=""></a>
-            <div class="desktop">
-                <ul>
-                    {% if is_granted('ROLE_MANAGER')%}
-                    <li><a href="">Plannings</a></li>
-                    <li><a href="{{ path('app_kid_index')}}">Liste des enfants</a></li>
-                    <li><a href="{{path('app_kid_new')}}">Enregistrer un enfant</a></li>
-                    {% endif %}
-                    <li><a href="{{path('app_outing_index')}}">Liste des sorties</a></li>
-                    <li><a href="{{path('app_outing_new')}}">Nouvelle sortie</a></li>
-                    <li class="logout"><a href="{{path('app_logout')}}">Se déconnecter</a></li>
-                </ul>                
-            </div>
-            <div class="mobile">
-                <div class="burger">
+		{% block javascripts %}
+			{% block importmap %}
+				{{ importmap('app') }}
+			{% endblock %}
+		{% endblock %}
+	</head>
+	<body>
+		<div class="container">
+			<nav class="">
+				<a href="{{path('app_task_index')}}" class="logo-container"><img src="{{asset('images/logo.png')}}" alt=""></a>
+				<div class="toggle">
+                    <div class="burger">
+                        {{ ux_icon('tabler:menu-2') }}
+                    </div>
+                    <div class="cross">
+                        {{ ux_icon('tabler:x') }}
+                    </div>
+				</div>
+				<div class="links">
+					<ul>
+						<li>
+							<a href="{{path('app_task_index')}}">Tâches du jour</a>
+						</li>
+						<li>
+							<a href="{{path('app_outing_index')}}">Liste des sorties</a>
+						</li>
+						<li>
+							<a href="{{path('app_outing_new')}}">Nouvelle sortie</a>
+						</li>
+						{% if is_granted('ROLE_MANAGER')%}
+							<li>
+								<a href="{{path('app_user_index')}}">Liste des animateurs</a>
+							</li>
+							<li>
+								<a href="{{ path('app_kid_index')}}">Liste des enfants</a>
+							</li>
+							<li>
+								<a href="{{path('app_kid_new')}}">Enregistrer un enfant</a>
+							</li>
+						{% endif %}
+						<li class="logout">
+							<a href="{{path('app_logout')}}">Se déconnecter</a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+			{% if is_granted('ROLE_ANIMATOR')%}
+				<div class="page page-{% block classPage %} {% endblock %}">
+					<div class="header"> {% block header %}{% endblock %}
+						</div>
+						<div class="main"> {% block body %}{% endblock %}
+							</div>
+						</div>
 
-                </div>
-                <ul>
-                    {% if is_granted('ROLE_MANAGER')%}
-                    <li><a href="">Plannings</a></li>
-                    <li><a href="{{ path('app_kid_index')}}">Liste des enfants</a></li>
-                    <li><a href="{{path('app_kid_new')}}">Enregistrer un enfant</a></li>
-                    {% endif %}
-                    <li><a href="{{path('app_outing_index')}}">Liste des sorties</a></li>
-                    <li><a href="{{path('app_outing_new')}}">Nouvelle sortie</a></li>
-                    <li class="logout"><a href="{{path('app_logout')}}">Se déconnecter</a></li>
-                </ul>    
-            </div>
-        </nav>
-        {% if is_granted('ROLE_ANIMATOR')%}
-            <div class="page page-{% block classPage %} {% endblock %}">
-                <div class="header">
-                    {% block header %} {% endblock %}
-                </div>
-                <div class="main">
-                    {% block body %}{% endblock %}
-                </div>
-            </div>
-           
-        {% else %}
-            <div>Votre compte sera prochainement validé</div>
-        {% endif %}
-        
-        </div>
-    </body>
-</html>
+					{% else %}
+						<div>Votre compte sera prochainement validé</div>
+					{% endif %}
+
+				</div>
+			</body>
+		</html>

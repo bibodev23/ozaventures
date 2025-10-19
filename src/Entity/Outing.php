@@ -46,6 +46,19 @@ class Outing
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $notes = null;
 
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $created_at = null;
+
+    #[ORM\ManyToOne(inversedBy: 'outings_created')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $created_by = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $updated_at = null;
+
+    #[ORM\ManyToOne]
+    private ?User $updated_by = null;
+
     public function __construct()
     {
         $this->kids = new ArrayCollection();
@@ -173,6 +186,54 @@ class Outing
     public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->created_by;
+    }
+
+    public function setCreatedBy(?User $created_by): static
+    {
+        $this->created_by = $created_by;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(?\DateTime $updated_at): static
+    {
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updated_by;
+    }
+
+    public function setUpdatedBy(?User $updated_by): static
+    {
+        $this->updated_by = $updated_by;
 
         return $this;
     }

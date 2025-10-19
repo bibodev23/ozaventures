@@ -41,9 +41,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Outing::class, mappedBy: 'animators')]
     private Collection $outings;
 
+    /**
+     * @var Collection<int, Task>
+     */
+    #[ORM\ManyToMany(targetEntity: Task::class, mappedBy: 'users', cascade: ['persist', 'remove'])]
+    private Collection $tasks;
+
+    /**
+     * @var Collection<int, Outing>
+     */
+    #[ORM\OneToMany(targetEntity: Outing::class, mappedBy: 'created_by')]
+    private Collection $outings_created;
+
     public function __construct()
     {
         $this->outings = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
+        $this->outings_created = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -149,6 +163,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->outings->removeElement($outing)) {
             $outing->removeAnimator($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): static
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Task $task): static
+    {
+        if ($this->tasks->removeElement($task)) {
+            // set the owning side to null (unless already changed)
+            if ($task->getUsers() === $this) {
+                $task->removeUser($this);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Outing>
+     */
+    public function getOutingsCreated(): Collection
+    {
+        return $this->outings_created;
+    }
+
+    public function addOutingsCreated(Outing $outingsCreated): static
+    {
+        if (!$this->outings_created->contains($outingsCreated)) {
+            $this->outings_created->add($outingsCreated);
+            $outingsCreated->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOutingsCreated(Outing $outingsCreated): static
+    {
+        if ($this->outings_created->removeElement($outingsCreated)) {
+            // set the owning side to null (unless already changed)
+            if ($outingsCreated->getCreatedBy() === $this) {
+                $outingsCreated->setCreatedBy(null);
+            }
         }
 
         return $this;

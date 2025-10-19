@@ -1,0 +1,61 @@
+{{ form_start(form) }}
+<div class="input">
+    {{ form_label(form.date) }}
+    {{ form_widget(form.date) }}
+</div>
+<div class="input">
+        {{ form_label(form.listingmatin) }}
+        	{% for animator in form.listingmatin %}
+		<div class="chexbock">
+			{{ form_widget(animator) }}
+			{{ form_label(animator, null, {label_attr: {'class': 'checkbox-label'}}) }}
+		</div>
+	{% endfor %}
+</div> 
+<div class="input">
+        {{ form_label(form.cantine) }}
+        	{% for animator in form.cantine %}
+		<div class="chexbock">
+			{{ form_widget(animator) }}
+			{{ form_label(animator, null, {label_attr: {'class': 'checkbox-label'}}) }}
+		</div>
+	{% endfor %}
+</div>
+<div class="input">
+        {{ form_label(form.listingmidi) }}
+    	{% for animator in form.listingmidi %}
+		<div class="chexbock">
+			{{ form_widget(animator) }}
+			{{ form_label(animator, null, {label_attr: {'class': 'checkbox-label'}}) }}
+		</div>
+	{% endfor %}
+</div>
+<div class="input">
+        {{ form_label(form.gouter) }}
+    	{% for animator in form.gouter %}
+		<div class="chexbock">
+			{{ form_widget(animator) }}
+			{{ form_label(animator, null, {label_attr: {'class': 'checkbox-label'}}) }}
+		</div>
+	{% endfor %}
+</div> 
+<div class="input">
+        {{ form_label(form.vaisselle) }}
+    	{% for animator in form.vaisselle %}
+		<div class="chexbock">
+			{{ form_widget(animator) }}
+			{{ form_label(animator, null, {label_attr: {'class': 'checkbox-label'}}) }}
+		</div>
+	{% endfor %}
+</div> 
+<div class="input">
+        {{ form_label(form.listingsoir) }}
+        	{% for animator in form.listingsoir %}
+		<div class="chexbock">
+			{{ form_widget(animator) }}
+			{{ form_label(animator, null, {label_attr: {'class': 'checkbox-label'}}) }}
+		</div>
+	{% endfor %}
+</div>      
+    <button class="btn">{{ button_label|default('Enregistrer') }}</button>
+{{ form_end(form) }}

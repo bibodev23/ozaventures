@@ -19,55 +19,44 @@ class OutingType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title')
+            ->add('title', TextType::class, [
+                'label' => 'Titre',
+            ])
             ->add('location', TextType::class, [
-                'label'=> 'Lieu',
+                'label' => 'Lieu',
             ])
             ->add('date', DateType::class)
             ->add('timeGo', TimeType::class, [
-                'label'=> 'Heure de départ',
+                'label' => 'Heure de départ',
             ])
             ->add('timeBack', TimeType::class, [
-                'label'=> 'Heure de retour',
+                'label' => 'Heure de retour',
             ])
             ->add('animators', EntityType::class, [
-                'class'=> User::class,
+                'class' => User::class,
                 'label' => 'Animateurs',
                 'choice_label' => 'username',
                 'multiple' => true,
                 'expanded' => true
             ])
-            ->add('babies', EntityType::class, [
+            ->add('kids', EntityType::class, [
                 'class' => Kid::class,
-                'label' => 'Enfants 3-5 ans',
+                'label' => 'Enfants',
                 'choice_label' => 'firstname',
                 'multiple' => true,
                 'expanded' => true,
-                'required' => false,
-                'mapped' => false, // on les traite manuellement si besoin
-                'query_builder' => function (KidRepository $er) {
-                    return $er->createQueryBuilder('k')
-                        ->where('k.age >=3 AND k.age <= 5')
-                        ->orderBy('k.firstname', 'ASC');
-                }
-            ])
-            ->add('children', EntityType::class, [
-                'class' => Kid::class,
-                'label' => 'Enfants 6-12 ans',
-                'choice_label' => 'firstname',
-                'multiple' => true,
-                'expanded' => true,
-                'required' => true,
-                'mapped'=> false,
-                'query_builder' => function (KidRepository $er) {
-                    return $er->createQueryBuilder('k')
-                        ->where('k.age >=6 AND k.age <= 12')
-                        ->orderBy('k.firstname', 'ASC');
+                'by_reference' => false,
+                'choice_attr' => function (Kid $kid) {
+                    if ($kid->getAge() >= 3 && $kid->getAge() <= 5) {
+                        return ['data-group' => '3-5'];
+                    } elseif ($kid->getAge() >= 6 && $kid->getAge() <= 12) {
+                        return ['data-group' => '6-12'];
+                    }
+                    return [];
                 },
             ])
-            ->add('notes')
 
-            
+            ->add('notes')
         ;
     }
 

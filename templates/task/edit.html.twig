@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mise à jour âches
+{% endblock %}
+{% block classPage %}task-edit
+{% endblock %}
+{% block header %}
+	<h1>{{ task.title.label }} du {{ task.date ? task.date|date('d-m-y') : '' }}</h1>
+{% endblock %}
+{% block body %}
+    {{ form_start(form) }}
+		<div class="input">
+		        {{ form_label(form.users, "Animateurs") }}
+		        	{% for animator in form.users %}
+				<div class="chexbock">
+					{{ form_widget(animator) }}
+					{{ form_label(animator, null, {label_attr: {'class': 'checkbox-label'}}) }}
+				</div>
+			{% endfor %}
+		</div>
+		<button class="btn">{{ button_label|default('Enregistrer') }}</button>
+		{{ form_end(form) }}
+	<div class="list-actions">
+		<a href="{{ path('app_task_index') }}" class="btn">Retour</a>
+	</div>
+
+{% endblock %}

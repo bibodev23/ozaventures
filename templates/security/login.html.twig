@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -20,8 +20,8 @@
             <div class="form">
                 {{ include('partials/flash.html.twig') }}
                 <h1 class="h3 mb-3 font-weight-normal">Se connecter</h1>
-                <a href="{{path('app_register')}}">Créer un compte</a>
-                <form method="post">
+                <a href="{{path('app_register')}}" class="btn link-register green">Créer un compte</a>
+                <form method="post" class="login-form">
                     {% if error %}
                         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                     {% endif %}

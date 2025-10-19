@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des tâches
+{% endblock %}
+{% block classPage %}task-index
+{% endblock %}
+{% block header %}
+	<h1>Liste des tâches</h1>
+	{% if is_granted('ROLE_MANAGER')%}
+		<a href="{{ path('app_task_daily_new') }}" class="btn svg green">{{ ux_icon('tabler:plus') }}</a>
+		{%endif%}
+	{% endblock %}
+	{% block body %}
+		<div class="list-container">
+			{% set currentDate = null %}
+			{% for task in tasks %}
+				{% set day = task.date|date('Y-m-d') %}
+				{% if day != currentDate %}
+					{% set currentDate = day %}
+					<div class="list-day">
+						<h3>
+							{{ task.date|date('d/m/Y') }}</h3>
+						<ul>
+						{% endif %}
+
+						<li>
+							<a href="{% if is_granted('ROLE_MANAGER')%}{{path('app_task_show', {'id' : task.id})}} {%endif%}">
+								<span>{{ task.title.label }}</span>
+								{% for user in task.users %}
+									{{ loop.first ? '' :'& ' }}{{ user.username|capitalize }}
+								{% endfor %}
+							</a>
+						</li>
+						{% set next = tasks[loop.index] ?? null %}
+						{% if next is null or next.date|date('Y-m-d') != currentDate %}
+						</ul>
+					</div>
+				{% endif %}
+			{% else %}
+				<p>Aucune tâche.</p>
+			{% endfor %}
+		</div>
+	{% endblock %}

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\AgeGroup;
 use App\Repository\KidRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -32,6 +33,9 @@ class Kid
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $notes = null;
+
+    #[ORM\Column(type: 'string', enumType: AgeGroup::class)]
+    private ?AgeGroup $ageGroup = null;
 
     public function __construct()
     {
@@ -117,4 +121,34 @@ class Kid
 
         return $this;
     }
+
+    public function getAgeGroup(): AgeGroup
+    {
+        return $this->ageGroup;
+    }
+
+    public function setAgeGroup(AgeGroup $ageGroup): static
+    {
+        $this->ageGroup = $ageGroup;
+        return $this;
+    }
+    public function getAgeGroupLabel(): string
+    {
+        return $this->ageGroup?->getLabel();
+    }
+
+
+    public function assignAgeGroup(): void
+    {
+        if ($this->age === null) {
+            return;
+        }
+
+        $this->ageGroup = match (true) {
+            $this->age >= 3 && $this->age <= 5 => AgeGroup::BABIES,
+            $this->age >= 6 && $this->age <= 12 => AgeGroup::CHILDREN,
+            default => throw new \InvalidArgumentException("L'âge doit être entre 3 et 12 ans"),
+        };
+    }
+
 }
