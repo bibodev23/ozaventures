@@ -21,6 +21,9 @@ final class OutingController extends AbstractController
     #[Route(name: 'app_outing_index', methods: ['GET'])]
     public function index(OutingRepository $outingRepository): Response
     {
+        if (!$this->isGranted('ROLE_ANIMATOR')) {
+            return $this->redirectToRoute('app_logout');
+        }
         return $this->render('outing/index.html.twig', [
             'outings' => $outingRepository->findAll(),
         ]);
