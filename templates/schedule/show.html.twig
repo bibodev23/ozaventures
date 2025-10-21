@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Schedule{% endblock %}
+{% block classPage %}schedule-show
+{% endblock %}
+{% block header %}
+    <h1>Horaires {{schedule.user.username|capitalize}} du {{schedule.date|date('d/m/y')}}</h1>
+{% endblock %}
+{% block body %}
+    <table class="table row">
+        <tbody>
+            <tr>
+                <th>Date</th>
+                <td>{{ schedule.date ? schedule.date|date('d-m-y') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Arrivée matin</th>
+                <td>{{ schedule.amStart ? schedule.amStart|date('H:i') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Départ matin</th>
+                <td>{{ schedule.amEnd ? schedule.amEnd|date('H:i') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Arrivée après-midi</th>
+                <td>{{ schedule.pmStart ? schedule.pmStart|date('H:i') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Départ aprés-midi</th>
+                <td>{{ schedule.pmEnd ? schedule.pmEnd|date('H:i') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Notes</th>
+                <td>{{ schedule.notes }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="list-actions">
+        <a href="{{ path('app_schedule_edit', {'id': schedule.id}) }}" class="btn green">Modifier</a>
+
+    {{ include('schedule/_delete_form.html.twig') }}
+    </div>
+
+{% endblock %}

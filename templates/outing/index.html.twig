@@ -20,7 +20,7 @@
             {% for outing in outings %}
                 <tr>
                     <td><a href="{{ path('app_outing_show', {'id': outing.id}) }}">{{ outing.title }}</a></td>
-                    <td>10/10/2025</td>
+                    <td>{{outing.date|date('d/m/y')}}</td>
                     <td>{{outing.kids.count}}</td>
                     <td class="not-mobile">
                         <a href="{{ path('app_outing_show', {'id': outing.id}) }}">{{ ux_icon('tabler:eye') }}</a>

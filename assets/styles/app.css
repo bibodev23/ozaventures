@@ -60,6 +60,10 @@
 .btn.yellow:hover {
   background: rgb(241.8322981366, 186.5279503106, 56.1677018634);
 }
+.btn.gradient {
+  background: linear-gradient(135deg, #73c8a9, #64b3f4);
+  color: white;
+}
 .btn.w-fit-content {
   width: -moz-fit-content;
   width: fit-content;
@@ -142,11 +146,16 @@ form .input:not(.agree-terms) textarea {
   border: 1px solid rgba(0, 0, 0, 0.2588235294);
   border-radius: 12px;
 }
+form .input:not(.agree-terms) select, form .input:not(.agree-terms) select::picker(select) {
+  -webkit-appearance: base-select;
+     -moz-appearance: base-select;
+          appearance: base-select;
+}
 form .btn-submit {
   padding: 10px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #73c8a9, #64b3f4);
+  background: #209978;
   color: #fff;
   font-weight: bold;
 }

@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block body %}
-    <h2>Groupe des 3 à 5 ans</h2>
+    <h2>Groupe des 3 à 5 ans ({{kids3To5|length}} enfants)</h2>
     <table class="table table-kids">
         <thead>
             <tr>
@@ -23,8 +23,8 @@
         <tbody>
         {% for kid in kids3To5 %}
             <tr>
-                <td>{{ kid.firstname }}</td>
-                <td>{{ kid.lastname }}</td>
+                <td>{{ kid.firstname|capitalize }}</td>
+                <td>{{ kid.lastname|upper }}</td>
                 <td>{{ kid.age }}</td>
                 <td>
                     <a href="{{ path('app_kid_show', {'id': kid.id}) }}">Voir</a>
@@ -39,7 +39,7 @@
         </tbody>
     </table>
 
-    <h2>Groupe des 6 à 12 ans</h2>
+    <h2>Groupe des 6 à 12 ans ({{kids6To12|length}} enfants)</h2>
         <table class="table table-kids">
         <thead>
             <tr>
@@ -52,8 +52,8 @@
         <tbody>
         {% for kid in kids6To12 %}
             <tr>
-                <td>{{ kid.firstname }}</td>
-                <td>{{ kid.lastname }}</td>
+                <td>{{ kid.firstname|capitalize }}</td>
+                <td>{{ kid.lastname|upper }}</td>
                 <td>{{ kid.age }}</td>
                 <td>
                     <a href="{{ path('app_kid_show', {'id': kid.id}) }}">Voir</a>

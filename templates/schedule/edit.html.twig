@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mise à jour horaire{% endblock %}
+{% block classPage %}schedule-edit
+{% endblock %}
+{% block header %}
+    <h1>Mise à jour horaire {{schedule.user.username|capitalize}}</h1>
+{% endblock %}
+{% block body %}
+    {{ include('schedule/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+{% endblock %}

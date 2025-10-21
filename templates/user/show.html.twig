@@ -52,6 +52,27 @@
 			{% endfor %}
 		</tbody>
 	</table>
+	<h2>Historique des horaires</h2>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Date</th>
+				<th>Matin</th>
+				<th>Aprés-midi</th>
+				<th>Notes</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for schedule in user.schedules %}
+				<tr>
+					<td>{{schedule.date|date('d/m/Y')}}</td>
+					<td>{{ schedule.amStart ? schedule.amStart|date('H:i') : '' }} - {{ schedule.amEnd ? schedule.amEnd|date('H:i') : '' }}</td>
+					<td>{{ schedule.pmStart ? schedule.pmStart|date('H:i') : '' }} - {{ schedule.pmEnd ? schedule.pmEnd|date('H:i') : '' }}</td>
+					<td class="not-mobile">{{ schedule.notes }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 
 	<div class="list-actions">
 		<a href="{{ path('app_user_index') }}" class="btn">Retour à la liste</a>

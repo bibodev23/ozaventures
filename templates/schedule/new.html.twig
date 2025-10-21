@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Schedule{% endblock %}
+{% block classPage %}schedule-new{% endblock %}
+{% block header %}
+     <h1>Nouvel horaire</h1>
+{% endblock %}
+{% block body %}
+    {{ include('schedule/_form.html.twig') }}
+{% endblock %}

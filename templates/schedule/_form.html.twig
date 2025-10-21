@@ -1,0 +1,32 @@
+{{ form_start(form) }}
+ <div class="input">
+    {{ form_label(form.date) }}
+    {{ form_widget(form.date) }}</td>
+</div>
+
+    <div class="input">
+    {{ form_label(form.user) }}
+    {{ form_widget(form.user) }}
+</div>
+    <div class="input">
+    {{ form_label(form.am_start) }}
+    {{ form_widget(form.am_start) }}
+</div>
+    <div class="input">
+    {{ form_label(form.am_end) }}
+    {{ form_widget(form.am_end) }}
+</div>
+    <div class="input">
+    {{ form_label(form.pm_start) }}
+    {{ form_widget(form.pm_start) }}
+</div>
+    <div class="input">
+    {{ form_label(form.pm_end) }}
+    {{ form_widget(form.pm_end) }}
+</div>
+    <div class="input">
+    {{ form_label(form.notes) }}
+    {{ form_widget(form.notes) }}
+</div>
+    <button class="btn green">{{ button_label|default('Enregistrer') }}</button>
+{{ form_end(form) }}

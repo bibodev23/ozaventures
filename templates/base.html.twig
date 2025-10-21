@@ -29,24 +29,26 @@
 				</div>
 				<div class="links">
 					<ul>
+						{% if is_granted('ROLE_MANAGER')%}
+						<li>
+							<a href="{{path('app_schedule_index')}}">Mes horraires</a>
+						</li>
+						{% endif %}
 						<li>
 							<a href="{{path('app_task_index')}}">Tâches du jour</a>
 						</li>
 						<li>
-							<a href="{{path('app_outing_index')}}">Liste des sorties</a>
-						</li>
-						<li>
-							<a href="{{path('app_outing_new')}}">Nouvelle sortie</a>
+							<a href="{{path('app_outing_index')}}">Sorties</a>
 						</li>
 						{% if is_granted('ROLE_MANAGER')%}
 							<li>
-								<a href="{{path('app_user_index')}}">Liste des animateurs</a>
+								<a href="{{path('app_user_index')}}">Animateurs</a>
 							</li>
 							<li>
-								<a href="{{ path('app_kid_index')}}">Liste des enfants</a>
+								<a href="{{ path('app_kid_index')}}">Enfants</a>
 							</li>
 							<li>
-								<a href="{{path('app_kid_new')}}">Enregistrer un enfant</a>
+								<a href="{{path('app_schedule_admin')}}">Horraires animateurs</a>
 							</li>
 						{% endif %}
 						<li class="logout">

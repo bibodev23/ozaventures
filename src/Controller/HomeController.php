@@ -11,7 +11,6 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Constraints\Date;
-
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
@@ -19,22 +18,10 @@ final class HomeController extends AbstractController
     {
         /** @var \App\Entity\User */
         $user = $this->getUser();
-        if (!$user)  {
+        if (!$user instanceof \App\Entity\User) {
             return $this->redirectToRoute('app_login');
         }
-
-        $kids = $kidRepository->findAll();
-        $numberOfKids = count($kids);
-        $users = $userRepository->findAll();
-        $numberOfUsers = count($users);
-        $tasks = $taskRepository->findAllByDate();
         
-        return $this->render('home/index.html.twig', [
-            'controller_name' => 'HomeController',
-            'kids' => $kidRepository->findAll(),
-            'numberOfKids'=> $numberOfKids,
-            'numberOfUsers' => $numberOfUsers,
-            'tasks' => $tasks
-        ]);
+        return $this->redirectToRoute('app_outing_index');
     }
 }

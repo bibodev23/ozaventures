@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Schedule index{% endblock %}
+{% block classPage %}schedule-admin{% endblock %}
+{% block header %}
+    <h1>Horraires animateurs</h1>
+    <a href="{{ path('app_schedule_new') }}" title="Nouvel horaire" class="btn green svg">{{ ux_icon('tabler:plus') }}</a>
+{% endblock %}
+{% block body %}
+{% set current = null %}
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Animateur</th>
+      <th>Matin</th>
+      <th>Après-midi</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in schedules %}
+      {% set key = s.date|date('Y-m-d') %}
+      {# Quand la date change, on imprime un seul h3 #}
+      {% if key != current %}
+        <tr class="date-sep">
+          <th colspan="4">
+            <h3 class="m-0">{{ s.date|date('d/m/Y') }}</h3>
+          </th>
+        </tr>
+        {% set current = key %}
+      {% endif %}
+
+      <tr>
+        <td><a href="{{ path('app_schedule_show', { id: s.id }) }}">{{ s.user.username|capitalize }}</a></td>
+        <td>{{ s.amStart ? s.amStart|date('H:i') : '' }} - {{ s.amEnd ? s.amEnd|date('H:i') : '' }}</td>
+        <td>{{ s.pmStart ? s.pmStart|date('H:i') : '' }} - {{ s.pmEnd ? s.pmEnd|date('H:i') : '' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4">Aucun horaire.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
