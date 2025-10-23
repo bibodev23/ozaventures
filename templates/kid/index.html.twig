@@ -10,61 +10,6 @@
 {% endblock %}
 
 {% block body %}
-    <h2>Groupe des 3 à 5 ans ({{kids3To5|length}} enfants)</h2>
-    <table class="table table-kids">
-        <thead>
-            <tr>
-                <th>Prénom</th>
-                <th>Nom</th>
-                <th>Âge</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for kid in kids3To5 %}
-            <tr>
-                <td>{{ kid.firstname|capitalize }}</td>
-                <td>{{ kid.lastname|upper }}</td>
-                <td>{{ kid.age }}</td>
-                <td>
-                    <a href="{{ path('app_kid_show', {'id': kid.id}) }}">Voir</a>
-                    <a href="{{ path('app_kid_edit', {'id': kid.id}) }}">Éditer</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">Pas de résultat</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <h2>Groupe des 6 à 12 ans ({{kids6To12|length}} enfants)</h2>
-        <table class="table table-kids">
-        <thead>
-            <tr>
-                <th>Prénom</th>
-                <th>Nom</th>
-                <th>Âge</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for kid in kids6To12 %}
-            <tr>
-                <td>{{ kid.firstname|capitalize }}</td>
-                <td>{{ kid.lastname|upper }}</td>
-                <td>{{ kid.age }}</td>
-                <td>
-                    <a href="{{ path('app_kid_show', {'id': kid.id}) }}">Voir</a>
-                    <a href="{{ path('app_kid_edit', {'id': kid.id}) }}">Éditer</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">Pas de résultat</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+{% include 'kid/_table.html.twig' with{'title': 'Groupe des 3 à 5 ans', 'kids': kids3To5} %}
+{% include 'kid/_table.html.twig' with{'title': 'Groupe des 6 à 12 ans', 'kids': kids6To12} %}
 {% endblock %}

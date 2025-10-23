@@ -1,0 +1,30 @@
+{# templates/kid/_table.html.twig #}
+<h2>{{ title }} ({{ kids|length }} enfants)</h2>
+
+<table class="table table-kids">
+    <thead>
+        <tr>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Âge</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for kid in kids %}
+        <tr>
+            <td>{{ kid.firstname|capitalize }}</td>
+            <td>{{ kid.lastname|upper }}</td>
+            <td>{{ kid.age }}</td>
+            <td>
+                <a href="{{ path('app_kid_show', {'id': kid.id}) }}">{{ ux_icon('tabler:eye') }}</a>
+                <a href="{{ path('app_kid_edit', {'id': kid.id}) }}">{{ ux_icon('tabler:edit') }}</a>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="5">Pas de résultat</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

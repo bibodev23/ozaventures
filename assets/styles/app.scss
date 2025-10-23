@@ -293,6 +293,11 @@ form {
         gap: 20px;
         padding: 20px;
     }
+    canvas {
+        width: 700px !important;
+        height: 700px !important;
+        // border: 5px solid red;
+    }
         .header {
             display: flex;
             align-items: center;
@@ -581,4 +586,15 @@ form {
             margin-bottom: 20px;
         }
     }
+}
+
+
+h2 {
+    &.3-5 {
+        color: #35a1eb;
+    }
+    &.6_12 {
+        color: #41b983;
+    }
+    
 }
