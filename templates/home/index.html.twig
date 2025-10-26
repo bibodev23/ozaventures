@@ -10,42 +10,108 @@
 {% endblock %}
 {% block body %}
 
-	<h3>Nombre d'enfants :
-		{{ kids|length }}</h3>
-		<h5 class="3-5">3 - 5 ans</h5>
-		<h5 class="6-12">6 - 12 ans</h5>
-		{{ render_chart(chart) }}
-	<h3>Nombre d'animateurs :
-		{{ animators|length }}</h3>
-	<div class="list-container">
-		{% set currentDate = null %}
-
-		{% for task in tasks %}
-			{% set day = task.date|date('Y-m-d') %}
-			{% if day != currentDate %}
-				{% set currentDate = day %}
-				<div class="list-day">
-					<h3>Tâches du
-						{{ task.date|date('d F Y') }}</h3>
-					<ul>
-					{% endif %}
-
-					<li>
-						<span>{{ task.title.label }}</span>
-						:
-						{% for u in task.users %}
-							{{ loop.first ? '' : '& ' }}{{ u.username|capitalize }}
-						{% endfor %}
-					</li>
-
-					{# Si prochaine itération est une nouvelle date, on ferme la liste #}
-					{% set next = tasks[loop.index] ?? null %}
-					{% if next is null or next.date|date('Y-m-d') != currentDate %}
-					</ul>
-				</div>
-			{% endif %}
-		{% else %}
-			<p>Aucune tâche.</p>
-		{% endfor %}
+	<div class="list-cards">
+		<div class="card w-25">
+			<div class="legend">
+				<h3>Nombre d'enfants :
+					{{ kids|length }}</h3>
+			</div>
+			{{ render_chart(chartKids) }}
+		</div>
+		<div class="card w-75">
+			{{ render_chart(chartBar) }}
+		</div>
 	</div>
+		<div class="list-cards">
+		<div class="card">
+			<h3>Ce matin</h3>
+			<p>{{morningCount}}</p>
+		</div>
+		<div class="card">
+			<h3>Cantine</h3>
+			<p>{{canteenCount}}</p>
+		</div>
+		<div class="card">
+			<h3>Prévision aprés-midi</h3>
+			<p>{{(morningCount*1.2)|round(0, 'ceil')}}</p>
+		</div>
+	</div> 
+	<div class="list-cards">
+		<div class="card w-75">
+			{% set current = null %}
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Animateur</th>
+						<th>Matin</th>
+						<th>Après-midi</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for s in schedules %}
+						{% set key = s.date|date('Y-m-d') %}
+						{# Quand la date change, on imprime un seul h3 #}
+						{% if key != current %}
+							<tr class="date-sep">
+								<th colspan="4">
+									<h3 class="m-0">{{ s.date|date('d/m/Y') }}</h3>
+								</th>
+							</tr>
+							{% set current = key %}
+						{% endif %}
+
+						<tr>
+							<td>
+								<a href="{{ path('app_schedule_show', { id: s.id }) }}">{{ s.user.username|capitalize }}</a>
+							</td>
+							<td>{{ s.amStart ? s.amStart|date('H:i') : '' }}
+								-
+								{{ s.amEnd ? s.amEnd|date('H:i') : '' }}</td>
+							<td>{{ s.pmStart ? s.pmStart|date('H:i') : '' }}
+								-
+								{{ s.pmEnd ? s.pmEnd|date('H:i') : '' }}</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="4">Aucun horaire.</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="card w-25">
+			<div class="list-container">
+				{% set currentDate = null %}
+				{% for task in tasks %}
+					{% set day = task.date|date('Y-m-d') %}
+					{% if day != currentDate %}
+						{% set currentDate = day %}
+						<div class="list-day">
+							<h3>Missions du
+								{{ task.date|date('d-m-Y', 'Europe/Paris')}}</h3>
+							<ul>
+							{% endif %}
+
+							<li>
+								<span>{{ task.title.label }}</span>
+								:
+								{% for u in task.users %}
+									{{ loop.first ? '' : '& ' }}{{ u.username|capitalize }}
+								{% endfor %}
+							</li>
+
+							{# Si prochaine itération est une nouvelle date, on ferme la liste #}
+							{% set next = tasks[loop.index] ?? null %}
+							{% if next is null or next.date|date('Y-m-d') != currentDate %}
+							</ul>
+						</div>
+					{% endif %}
+				{% else %}
+					<p>Aucune tâche.</p>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+	{# <h3>Nombre d'animateurs :
+				{{ animators|length }}</h3> #}
 {% endblock %}

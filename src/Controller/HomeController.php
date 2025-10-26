@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\Repository\DailyAttendanceRepository;
 use App\Repository\KidRepository;
+use App\Repository\ScheduleRepository;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
 use App\Service\ChartService;
 use DateTime;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,23 +21,38 @@ use Symfony\UX\Chartjs\Model\Chart;
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(KidRepository $kidRepo, UserRepository $userRepo, TaskRepository $taskRepo, ChartService $chartService, ChartBuilderInterface $chartBuilder): Response
+    public function index(
+        KidRepository $kidRepo, 
+        UserRepository $userRepo, 
+        TaskRepository $taskRepo, 
+        ChartService $chartService, 
+        ChartBuilderInterface $chartBuilder, 
+        ScheduleRepository $scheduleRepository,
+        DailyAttendanceRepository $dailyAttendanceRepo
+        ): Response
     {
         /** @var \App\Entity\User */
         $user = $this->getUser();
         if (!$user instanceof \App\Entity\User) {
             return $this->redirectToRoute('app_login');
         }
-        
+        $canteenCount = $dailyAttendanceRepo->canteenDay(new DateTimeImmutable('today'));
+        $morningCount = $dailyAttendanceRepo->morningDay(new DateTimeImmutable('today'));
         $countKids3To5 = count($kidRepo->listKids3To5YearsOld());
         $countKids6To12 = count($kidRepo->listKids6To12YearsOld());
-        $chart = $chartService->createChart($countKids3To5, $countKids6To12,  $chartBuilder);
-
+        $chartKids = $chartService->createChartDoughnut($countKids3To5, $countKids6To12,  $chartBuilder);
+        $chartBar = $chartService->createChartBar($chartBuilder);
         return $this->render('home/index.html.twig', [
             'kids' => $kidRepo->findAll(),
             'animators' => $userRepo->findAll(),
             'tasks' => $taskRepo->findAllByDate(),
-            'chart' => $chart,
+            'chartKids' => $chartKids,
+            'countKids3To5' => $countKids3To5,
+            'countKids6To12' => $countKids6To12,
+            'chartBar' => $chartBar,
+            'schedules' => $scheduleRepository->findAllByDate(),
+            'canteenCount' => $canteenCount,
+            'morningCount'=> $morningCount
         ]);
     }
 }

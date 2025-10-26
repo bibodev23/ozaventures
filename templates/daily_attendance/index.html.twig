@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}DailyAttendance index
+{% endblock %}
+
+{% block classPage %}listing
+{% endblock %}
+{% block header %}
+	<h1>Listing</h1>
+	<a href="{{ path('app_daily_attendance_new') }}" class="btn svg green">{{ ux_icon('tabler:plus') }}</a>
+{% endblock %}
+{% block body %}
+	{% set currentDate = null %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Enfant</th>
+				<th>Matin</th>
+				<th>Cantine</th>
+				<th>Aprés-midi</th>
+				{# <th>Notes</th> #}
+				{# <th>Actions</th> #}
+			</tr>
+		</thead>
+		<tbody>
+			{% for daily_attendance in daily_attendances %}
+					{% set day = daily_attendance.date|date('d-m-Y') %}
+					{% if day != currentDate %}
+					{% set currentDate = day %}
+						<tr>
+							<th style="width: 100%;padding:20px;">{{ daily_attendance.date|date('d/m/Y') }}</th>
+						</tr>
+	
+						{% endif %}
+						<tr>
+							<td>{{ daily_attendance.kid.firstname }}</td>
+							<td>
+								{% if daily_attendance.morning %}
+									<div class="yes">
+										{{ ux_icon('tabler:circle-check') }}
+									</div>
+								{% else %}
+									<div class="no">
+										{{ ux_icon('tabler:x') }}
+									</div>
+								{% endif %}
+							</td>
+							<td>
+								{% if daily_attendance.canteen %}
+									<div class="yes">
+										{{ ux_icon('tabler:circle-check') }}
+									</div>
+
+								{% else %}
+									<div class="no">
+										{{ ux_icon('tabler:x') }}
+									</div>
+								{% endif %}
+							</td>
+							<td>
+								{% if daily_attendance.afternoon %}
+									<div class="yes">
+										{{ ux_icon('tabler:circle-check') }}
+									</div>
+
+								{% else %}
+									<div class="no">
+										{{ ux_icon('tabler:x') }}
+									</div>
+								{% endif %}
+							</td>
+							{# <td>{{ daily_attendance.notes }}</td> #}
+							{# <td>
+																		<a href="{{ path('app_daily_attendance_show', {'id': daily_attendance.id}) }}">show</a>
+																		<a href="{{ path('app_daily_attendance_edit', {'id': daily_attendance.id}) }}">edit</a>
+																	</td> #}
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="7">Pas de résultat</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+	</tbody>
+{% endblock%}

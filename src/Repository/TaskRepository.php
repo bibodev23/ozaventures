@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Task;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,7 +20,7 @@ class TaskRepository extends ServiceEntityRepository
     /**
          * @return Task[] Returns an array of Task objects
     */
-    public function tasksOfDay(\DateTime $date): array
+    public function tasksOfDay(DateTime $date): array
     {
         return $this->createQueryBuilder("t")
             ->where('t.date = :date')

@@ -31,18 +31,21 @@
 					<ul>
 						{% if is_granted('ROLE_MANAGER')%}
 						<li>
-							<a href="{{path('app_schedule_index')}}">Mes horaires</a>
+							<a href="{{path('app_schedule_index')}}">Horaires</a>
 						</li>
 						{% endif %}
 						<li>
-							<a href="{{path('app_task_index')}}">Tâches du jour</a>
+							<a href="{{path('app_task_index')}}">Mission du jour</a>
+						</li>
+						<li>
+							<a href="{{path('app_daily_attendance_index')}}">Listing</a>
 						</li>
 						<li>
 							<a href="{{path('app_outing_index')}}">Sorties</a>
 						</li>
-						<li>
+						{# <li>
 							<a href="">Ressources</a>
-						</li>
+						</li> #}
 						{% if is_granted('ROLE_MANAGER')%}
 							<li>
 								<a href="{{path('app_user_index')}}">Animateurs</a>
@@ -50,12 +53,12 @@
 							<li>
 								<a href="{{ path('app_kid_index')}}">Enfants</a>
 							</li>
-							<li>
+							{# <li>
 								<a href="{{path('app_schedule_admin')}}">Horaires animateurs</a>
-							</li>
+							</li> #}
 						{% endif %}
 						<li class="logout">
-							<a href="{{path('app_logout')}}">Se déconnecter</a>
+							<a href="{{path('app_logout')}}" title="Déconnexion">{{ ux_icon('tabler:logout-2') }}</a>
 						</li>
 					</ul>
 				</div>

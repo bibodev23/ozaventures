@@ -37,9 +37,16 @@ class Kid
     #[ORM\Column(type: 'string', enumType: AgeGroup::class)]
     private ?AgeGroup $ageGroup = null;
 
+    /**
+     * @var Collection<int, DailyAttendance>
+     */
+    #[ORM\OneToMany(targetEntity: DailyAttendance::class, mappedBy: 'kid', orphanRemoval: true)]
+    private Collection $dailyAttendances;
+
     public function __construct()
     {
         $this->outings = new ArrayCollection();
+        $this->dailyAttendances = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -149,6 +156,36 @@ class Kid
             $this->age >= 6 && $this->age <= 12 => AgeGroup::CHILDREN,
             default => throw new \InvalidArgumentException("L'âge doit être entre 3 et 12 ans"),
         };
+    }
+
+    /**
+     * @return Collection<int, DailyAttendance>
+     */
+    public function getDailyAttendances(): Collection
+    {
+        return $this->dailyAttendances;
+    }
+
+    public function addDailyAttendance(DailyAttendance $dailyAttendance): static
+    {
+        if (!$this->dailyAttendances->contains($dailyAttendance)) {
+            $this->dailyAttendances->add($dailyAttendance);
+            $dailyAttendance->setKid($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDailyAttendance(DailyAttendance $dailyAttendance): static
+    {
+        if ($this->dailyAttendances->removeElement($dailyAttendance)) {
+            // set the owning side to null (unless already changed)
+            if ($dailyAttendance->getKid() === $this) {
+                $dailyAttendance->setKid(null);
+            }
+        }
+
+        return $this;
     }
 
 }

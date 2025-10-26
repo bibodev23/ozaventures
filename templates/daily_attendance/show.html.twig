@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}DailyAttendance{% endblock %}
+
+{% block body %}
+    <h1>DailyAttendance</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ daily_attendance.id }}</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>{{ daily_attendance.date ? daily_attendance.date|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Morning</th>
+                <td>{{ daily_attendance.morning ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Canteen</th>
+                <td>{{ daily_attendance.canteen ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Afternoon</th>
+                <td>{{ daily_attendance.afternoon ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Notes</th>
+                <td>{{ daily_attendance.notes }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_daily_attendance_index') }}">back to list</a>
+
+    <a href="{{ path('app_daily_attendance_edit', {'id': daily_attendance.id}) }}">edit</a>
+
+    {{ include('daily_attendance/_delete_form.html.twig') }}
+{% endblock %}

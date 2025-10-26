@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Listing{% endblock %}
+    {% block classPage %}listing-new
+{% endblock %}
+{% block header %}
+	<h1>Nouvelle présence</h1>
+{% endblock %}
+{% block body %}
+    {{ include('daily_attendance/_form.html.twig') }}
+{% endblock %}

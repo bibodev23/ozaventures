@@ -67,7 +67,6 @@ $color-red: rgb(236, 101, 101);
     &.gradient {
         background: linear-gradient(135deg, #73c8a9, #64b3f4);
         color: white;
-
     }
     &.w-fit-content {
         width: fit-content;
@@ -116,6 +115,8 @@ svg {
 }
 .container {
     display: flex;
+    gap: 20px;
+    flex-direction: column;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
@@ -145,12 +146,13 @@ form {
             font-weight: bold;
         }
         input,
-        textarea{
+        textarea {
             padding: 10px;
             border: 1px solid #00000042;
             border-radius: 12px;
         }
-        select, select::picker(select) {
+        select,
+        select::picker(select) {
             appearance: base-select;
         }
     }
@@ -222,18 +224,24 @@ form {
 }
 
 .container {
+    nav, .header, .main {
+    background: #f7f7f7;
+    border-radius: 20px;
+    padding: 20px;
+    }
     nav {
         display: flex;
-        flex-direction: column;
         align-items: center;
-        height: 100%;
-        width: 300px;
-        background: linear-gradient(135deg, #73c8a9, #64b3f4);
+        justify-content: space-between;
+        height: 140px;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        // background: linear-gradient(135deg, #73c8a9, #64b3f4);
         .logo-container {
             padding: 20px;
-            margin-bottom: 40px;
             img {
-                width: 100%;
+                width: 200px;
                 height: auto;
             }
         }
@@ -242,21 +250,21 @@ form {
         }
         .links {
             display: flex;
-            flex-direction: column;
-            position: relative;
+            justify-content: flex-end;
             height: 100%;
             width: 100%;
             gap: 20px;
+            padding-right: 20px;
         }
         ul {
             display: flex;
-            flex-direction: column;
-            position: relative;
+            align-items: center;
+            justify-content: flex-end;
             height: 100%;
             width: 100%;
             gap: 20px;
-            padding-left: 30px;
             li {
+                text-align: center;
                 a {
                     color: rgb(51, 37, 1);
                     font-size: 16px;
@@ -268,19 +276,29 @@ form {
                     overflow: hidden;
                     transition: all 0.3s ease;
                     &:hover {
-                        background: white;
+                        background: $color-red;
+                        color: white;
                         transition: all 0.3s ease;
                     }
                 }
             }
             li.logout {
-                position: absolute;
-                bottom: 40px;
                 a {
-                    background-color: tomato;
-                    color: white;
+                    width: 40px;
+                    height: 40px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 4px;
+                    svg {
+                        color: $color-red;
+                        width: 100%;
+                        height: 100%;
+                    }
                     &:hover {
-                        background-color: red;
+                        svg {
+                            color: white;
+                        }
                     }
                 }
             }
@@ -288,26 +306,71 @@ form {
     }
     .page {
         &:not(.page-login) {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px;
-    }
-    canvas {
-        width: 700px !important;
-        height: 700px !important;
-        // border: 5px solid red;
-    }
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 1200px;
+            height: 100%;
+            margin: 0 auto;
+            overflow-y: scroll;
+        }
+        .list-cards {
+            display: flex;
+            gap: 20px;
+            .card {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                width: 100%;
+                height: auto;
+                border-radius: 12px;
+                padding: 20px;
+                background: white;
+                cursor: pointer;
+                .legend {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-around;
+                    h3 {
+                        font-size: 16px;
+                        text-align: center;
+                    }
+                }
+                canvas {
+                    width: auto !important;
+                    max-width: 100% !important;
+                    height: auto !important;
+                    max-height: 100% !important;
+                }
+                &.w-75 {
+                    width: 70%;
+                }
+                &.w-25 {
+                    width: 30%;
+                }
+                table {
+                    th, td {
+                        width: 100%;
+                    }
+                }
+            }
+        }
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+        .main {
+            padding: 20px;
+            background: #f7f7f7;
+            border-radius: 20px;
         }
         .table {
             display: flex;
             flex-direction: column;
             height: 100%;
             overflow: scroll;
+            background: white;
             thead {
                 background: linear-gradient(135deg, #73c8a9, #64b3f4);
                 tr {
@@ -345,6 +408,18 @@ form {
                 td {
                     width: 300px;
                 }
+            }
+            .yes, .no {
+                svg {
+                    width: 30px;
+                    height: 30px;
+                }
+            }
+            .yes {
+                color: green;
+            }
+            .no {
+                color: red;
             }
         }
         .list-actions {
@@ -476,7 +551,8 @@ form {
                 display: flex;
                 margin-right: 30px;
                 cursor: pointer;
-                .burger, .close {
+                .burger,
+                .close {
                     width: 30px;
                     height: 30px;
                     svg {
@@ -539,6 +615,12 @@ form {
                 flex-direction: column;
                 gap: 20px;
             }
+            .list-cards {
+                flex-direction: column;
+                .card, .card.w-25, .card.w-75 {
+                    width: 100%;
+                }
+            } 
             .not-mobile {
                 display: none;
             }
@@ -586,15 +668,4 @@ form {
             margin-bottom: 20px;
         }
     }
-}
-
-
-h2 {
-    &.3-5 {
-        color: #35a1eb;
-    }
-    &.6_12 {
-        color: #41b983;
-    }
-    
 }

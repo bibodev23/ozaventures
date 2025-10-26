@@ -9,8 +9,8 @@
 	{% if is_granted('ROLE_MANAGER')%}
 		<a href="{{ path('app_task_daily_new') }}" class="btn svg green">{{ ux_icon('tabler:plus') }}</a>
 		{%endif%}
-	{% endblock %}
-	{% block body %}
+{% endblock %}
+{% block body %}
 		<div class="list-container">
 			{% set currentDate = null %}
 			{% for task in tasks %}
@@ -40,4 +40,4 @@
 				<p>Aucune tâche.</p>
 			{% endfor %}
 		</div>
-	{% endblock %}
+{% endblock %}

@@ -51,28 +51,17 @@ class KidRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    //    /**
-    //     * @return Kid[] Returns an array of Kid objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('k')
-    //            ->andWhere('k.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('k.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Kid
-    //    {
-    //        return $this->createQueryBuilder('k')
-    //            ->andWhere('k.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+       /**
+         * @return Kid[] Returns an array of Kid objects
+         */
+    public function countKidsByAge(): array
+    {
+        return $this->createQueryBuilder('k')
+        ->select('k.age AS age, COUNT(k.id) AS count')
+        ->groupBy('k.age')
+        ->orderBy('k.age','ASC')
+        ->getQuery()
+        ->getResult();
+    }
+    
 }
