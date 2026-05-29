@@ -36,7 +36,7 @@ class ApiTokenAuthenticator extends AbstractAuthenticator implements Authenticat
         }
 
         $apiToken = $this->apiTokenManager->findValidToken($plainToken);
-        if ($apiToken === null || $apiToken->getAnimator() === null) {
+        if ($apiToken === null || $apiToken->getUser() === null) {
             throw new CustomUserMessageAuthenticationException('Token API invalide.');
         }
 
@@ -44,8 +44,8 @@ class ApiTokenAuthenticator extends AbstractAuthenticator implements Authenticat
         $this->entityManager->flush();
 
         return new SelfValidatingPassport(new UserBadge(
-            $apiToken->getAnimator()->getUserIdentifier(),
-            fn () => $apiToken->getAnimator(),
+            $apiToken->getUser()->getUserIdentifier(),
+            fn () => $apiToken->getUser(),
         ));
     }
 

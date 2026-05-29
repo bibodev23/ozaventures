@@ -5,22 +5,10 @@ security:
 
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        direction_users:
-            memory:
-                users:
-                    adjoint:
-                        password: '%env(APP_ADJOINT_PASSWORD_HASH)%'
-                        roles: ['ROLE_DIRECTION']
-                    directrice:
-                        password: '%env(APP_DIRECTRICE_PASSWORD_HASH)%'
-                        roles: ['ROLE_DIRECTION']
-        animator_users:
+        app_users:
             entity:
-                class: App\Entity\Animator
+                class: App\Entity\User
                 property: username
-        all_users:
-            chain:
-                providers: ['direction_users', 'animator_users']
 
     firewalls:
         dev:
@@ -30,13 +18,13 @@ security:
         api:
             pattern: ^/api
             stateless: true
-            provider: animator_users
+            provider: app_users
             entry_point: App\Security\ApiTokenAuthenticator
             custom_authenticators:
                 - App\Security\ApiTokenAuthenticator
         main:
             lazy: true
-            provider: all_users
+            provider: app_users
             form_login:
                 login_path: app_login
                 check_path: app_login
@@ -49,11 +37,11 @@ security:
     # Note: Only the *first* matching rule is applied
     access_control:
         - { path: ^/api/login$, roles: PUBLIC_ACCESS }
-        - { path: ^/api, roles: ROLE_ANIMATOR }
+        - { path: ^/api, roles: ROLE_USER }
         - { path: ^/connexion$, roles: PUBLIC_ACCESS }
         - { path: ^/apres-connexion$, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/mon-mot-de-passe$, roles: ROLE_ANIMATOR }
-        - { path: ^/, roles: ROLE_DIRECTION }
+        - { path: ^/mon-mot-de-passe$, roles: ROLE_USER }
+        - { path: ^/, roles: ROLE_DIRECTOR }
 
 when@test:
     security:

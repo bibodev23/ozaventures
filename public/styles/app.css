@@ -1,6 +1,6 @@
 :root {
     --ink: #3f3b4a;
-    --muted: #837c8e;
+    --muted: #696375;
     --paper: #fff8f3;
     --panel: rgba(255, 255, 255, .84);
     --line: #eadde6;
@@ -2910,7 +2910,7 @@ body {
 
 .dashboard-topline p {
     margin: 10px 0 0;
-    color: #929b95;
+    color: #625f69;
     font-weight: 700;
 }
 
@@ -3089,17 +3089,84 @@ body {
     font-weight: 900;
 }
 
-.reminder-card {
+.operations-card {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     min-height: 250px;
 }
 
-.reminder-card p {
-    color: #65716a;
+.operation-alert-list {
+    display: grid;
+    gap: 10px;
+}
+
+.operation-alert {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #ece4ed;
+    border-radius: 16px;
+    color: var(--ink);
+    background: rgba(255, 255, 255, .68);
+}
+
+.operation-alert strong,
+.operation-alert small {
+    display: block;
+}
+
+.operation-alert strong {
+    color: #302b3d;
+    font-size: .92rem;
+}
+
+.operation-alert small {
+    margin-top: 3px;
+    color: #625f69;
+    font-size: .78rem;
     font-weight: 800;
-    line-height: 1.45;
+    line-height: 1.35;
+}
+
+.operation-alert-dot {
+    width: 12px;
+    height: 12px;
+    margin-top: 3px;
+    border-radius: 50%;
+    background: #9edbc3;
+    box-shadow: 0 0 0 5px rgba(158, 219, 195, .18);
+}
+
+.operation-alert-critical {
+    border-color: #f3b5aa;
+    background: linear-gradient(135deg, rgba(255, 214, 200, .92), rgba(255, 248, 243, .78));
+}
+
+.operation-alert-critical .operation-alert-dot {
+    background: #e46e5a;
+    box-shadow: 0 0 0 5px rgba(228, 110, 90, .18);
+}
+
+.operation-alert-warning {
+    border-color: #ead396;
+    background: linear-gradient(135deg, rgba(255, 240, 184, .72), rgba(255, 253, 250, .78));
+}
+
+.operation-alert-warning .operation-alert-dot {
+    background: #c99534;
+    box-shadow: 0 0 0 5px rgba(201, 149, 52, .18);
+}
+
+.operation-alert-info .operation-alert-dot {
+    background: #7ca7d8;
+    box-shadow: 0 0 0 5px rgba(124, 167, 216, .18);
+}
+
+.operation-alert-ok .operation-alert-dot {
+    background: #5fae8f;
+    box-shadow: 0 0 0 5px rgba(95, 174, 143, .18);
 }
 
 .collaboration-card {
@@ -3131,7 +3198,7 @@ body {
 .collab-list small,
 .project-list small {
     margin-top: 3px;
-    color: #8f9892;
+    color: #625f69;
     font-size: .76rem;
     font-weight: 800;
 }
@@ -3181,9 +3248,13 @@ body {
 }
 
 .progress-arc span {
-    margin-top: 58px;
-    color: #8f9892;
+    width: 110px;
+    margin-top: 66px;
+    color: #625f69;
+    font-size: .72rem;
     font-weight: 900;
+    line-height: 1.15;
+    text-align: center;
 }
 
 .legend-row,
@@ -3263,6 +3334,50 @@ body {
 .next-outing-card h2 {
     color: #fff;
     font-size: 1.55rem;
+}
+
+.next-outing-checklist {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.check-row {
+    display: grid;
+    gap: 2px;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, .42);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .16);
+}
+
+.check-row strong {
+    color: inherit;
+    font-size: .72rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.check-row small {
+    color: inherit;
+    font-size: .78rem;
+    font-weight: 900;
+}
+
+.check-row-ok {
+    background: rgba(190, 235, 216, .34);
+}
+
+.check-row-warning {
+    background: rgba(255, 240, 184, .42);
+}
+
+.check-row-critical {
+    background: rgba(255, 199, 183, .50);
+}
+
+.check-row-neutral {
+    background: rgba(255, 255, 255, .20);
 }
 
 .next-outing-card .button-primary {
@@ -3599,6 +3714,27 @@ body {
 .next-outing-card .button-primary {
     color: #524e73;
     background: rgba(255, 255, 255, .74);
+}
+
+.next-outing-card .check-row {
+    border-color: rgba(255, 255, 255, .72);
+    background: rgba(255, 255, 255, .54);
+}
+
+.next-outing-card .check-row-ok {
+    background: rgba(223, 243, 236, .76);
+}
+
+.next-outing-card .check-row-warning {
+    background: rgba(255, 240, 184, .72);
+}
+
+.next-outing-card .check-row-critical {
+    background: rgba(255, 214, 200, .82);
+}
+
+.next-outing-card .check-row small {
+    color: #524e73;
 }
 
 .season-timer-card strong {

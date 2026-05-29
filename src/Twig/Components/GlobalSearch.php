@@ -12,7 +12,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 #[AsLiveComponent]
-#[IsGranted('ROLE_DIRECTION')]
+#[IsGranted('ROLE_DIRECTOR')]
 final class GlobalSearch
 {
     use DefaultActionTrait;

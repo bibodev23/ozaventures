@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Animator;
+use App\Entity\User;
+use App\Enum\UserRole;
 use App\Form\AnimatorType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,7 +15,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/animateurs')]
-#[IsGranted('ROLE_DIRECTION')]
+#[IsGranted('ROLE_DIRECTOR')]
 class AnimatorController extends AbstractController
 {
     #[Route('', name: 'app_animators')]
@@ -32,7 +34,9 @@ class AnimatorController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->applyPasswordFromForm($animator, $form->get('plainPassword')->getData(), $passwordHasher);
+            $user = $this->syncUserFromAnimator($animator);
+            $this->applyPasswordFromForm($animator, $user, $form->get('plainPassword')->getData(), $passwordHasher);
+            $entityManager->persist($user);
             $entityManager->persist($animator);
             $entityManager->flush();
 
@@ -55,11 +59,13 @@ class AnimatorController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->syncUserFromAnimator($animator);
             $plainPassword = $form->get('plainPassword')->getData();
             if ($plainPassword !== null && $plainPassword !== '') {
-                $this->applyPasswordFromForm($animator, $plainPassword, $passwordHasher);
+                $this->applyPasswordFromForm($animator, $user, $plainPassword, $passwordHasher);
             }
 
+            $entityManager->persist($user);
             $entityManager->flush();
 
             $this->addFlash('success', 'Animateur mis à jour.');
@@ -76,11 +82,33 @@ class AnimatorController extends AbstractController
 
     private function applyPasswordFromForm(
         Animator $animator,
+        User $user,
         string $plainPassword,
         UserPasswordHasherInterface $passwordHasher,
     ): void {
-        $animator
-            ->setPasswordHash($passwordHasher->hashPassword($animator, $plainPassword))
+        $user
+            ->setPasswordHash($passwordHasher->hashPassword($user, $plainPassword))
             ->setMustChangePassword(true);
+
+        $animator
+            ->setPasswordHash($user->getPassword() ?? '')
+            ->setMustChangePassword(true);
+    }
+
+    private function syncUserFromAnimator(Animator $animator): User
+    {
+        $user = $animator->getUser() ?? new User();
+
+        $user
+            ->setUsername($animator->getUsername())
+            ->setFirstName($animator->getFirstName())
+            ->setLastName($animator->getLastName())
+            ->setActive($animator->isActive())
+            ->setRole(UserRole::Animator)
+            ->setMustChangePassword($animator->mustChangePassword());
+
+        $animator->setUser($user);
+
+        return $user;
     }
 }

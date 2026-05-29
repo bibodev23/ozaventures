@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Animator;
 use App\Entity\MobileDeviceToken;
 use App\Entity\Outing;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 
 class MobileNotificationService
@@ -123,10 +124,15 @@ class MobileNotificationService
                 continue;
             }
 
-            $tokens = $this->entityManager->getRepository(MobileDeviceToken::class)->findBy([
-                'animator' => $animator,
-                'enabled' => true,
-            ]);
+            $criteria = ['enabled' => true];
+            $user = $animator->getUser();
+            if ($user instanceof User) {
+                $criteria['user'] = $user;
+            } else {
+                $criteria['animator'] = $animator;
+            }
+
+            $tokens = $this->entityManager->getRepository(MobileDeviceToken::class)->findBy($criteria);
 
             if ($tokens === []) {
                 ++$skipped;

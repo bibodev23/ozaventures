@@ -9,6 +9,7 @@ use App\Entity\DailyTaskAssignment;
 use App\Entity\MobileDeviceToken;
 use App\Entity\Outing;
 use App\Entity\Season;
+use App\Entity\User;
 use App\Enum\OutingStatus;
 use App\Service\ActiveSeasonProvider;
 use App\Service\ApiTokenManager;
@@ -44,24 +45,25 @@ class MobileApiController extends AbstractController
             return $this->apiError('invalid_credentials', 'Identifiant et mot de passe obligatoires.', Response::HTTP_BAD_REQUEST);
         }
 
-        $animator = $this->entityManager->getRepository(Animator::class)->findOneBy(['username' => $username]);
-        if (!$animator instanceof Animator || !$animator->isActive() || !$passwordHasher->isPasswordValid($animator, $password)) {
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
+        if (!$user instanceof User || !$user->isActive() || !$passwordHasher->isPasswordValid($user, $password)) {
             return $this->apiError('invalid_credentials', 'Identifiants incorrects.', Response::HTTP_UNAUTHORIZED);
         }
 
-        $tokenData = $apiTokenManager->createForAnimator($animator);
+        $tokenData = $apiTokenManager->createForUser($user);
         $this->entityManager->flush();
 
         return $this->json([
             'token' => $tokenData['plainToken'],
             'tokenType' => 'Bearer',
             'expiresAt' => $tokenData['apiToken']->getExpiresAt()?->format(\DateTimeInterface::ATOM),
-            'animator' => $this->serializeAnimator($animator),
+            'user' => $this->serializeUser($user),
+            'animator' => $user->getAnimator() instanceof Animator ? $this->serializeAnimator($user->getAnimator()) : null,
         ]);
     }
 
     #[Route('/logout', name: 'api_logout', methods: ['POST'])]
-    #[IsGranted('ROLE_ANIMATOR')]
+    #[IsGranted('ROLE_USER')]
     public function logout(Request $request, ApiTokenManager $apiTokenManager): JsonResponse
     {
         $token = $this->bearerToken($request);
@@ -74,19 +76,23 @@ class MobileApiController extends AbstractController
     }
 
     #[Route('/me', name: 'api_me', methods: ['GET'])]
-    #[IsGranted('ROLE_ANIMATOR')]
+    #[IsGranted('ROLE_USER')]
     public function me(): JsonResponse
     {
+        $user = $this->currentUser();
+
         return $this->json([
-            'animator' => $this->serializeAnimator($this->currentAnimator()),
+            'user' => $this->serializeUser($user),
+            'animator' => $user->getAnimator() instanceof Animator ? $this->serializeAnimator($user->getAnimator()) : null,
         ]);
     }
 
     #[Route('/device-tokens', name: 'api_device_token_register', methods: ['POST'])]
-    #[IsGranted('ROLE_ANIMATOR')]
+    #[IsGranted('ROLE_USER')]
     public function registerDeviceToken(Request $request): JsonResponse
     {
-        $animator = $this->currentAnimator();
+        $user = $this->currentUser();
+        $animator = $user->getAnimator();
         $payload = $this->jsonPayload($request);
         $token = trim((string) ($payload['token'] ?? ''));
         $platform = strtolower(trim((string) ($payload['platform'] ?? 'android')));
@@ -107,7 +113,8 @@ class MobileApiController extends AbstractController
         }
 
         $deviceToken
-            ->setAnimator($animator)
+            ->setUser($user)
+            ->setAnimator($animator instanceof Animator ? $animator : null)
             ->setPlatform($platform)
             ->setDeviceName($deviceName)
             ->setEnabled(true)
@@ -127,15 +134,15 @@ class MobileApiController extends AbstractController
     }
 
     #[Route('/change-password', name: 'api_change_password', methods: ['POST'])]
-    #[IsGranted('ROLE_ANIMATOR')]
+    #[IsGranted('ROLE_USER')]
     public function changePassword(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
-        $animator = $this->currentAnimator();
+        $user = $this->currentUser();
         $payload = $this->jsonPayload($request);
         $currentPassword = (string) ($payload['currentPassword'] ?? '');
         $newPassword = (string) ($payload['newPassword'] ?? '');
 
-        if (!$passwordHasher->isPasswordValid($animator, $currentPassword)) {
+        if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
             return $this->apiError('invalid_current_password', 'Mot de passe actuel incorrect.', Response::HTTP_BAD_REQUEST);
         }
 
@@ -143,20 +150,28 @@ class MobileApiController extends AbstractController
             return $this->apiError('weak_password', 'Le nouveau mot de passe doit contenir au moins 8 caractères.', Response::HTTP_BAD_REQUEST);
         }
 
-        $animator
-            ->setPasswordHash($passwordHasher->hashPassword($animator, $newPassword))
+        $user
+            ->setPasswordHash($passwordHasher->hashPassword($user, $newPassword))
             ->setMustChangePassword(false);
+
+        $animator = $user->getAnimator();
+        if ($animator instanceof Animator) {
+            $animator
+                ->setPasswordHash($user->getPassword() ?? '')
+                ->setMustChangePassword(false);
+        }
 
         $this->entityManager->flush();
 
         return $this->json([
             'message' => 'Mot de passe modifié.',
-            'animator' => $this->serializeAnimator($animator),
+            'user' => $this->serializeUser($user),
+            'animator' => $animator instanceof Animator ? $this->serializeAnimator($animator) : null,
         ]);
     }
 
     #[Route('/children', name: 'api_children', methods: ['GET'])]
-    #[IsGranted('ROLE_ANIMATOR')]
+    #[IsGranted('ROLE_USER')]
     public function children(): JsonResponse
     {
         $season = $this->seasonProvider->getActiveSeason();
@@ -177,7 +192,7 @@ class MobileApiController extends AbstractController
     }
 
     #[Route('/animators', name: 'api_animators', methods: ['GET'])]
-    #[IsGranted('ROLE_ANIMATOR')]
+    #[IsGranted('ROLE_USER')]
     public function animators(): JsonResponse
     {
         $animators = $this->entityManager->getRepository(Animator::class)->findBy(
@@ -191,21 +206,32 @@ class MobileApiController extends AbstractController
     }
 
     #[Route('/outings', name: 'api_outings', methods: ['GET'])]
-    #[IsGranted('ROLE_ANIMATOR')]
+    #[IsGranted('ROLE_USER')]
     public function outings(): JsonResponse
     {
-        $animator = $this->currentAnimator();
+        $user = $this->currentUser();
+        $animator = $user->getAnimator();
         $season = $this->seasonProvider->getActiveSeason();
-        $outings = $this->entityManager->getRepository(Outing::class)->createQueryBuilder('outing')
+        $queryBuilder = $this->entityManager->getRepository(Outing::class)->createQueryBuilder('outing')
             ->leftJoin('outing.animators', 'animator')
             ->addSelect('animator')
             ->leftJoin('outing.children', 'child')
             ->addSelect('child')
             ->andWhere('outing.season = :season')
-            ->andWhere('outing.createdBy = :animator OR animator = :animator')
             ->setParameter('season', $season)
-            ->setParameter('animator', $animator)
-            ->orderBy('outing.departureAt', 'ASC')
+            ->orderBy('outing.departureAt', 'ASC');
+
+        if (!$user->isDirector()) {
+            if (!$animator instanceof Animator) {
+                throw $this->createAccessDeniedException();
+            }
+
+            $queryBuilder
+                ->andWhere('outing.createdBy = :animator OR animator = :animator')
+                ->setParameter('animator', $animator);
+        }
+
+        $outings = $queryBuilder
             ->getQuery()
             ->getResult();
 
@@ -216,16 +242,17 @@ class MobileApiController extends AbstractController
     }
 
     #[Route('/outings', name: 'api_outing_create', methods: ['POST'])]
-    #[IsGranted('ROLE_ANIMATOR')]
+    #[IsGranted('ROLE_USER')]
     public function createOuting(Request $request): JsonResponse
     {
-        $animator = $this->currentAnimator();
+        $user = $this->currentUser();
+        $animator = $user->getAnimator();
         $season = $this->seasonProvider->getActiveSeason();
         $payload = $this->jsonPayload($request);
 
         $outing = (new Outing())
             ->setSeason($season)
-            ->setCreatedBy($animator)
+            ->setCreatedBy($animator instanceof Animator ? $animator : null)
             ->setStatus(OutingStatus::Pending->value)
             ->setNumber(trim((string) ($payload['number'] ?? $this->nextOutingNumber($season))));
 
@@ -249,10 +276,10 @@ class MobileApiController extends AbstractController
     }
 
     #[Route('/outings/{id}', name: 'api_outing_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    #[IsGranted('ROLE_ANIMATOR')]
+    #[IsGranted('ROLE_USER')]
     public function outing(Outing $outing): JsonResponse
     {
-        if (!$this->animatorCanSeeOuting($this->currentAnimator(), $outing)) {
+        if (!$this->currentUser()->isDirector() && !$this->animatorCanSeeOuting($this->currentAnimator(), $outing)) {
             return $this->apiError('forbidden', 'Sortie inaccessible.', Response::HTTP_FORBIDDEN);
         }
 
@@ -262,11 +289,12 @@ class MobileApiController extends AbstractController
     }
 
     #[Route('/outings/{id}', name: 'api_outing_update', requirements: ['id' => '\d+'], methods: ['PUT', 'PATCH'])]
-    #[IsGranted('ROLE_ANIMATOR')]
+    #[IsGranted('ROLE_USER')]
     public function updateOuting(Outing $outing, Request $request): JsonResponse
     {
-        $animator = $this->currentAnimator();
-        if ($outing->getCreatedBy() !== $animator) {
+        $user = $this->currentUser();
+        $animator = $user->getAnimator();
+        if (!$user->isDirector() && (!$animator instanceof Animator || $outing->getCreatedBy() !== $animator)) {
             return $this->apiError('forbidden', 'Seul l’animateur qui a créé la sortie peut la modifier depuis l’app mobile.', Response::HTTP_FORBIDDEN);
         }
 
@@ -367,7 +395,7 @@ class MobileApiController extends AbstractController
     /**
      * @param array<string, mixed> $payload
      */
-    private function applyOutingPayload(Outing $outing, array $payload, ?Season $season, Animator $currentAnimator): ?JsonResponse
+    private function applyOutingPayload(Outing $outing, array $payload, ?Season $season, ?Animator $currentAnimator): ?JsonResponse
     {
         if (!$season instanceof Season) {
             return $this->apiError('missing_season', 'Saison active introuvable.', Response::HTTP_BAD_REQUEST);
@@ -398,14 +426,19 @@ class MobileApiController extends AbstractController
             ->touch();
 
         $childIds = $payload['childIds'] ?? [];
-        $animatorIds = $payload['animatorIds'] ?? [$currentAnimator->getId()];
+        $animatorIds = $payload['animatorIds'] ?? ($currentAnimator instanceof Animator ? [$currentAnimator->getId()] : []);
 
         if (!is_array($childIds) || !is_array($animatorIds)) {
             return $this->apiError('invalid_selection', 'childIds et animatorIds doivent être des tableaux.', Response::HTTP_BAD_REQUEST);
         }
 
         $this->replaceChildren($outing, $season, array_map('intval', $childIds));
-        $this->replaceAnimators($outing, array_unique([...array_map('intval', $animatorIds), (int) $currentAnimator->getId()]));
+        $animatorIds = array_map('intval', $animatorIds);
+        if ($currentAnimator instanceof Animator) {
+            $animatorIds[] = (int) $currentAnimator->getId();
+        }
+
+        $this->replaceAnimators($outing, array_unique($animatorIds));
 
         return null;
     }
@@ -511,8 +544,18 @@ class MobileApiController extends AbstractController
 
     private function currentAnimator(): Animator
     {
+        $animator = $this->currentUser()->getAnimator();
+        if (!$animator instanceof Animator) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return $animator;
+    }
+
+    private function currentUser(): User
+    {
         $user = $this->getUser();
-        if (!$user instanceof Animator) {
+        if (!$user instanceof User) {
             throw $this->createAccessDeniedException();
         }
 
@@ -589,6 +632,24 @@ class MobileApiController extends AbstractController
             'name' => $season->getName(),
             'startsAt' => $season->getStartsAt()->format('Y-m-d'),
             'endsAt' => $season->getEndsAt()->format('Y-m-d'),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serializeUser(User $user): array
+    {
+        return [
+            'id' => $user->getId(),
+            'username' => $user->getUsername(),
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'fullName' => $user->getFullName(),
+            'displayName' => $user->getDisplayName(),
+            'role' => $user->getRole()->value,
+            'roleLabel' => $user->getRole()->label(),
+            'mustChangePassword' => $user->mustChangePassword(),
         ];
     }
 

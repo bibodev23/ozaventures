@@ -25,8 +25,12 @@ class ApiToken
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $expiresAt = null;
 
-    #[ORM\ManyToOne(targetEntity: Animator::class, inversedBy: 'apiTokens')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'apiTokens')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: Animator::class, inversedBy: 'apiTokens')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Animator $animator = null;
 
     public function __construct()
@@ -59,6 +63,18 @@ class ApiToken
     public function setAnimator(?Animator $animator): self
     {
         $this->animator = $animator;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Animator;
+use App\Entity\User;
 use App\Form\ChangePasswordType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +20,12 @@ class AccountController extends AbstractController
     #[IsGranted('ROLE_ANIMATOR')]
     public function password(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
-        $animator = $this->getUser();
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $animator = $user->getAnimator();
         if (!$animator instanceof Animator) {
             throw $this->createAccessDeniedException();
         }
@@ -30,11 +36,14 @@ class AccountController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $currentPassword = $form->get('currentPassword')->getData();
 
-            if (!$passwordHasher->isPasswordValid($animator, $currentPassword)) {
+            if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
                 $form->get('currentPassword')->addError(new FormError('Mot de passe actuel incorrect.'));
             } else {
+                $user
+                    ->setPasswordHash($passwordHasher->hashPassword($user, $form->get('newPassword')->getData()))
+                    ->setMustChangePassword(false);
                 $animator
-                    ->setPasswordHash($passwordHasher->hashPassword($animator, $form->get('newPassword')->getData()))
+                    ->setPasswordHash($user->getPassword() ?? '')
                     ->setMustChangePassword(false);
 
                 $entityManager->flush();

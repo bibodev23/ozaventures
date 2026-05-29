@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/planning')]
-#[IsGranted('ROLE_DIRECTION')]
+#[IsGranted('ROLE_DIRECTOR')]
 class DailyPlanningController extends AbstractController
 {
     #[Route('', name: 'app_daily_planning')]

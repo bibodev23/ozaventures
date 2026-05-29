@@ -34,8 +34,12 @@ class MobileDeviceToken
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastSeenAt = null;
 
-    #[ORM\ManyToOne(targetEntity: Animator::class, inversedBy: 'mobileDeviceTokens')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'mobileDeviceTokens')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: Animator::class, inversedBy: 'mobileDeviceTokens')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Animator $animator = null;
 
     public function __construct()
@@ -136,6 +140,18 @@ class MobileDeviceToken
     public function setAnimator(?Animator $animator): self
     {
         $this->animator = $animator;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

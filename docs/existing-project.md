@@ -39,9 +39,9 @@ Then update worker configuration:
 
 ```diff
  worker {
-	file ./public/index.php
+ 	file ./public/index.php
 +	env APP_RUNTIME Runtime\FrankenPhpSymfony\Runtime
-	{$FRANKENPHP_WORKER_CONFIG}
+ 	{$FRANKENPHP_WORKER_CONFIG}
  }
 ```
 

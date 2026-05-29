@@ -21,7 +21,7 @@ class SecurityController extends AbstractController
     #[Route('/apres-connexion', name: 'app_after_login')]
     public function afterLogin(): Response
     {
-        if ($this->isGranted('ROLE_DIRECTION')) {
+        if ($this->isGranted('ROLE_DIRECTOR')) {
             return $this->redirectToRoute('app_dashboard');
         }
 

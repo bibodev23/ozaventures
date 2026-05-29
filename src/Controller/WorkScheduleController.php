@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/horaires')]
-#[IsGranted('ROLE_DIRECTION')]
+#[IsGranted('ROLE_DIRECTOR')]
 class WorkScheduleController extends AbstractController
 {
     private const CENTER_OPEN_MINUTES = 7 * 60;

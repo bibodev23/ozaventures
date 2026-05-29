@@ -58,6 +58,10 @@ class Animator implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
+    #[ORM\OneToOne(targetEntity: User::class, inversedBy: 'animator')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $user = null;
+
     /**
      * @var Collection<int, Outing>
      */
@@ -244,6 +248,22 @@ class Animator implements UserInterface, PasswordAuthenticatedUserInterface
     public function getPlanningLabel(): string
     {
         return sprintf('%s (%s)', $this->getFullName(), $this->getAgeGroupLabel());
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        if ($user instanceof User && $user->getAnimator() !== $this) {
+            $user->setAnimator($this);
+        }
+
+        return $this;
     }
 
     /**

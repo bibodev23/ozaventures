@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Comptes direction{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">Administration</p>
+            <h1>Comptes direction</h1>
+            <p class="lead lead-compact">Les comptes qui peuvent piloter la webapp, l’API mobile et bientôt la messagerie interne.</p>
+        </div>
+        <a class="button button-primary" href="{{ path('app_director_new') }}">Ajouter un directeur</a>
+    </section>
+
+    {% if directors is empty %}
+        <div class="empty-state">Aucun compte direction en base. Crée le premier compte avec la commande de bootstrap.</div>
+    {% else %}
+        <section class="section">
+            <div class="list">
+                {% for director in directors %}
+                    <a class="list-row" href="{{ path('app_director_edit', {id: director.id}) }}">
+                        <strong>{{ director.displayName }}</strong>
+                        <span>
+                            Identifiant : {{ director.username }}
+                            ·
+                            {{ director.active ? 'Actif' : 'Inactif' }}
+                            {% if app.user and app.user.id == director.id %} · compte actuel{% endif %}
+                        </span>
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}

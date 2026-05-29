@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Animator;
 use App\Entity\ApiToken;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ApiTokenManager
@@ -17,9 +18,23 @@ class ApiTokenManager
      */
     public function createForAnimator(Animator $animator): array
     {
+        $user = $animator->getUser();
+        if (!$user instanceof User) {
+            throw new \LogicException('Cet animateur n’a pas encore de compte utilisateur lié.');
+        }
+
+        return $this->createForUser($user, $animator);
+    }
+
+    /**
+     * @return array{plainToken: string, apiToken: ApiToken}
+     */
+    public function createForUser(User $user, ?Animator $animator = null): array
+    {
         $plainToken = bin2hex(random_bytes(32));
         $apiToken = (new ApiToken())
-            ->setAnimator($animator)
+            ->setUser($user)
+            ->setAnimator($animator ?? $user->getAnimator())
             ->setTokenHash($this->hash($plainToken))
             ->setExpiresAt(new \DateTimeImmutable('+90 days'));
 
@@ -41,8 +56,8 @@ class ApiTokenManager
             return null;
         }
 
-        $animator = $apiToken->getAnimator();
-        if (!$animator instanceof Animator || !$animator->isActive()) {
+        $user = $apiToken->getUser();
+        if (!$user instanceof User || !$user->isActive()) {
             return null;
         }
 

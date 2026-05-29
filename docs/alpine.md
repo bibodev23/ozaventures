@@ -28,7 +28,7 @@ To switch to Alpine-based images, apply the following changes to the `Dockerfile
 +	apk add --no-cache \
 +		file \
 +		git
-	install-php-extensions \
+ 	install-php-extensions \
 
 -# hadolint ignore=DL3008,SC3054,DL4006
 -RUN <<-'EOF'
@@ -37,7 +37,7 @@ To switch to Alpine-based images, apply the following changes to the `Dockerfile
 +# hadolint ignore=DL3018,SC3054,DL4006
 +RUN <<-'EOF'
 +	apk add --no-cache libtree
-	mkdir -p /tmp/libs
+ 	mkdir -p /tmp/libs
 -	BINARIES=(frankenphp php file)
 -	for target in $(printf '%s\n' "${BINARIES[@]}" | xargs -I{} which {}) \
 +	BINARIES="frankenphp php file"

@@ -6,7 +6,7 @@
     <section class="dribbble-dashboard">
         <header class="dashboard-topline">
             <div>
-                <h1>Dashboard</h1>
+                <h1>Tableau de bord</h1>
                 <p>Planifier, prioriser et suivre les sorties avec une vue claire de la saison.</p>
             </div>
             <div class="dashboard-actions">
@@ -20,14 +20,14 @@
                 href="{{ path('app_outings') }}"
                 label="Total sorties"
                 value="{{ total_outings_count }}"
-                caption="{{ season_progress }} % de saison"
+                caption="{{ season_state.metric_caption }}"
                 variant="primary"
             />
             <twig:DashboardMetric
                 href="{{ path('app_outings', {status: 'validated'}) }}"
                 label="Sorties validées"
                 value="{{ validated_count }}"
-                caption="Prêtes à suivre"
+                caption="{{ completed_validated_count }} réalisée(s)"
             />
             <twig:DashboardMetric
                 href="{{ path('app_outings') }}"
@@ -58,21 +58,25 @@
                     </div>
                 </section>
 
-                <section class="panel-card reminder-card">
+                <section class="panel-card operations-card">
                     <div class="panel-heading">
                         <div>
-                            <span class="panel-kicker">Rappel direction</span>
-                            <h2>{{ pending_count > 0 ? 'Valider les sorties en attente' : 'Aucune urgence sortie' }}</h2>
+                            <span class="panel-kicker">Alertes opérationnelles</span>
+                            <h2>À traiter maintenant</h2>
                         </div>
+                        <span class="soft-chip">{{ operational_alerts|length }} point(s)</span>
                     </div>
-                    <p>
-                        {% if pending_count > 0 %}
-                            {{ pending_count }} demande(s) attendent une décision avant d'être visibles comme sorties validées.
-                        {% else %}
-                            Les demandes de sortie sont à jour. Tu peux préparer la suite de la saison tranquillement.
-                        {% endif %}
-                    </p>
-                    <a class="button button-primary" href="{{ path('app_outings', {status: 'pending'}) }}">Ouvrir les validations</a>
+                    <div class="operation-alert-list">
+                        {% for alert in operational_alerts %}
+                            <a class="operation-alert operation-alert-{{ alert.level }}" href="{{ alert.href }}">
+                                <span class="operation-alert-dot"></span>
+                                <span>
+                                    <strong>{{ alert.title }}</strong>
+                                    <small>{{ alert.message }}</small>
+                                </span>
+                            </a>
+                        {% endfor %}
+                    </div>
                 </section>
 
                 <section class="panel-card collaboration-card">
@@ -102,11 +106,11 @@
                 <section class="panel-card progress-card">
                     <div>
                         <span class="panel-kicker">Progression</span>
-                        <h2>Saison en cours</h2>
+                        <h2>{{ season_state.label }}</h2>
                     </div>
                     <div class="progress-arc" style="--value: {{ season_progress }}">
                         <strong>{{ season_progress }}%</strong>
-                        <span>de saison</span>
+                        <span>{{ season_state.caption }}</span>
                     </div>
                     <div class="legend-row">
                         <span><i class="legend-dot is-done"></i>Écoulé</span>
@@ -154,8 +158,19 @@
                         <div class="next-outing-meta">
                             <span>{{ next_outing.children|length }} enfant(s)</span>
                             <span>{{ next_outing.animators|length }} anim.</span>
+                            <span>{{ next_outing.transportMode }}</span>
                             <span class="badge {{ next_outing.statusBadgeClass }}">{{ next_outing.statusLabel }}</span>
                         </div>
+                        {% if next_outing_checklist %}
+                            <div class="next-outing-checklist" aria-label="Checklist prochaine sortie">
+                                {% for item in next_outing_checklist.items %}
+                                    <span class="check-row check-row-{{ item.state }}">
+                                        <strong>{{ item.label }}</strong>
+                                        <small>{{ item.value }}</small>
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                         <a class="button button-primary" href="{{ path('app_outing_show', {id: next_outing.id}) }}">Préparer</a>
                     {% else %}
                         <h2>Aucune sortie à venir</h2>

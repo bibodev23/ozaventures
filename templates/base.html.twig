@@ -25,14 +25,15 @@
                     <div class="sidebar-section">
                         <p class="sidebar-label">Menu</p>
                         <nav class="nav" aria-label="Navigation principale">
-                            {% if is_granted('ROLE_DIRECTION') %}
+                            {% if is_granted('ROLE_DIRECTOR') %}
                                 {% set nav_items = [
                                     {label: 'Dashboard', icon: 'DB', route: 'app_dashboard', routes: ['app_home', 'app_dashboard']},
                                     {label: 'Planning', icon: 'PL', route: 'app_daily_planning', match: 'app_daily_planning'},
                                     {label: 'Horaires', icon: 'HR', route: 'app_work_schedule', match: 'app_work_schedule'},
                                     {label: 'Sorties', icon: 'SO', route: 'app_outings', match: 'app_outing'},
                                     {label: 'Enfants', icon: 'EN', route: 'app_children', match: 'app_child'},
-                                    {label: 'Animateurs', icon: 'AN', route: 'app_animators', match: 'app_animator'}
+                                    {label: 'Animateurs', icon: 'AN', route: 'app_animators', match: 'app_animator'},
+                                    {label: 'Direction', icon: 'DI', route: 'app_directors', match: 'app_director'}
                                 ] %}
                                 {% for item in nav_items %}
                                     {% set is_active = item.routes is defined ? current_route in item.routes : current_route starts with item.match %}
@@ -61,16 +62,11 @@
                         <a class="sidebar-link" href="{{ path('app_logout') }}"><span class="nav-icon">LO</span>Déconnexion</a>
                     </div>
 
-                    <div class="mobile-card">
-                        <strong>Application mobile</strong>
-                        <span>Les animateurs gardent leurs sorties et horaires dans la poche.</span>
-                        <a href="{{ path('app_animators') }}">Gérer l'équipe</a>
-                    </div>
                 </aside>
 
                 <div class="app-workspace">
                     <header class="workspace-topbar">
-                        {% if is_granted('ROLE_DIRECTION') %}
+                        {% if is_granted('ROLE_DIRECTOR') %}
                             <twig:GlobalSearch />
                         {% else %}
                             <div class="search-pill" aria-label="Recherche visuelle">

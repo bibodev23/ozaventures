@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">Direction</p>
+            <h1>{{ title }}</h1>
+            <p class="lead lead-compact">Ce compte aura accès au pilotage direction sur la webapp et à l’espace direction mobile.</p>
+        </div>
+    </section>
+
+    <section class="form-panel">
+        {{ form_start(form, {attr: {class: 'form'}}) }}
+            {{ form_row(form.firstName) }}
+            {{ form_row(form.lastName) }}
+            {{ form_row(form.username) }}
+            {{ form_row(form.plainPassword) }}
+            {{ form_row(form.active) }}
+            <div class="form-actions">
+                <a class="button button-secondary" href="{{ path('app_directors') }}">Annuler</a>
+                <button class="button button-primary" type="submit">Enregistrer</button>
+            </div>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}
