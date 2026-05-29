@@ -76,12 +76,12 @@
                             </div>
                         {% endif %}
                         <div class="workspace-actions">
-                            <span class="round-action">@</span>
-                            <span class="round-action">!</span>
+                            {% set user_display_name = app.user.firstName|default('') ?: app.user.userIdentifier %}
+                            {% set user_avatar = (app.user.firstName|default('')|slice(0, 1) ~ app.user.lastName|default('')|slice(0, 1))|trim ?: app.user.userIdentifier|slice(0, 2) %}
                             <span class="user-chip">
-                                <span class="avatar">{{ app.user.userIdentifier|slice(0, 2)|upper }}</span>
+                                <span class="avatar">{{ user_avatar|upper }}</span>
                                 <span>
-                                    <strong>{{ app.user.userIdentifier }}</strong>
+                                    <strong>{{ user_display_name }}</strong>
                                     <small>Compte connecté</small>
                                 </span>
                             </span>

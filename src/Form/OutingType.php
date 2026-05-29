@@ -65,6 +65,7 @@ class OutingType extends AbstractType
                 'tom_select_options' => [
                     'plugins' => ['remove_button'],
                     'closeAfterSelect' => false,
+                    'dropdownParent' => 'body',
                     'hideSelected' => true,
                     'placeholder' => 'Rechercher puis sélectionner les enfants',
                 ],
@@ -87,6 +88,7 @@ class OutingType extends AbstractType
                 'tom_select_options' => [
                     'plugins' => ['remove_button'],
                     'closeAfterSelect' => false,
+                    'dropdownParent' => 'body',
                     'hideSelected' => true,
                     'placeholder' => 'Rechercher puis sélectionner les animateurs',
                 ],

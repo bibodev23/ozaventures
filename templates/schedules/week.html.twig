@@ -3,34 +3,34 @@
 {% block title %}Horaires animateurs{% endblock %}
 
 {% block body %}
-    {% set previous_week_params = {'week': previous_week|date('Y-m-d')}|merge(schedule_query) %}
-    {% set next_week_params = {'week': next_week|date('Y-m-d')}|merge(schedule_query) %}
-
     <section class="page-heading">
         <div>
             <p class="eyebrow">{{ season.name }}</p>
             <h1>Horaires semaine du {{ week_start|date('d/m/Y') }}</h1>
+            <p class="lead lead-compact">Centre ouvert du {{ opening_start|date('d/m') }} au {{ opening_end|date('d/m') }}.</p>
         </div>
-        <form class="date-jump" method="get" action="{{ path('app_work_schedule') }}">
-            <label for="schedule-week">Choisir une semaine</label>
-            <input id="schedule-week" type="date" name="week" value="{{ week_start|date('Y-m-d') }}">
-            {% if selected_age_group %}
-                <input type="hidden" name="group" value="{{ selected_age_group }}">
-            {% endif %}
-            <button class="button button-secondary" type="submit">Ouvrir</button>
-        </form>
     </section>
 
-    <div class="actions planning-actions">
-        <a class="button button-secondary" href="{{ path('app_work_schedule_week', previous_week_params) }}">Semaine précédente</a>
-        <a class="button button-secondary" href="{{ path('app_work_schedule_week', next_week_params) }}">Semaine suivante</a>
-    </div>
+    <nav class="week-selector" aria-label="Semaines d'ouverture du centre">
+        <span>Semaines d'ouverture</span>
+        <div>
+            {% for option in week_options %}
+                <a
+                    class="week-option {{ option.active ? 'is-active' : '' }}"
+                    href="{{ path('app_work_schedule_week', {'week': option.week}|merge(option.query)) }}"
+                    {% if option.active %}aria-current="page"{% endif %}
+                >
+                    <strong>{{ option.label }}</strong>
+                    <small>{{ option.range_label }}</small>
+                </a>
+            {% endfor %}
+        </div>
+    </nav>
 
     <section class="schedule-filter-panel" aria-label="Choisir les animateurs à planifier">
         <div>
             <p class="eyebrow">Equipe à planifier</p>
             <h2>Filtrer les horaires par groupe</h2>
-            <p>Affiche uniquement les animateurs concernés. À l'enregistrement, les groupes masqués ne sont pas modifiés.</p>
         </div>
 
         <div class="schedule-filter-options">

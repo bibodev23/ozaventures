@@ -123,6 +123,21 @@ class OutingController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/supprimer', name: 'app_outing_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function delete(Outing $outing, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if (!$this->isCsrfTokenValid('outing_delete_' . $outing->getId(), (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $entityManager->remove($outing);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Sortie supprimée.');
+
+        return $this->redirectToRoute('app_outings');
+    }
+
     #[Route('/{id}/statut/{status}', name: 'app_outing_status', requirements: ['id' => '\d+', 'status' => 'pending|validated|refused'], methods: ['POST'])]
     public function status(Outing $outing, string $status, Request $request, EntityManagerInterface $entityManager, MobileNotificationService $notificationService): Response
     {

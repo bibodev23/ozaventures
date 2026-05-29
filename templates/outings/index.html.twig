@@ -77,6 +77,14 @@
 
                     <div class="outing-card-actions">
                         <a class="button button-secondary" href="{{ path('app_outing_show', {id: outing.id}) }}">Ouvrir</a>
+                        <form
+                            method="post"
+                            action="{{ path('app_outing_delete', {id: outing.id}) }}"
+                            onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette sortie ? Cette action est définitive.');"
+                        >
+                            <input type="hidden" name="_token" value="{{ csrf_token('outing_delete_' ~ outing.id) }}">
+                            <button class="button button-danger button-compact" type="submit">Supprimer</button>
+                        </form>
                         {% if outing.status == 'pending' %}
                             <span class="action-hint">Décision attendue</span>
                         {% endif %}

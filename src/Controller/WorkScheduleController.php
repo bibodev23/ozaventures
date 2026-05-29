@@ -23,6 +23,10 @@ class WorkScheduleController extends AbstractController
     private const CENTER_CLOSE_MINUTES = 18 * 60;
     private const TIME_STEP_MINUTES = 15;
     private const WEEKLY_MAX_MINUTES = 35 * 60;
+    private const OPENING_START_MONTH = 7;
+    private const OPENING_START_DAY = 6;
+    private const OPENING_END_MONTH = 8;
+    private const OPENING_END_DAY = 28;
 
     /**
      * @var array<string, string>
@@ -49,7 +53,7 @@ class WorkScheduleController extends AbstractController
                 $this->addFlash('error', 'Date de semaine invalide.');
                 $weekStart = $this->defaultWeekStart($season);
             } else {
-                $weekStart = $this->weekStart($date);
+                $weekStart = $this->constrainWeekStart($season, $this->weekStart($date));
             }
         }
 
@@ -74,7 +78,7 @@ class WorkScheduleController extends AbstractController
         $selectedAgeGroup = $this->selectedAgeGroup($request);
         $scheduleQuery = $this->scheduleQuery($selectedAgeGroup);
 
-        $weekStart = $this->weekStart($date);
+        $weekStart = $this->constrainWeekStart($season, $this->weekStart($date));
         if ($weekStart->format('Y-m-d') !== $week) {
             return $this->redirectToRoute('app_work_schedule_week', array_merge(
                 ['week' => $weekStart->format('Y-m-d')],
@@ -145,8 +149,9 @@ class WorkScheduleController extends AbstractController
         return $this->render('schedules/week.html.twig', [
             'season' => $season,
             'week_start' => $weekStart,
-            'previous_week' => $weekStart->modify('-7 days'),
-            'next_week' => $weekStart->modify('+7 days'),
+            'opening_start' => $this->openingStart($season),
+            'opening_end' => $this->openingEnd($season),
+            'week_options' => $this->weekOptions($season, $selectedAgeGroup, $weekStart),
             'week_days' => $weekDays,
             'animators' => $animators,
             'active_animators_count' => $this->countActiveAnimators($entityManager),
@@ -263,17 +268,78 @@ class WorkScheduleController extends AbstractController
     private function defaultWeekStart(Season $season): \DateTimeImmutable
     {
         $today = (new \DateTimeImmutable('today'))->setTime(0, 0);
+        $openingStart = $this->openingStart($season);
+        $openingEnd = $this->openingEnd($season);
 
-        if ($today >= $season->getStartsAt() && $today <= $season->getEndsAt()) {
-            return $this->weekStart($today);
+        if ($today >= $openingStart && $today <= $openingEnd) {
+            return $this->constrainWeekStart($season, $this->weekStart($today));
         }
 
-        return $this->weekStart($season->getStartsAt());
+        return $openingStart;
     }
 
     private function weekStart(\DateTimeImmutable $date): \DateTimeImmutable
     {
         return $date->modify(sprintf('-%d days', ((int) $date->format('N')) - 1))->setTime(0, 0);
+    }
+
+    private function constrainWeekStart(Season $season, \DateTimeImmutable $weekStart): \DateTimeImmutable
+    {
+        $openingStart = $this->openingStart($season);
+        $lastWeekStart = $this->weekStart($this->openingEnd($season));
+
+        if ($weekStart < $openingStart) {
+            return $openingStart;
+        }
+
+        if ($weekStart > $lastWeekStart) {
+            return $lastWeekStart;
+        }
+
+        return $weekStart;
+    }
+
+    /**
+     * @return list<array{label: string, range_label: string, week: string, active: bool, query: array<string, string>}>
+     */
+    private function weekOptions(Season $season, ?string $selectedAgeGroup, \DateTimeImmutable $selectedWeekStart): array
+    {
+        $options = [];
+        $openingEnd = $this->openingEnd($season);
+        $weekStart = $this->openingStart($season);
+        $index = 1;
+
+        while ($weekStart <= $openingEnd) {
+            $rawWeekEnd = $weekStart->modify('+4 days');
+            $weekEnd = $rawWeekEnd > $openingEnd ? $openingEnd : $rawWeekEnd;
+            $week = $weekStart->format('Y-m-d');
+            $options[] = [
+                'label' => sprintf('Semaine %d', $index),
+                'range_label' => sprintf('Lun. %s - Ven. %s', $weekStart->format('d/m'), $weekEnd->format('d/m')),
+                'week' => $week,
+                'active' => $week === $selectedWeekStart->format('Y-m-d'),
+                'query' => $this->scheduleQuery($selectedAgeGroup),
+            ];
+
+            $weekStart = $weekStart->modify('+7 days');
+            ++$index;
+        }
+
+        return $options;
+    }
+
+    private function openingStart(Season $season): \DateTimeImmutable
+    {
+        return $season->getStartsAt()
+            ->setDate((int) $season->getStartsAt()->format('Y'), self::OPENING_START_MONTH, self::OPENING_START_DAY)
+            ->setTime(0, 0);
+    }
+
+    private function openingEnd(Season $season): \DateTimeImmutable
+    {
+        return $season->getStartsAt()
+            ->setDate((int) $season->getStartsAt()->format('Y'), self::OPENING_END_MONTH, self::OPENING_END_DAY)
+            ->setTime(0, 0);
     }
 
     /**

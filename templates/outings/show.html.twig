@@ -12,6 +12,14 @@
         <div class="actions">
             <a class="button button-secondary" href="{{ path('app_outing_print', {id: outing.id}) }}" target="_blank">Affiche A3</a>
             <a class="button button-secondary" href="{{ path('app_outing_edit', {id: outing.id}) }}">Modifier</a>
+            <form
+                method="post"
+                action="{{ path('app_outing_delete', {id: outing.id}) }}"
+                onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette sortie ? Cette action est définitive.');"
+            >
+                <input type="hidden" name="_token" value="{{ csrf_token('outing_delete_' ~ outing.id) }}">
+                <button class="button button-danger" type="submit">Supprimer</button>
+            </form>
         </div>
     </section>
 
