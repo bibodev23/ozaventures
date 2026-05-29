@@ -329,7 +329,8 @@ class MobileApiController extends AbstractController
     {
         $animator = $this->currentAnimator();
         $season = $this->seasonProvider->getActiveSeason();
-        $weekStart = $this->weekStart($this->dateFromQuery($request, 'week') ?? new \DateTimeImmutable('today'));
+        $weekDate = $this->dateFromQuery($request, 'week') ?? $this->defaultWorkScheduleWeek($season);
+        $weekStart = $this->weekStart($weekDate);
 
         $shifts = $this->entityManager->getRepository(AnimatorWorkShift::class)
             ->createQueryBuilder('shift')
@@ -553,6 +554,17 @@ class MobileApiController extends AbstractController
     private function weekStart(\DateTimeImmutable $date): \DateTimeImmutable
     {
         return $date->modify(sprintf('-%d days', ((int) $date->format('N')) - 1))->setTime(0, 0);
+    }
+
+    private function defaultWorkScheduleWeek(Season $season): \DateTimeImmutable
+    {
+        $today = (new \DateTimeImmutable('today'))->setTime(0, 0);
+
+        if ($today >= $season->getStartsAt() && $today <= $season->getEndsAt()) {
+            return $today;
+        }
+
+        return $season->getStartsAt();
     }
 
     private function nextOutingNumber(Season $season): string
