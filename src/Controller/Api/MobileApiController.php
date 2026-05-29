@@ -160,14 +160,19 @@ class MobileApiController extends AbstractController
     public function children(): JsonResponse
     {
         $season = $this->seasonProvider->getActiveSeason();
-        $children = $this->entityManager->getRepository(Child::class)->findBy(
-            ['season' => $season],
-            ['lastName' => 'ASC', 'firstName' => 'ASC'],
-        );
+        $children = $this->entityManager->getRepository(Child::class)->createQueryBuilder('child')
+            ->leftJoin('child.outings', 'outing')
+            ->addSelect('outing')
+            ->andWhere('child.season = :season')
+            ->setParameter('season', $season)
+            ->orderBy('child.lastName', 'ASC')
+            ->addOrderBy('child.firstName', 'ASC')
+            ->getQuery()
+            ->getResult();
 
         return $this->json([
             'season' => $this->serializeSeason($season),
-            'children' => array_map(fn (Child $child): array => $this->serializeChild($child), $children),
+            'children' => array_map(fn (Child $child): array => $this->serializeChild($child, true), $children),
         ]);
     }
 
@@ -608,9 +613,9 @@ class MobileApiController extends AbstractController
     /**
      * @return array<string, mixed>
      */
-    private function serializeChild(Child $child): array
+    private function serializeChild(Child $child, bool $includeDetails = false): array
     {
-        return [
+        $data = [
             'id' => $child->getId(),
             'firstName' => $child->getFirstName(),
             'lastName' => $child->getLastName(),
@@ -619,6 +624,48 @@ class MobileApiController extends AbstractController
             'ageGroup' => $child->getAgeGroup(),
             'ageGroupLabel' => $child->getAgeGroupLabel(),
         ];
+
+        if (!$includeDetails) {
+            return $data;
+        }
+
+        return $data + [
+            'legalGuardians' => $child->getLegalGuardians(),
+            'legalGuardianPhones' => $child->getLegalGuardianPhones(),
+            'allergies' => $child->getAllergies(),
+            'hasAllergies' => $child->hasAllergies(),
+            'photoPermission' => $child->hasPhotoPermission(),
+            'importantNotes' => $child->getImportantNotes(),
+            'outings' => $this->serializeChildOutings($child),
+        ];
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function serializeChildOutings(Child $child): array
+    {
+        $outings = $child->getOutings()->toArray();
+        usort(
+            $outings,
+            fn (Outing $left, Outing $right): int => $right->getDepartureAt() <=> $left->getDepartureAt(),
+        );
+
+        return array_map(
+            fn (Outing $outing): array => [
+                'id' => $outing->getId(),
+                'number' => $outing->getNumber(),
+                'destination' => $outing->getDestination(),
+                'departureAt' => $outing->getDepartureAt()->format(\DateTimeInterface::ATOM),
+                'returnAt' => $outing->getReturnAt()->format(\DateTimeInterface::ATOM),
+                'transportMode' => $outing->getTransportMode(),
+                'picnicRequired' => $outing->isPicnicRequired(),
+                'status' => $outing->getStatus(),
+                'statusLabel' => $outing->getStatusLabel(),
+                'validationComment' => $outing->getValidationComment(),
+            ],
+            $outings,
+        );
     }
 
     /**
