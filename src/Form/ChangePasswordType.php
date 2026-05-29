@@ -16,6 +16,9 @@ class ChangePasswordType extends AbstractType
             ->add('currentPassword', PasswordType::class, [
                 'label' => 'Mot de passe actuel',
                 'mapped' => false,
+                'toggle' => true,
+                'visible_label' => 'Afficher',
+                'hidden_label' => 'Masquer',
                 'constraints' => [
                     new Assert\NotBlank(message: 'Renseigne ton mot de passe actuel.'),
                 ],
@@ -30,9 +33,15 @@ class ChangePasswordType extends AbstractType
                 ],
                 'first_options' => [
                     'label' => 'Nouveau mot de passe',
+                    'toggle' => true,
+                    'visible_label' => 'Afficher',
+                    'hidden_label' => 'Masquer',
                 ],
                 'second_options' => [
                     'label' => 'Confirmation du nouveau mot de passe',
+                    'toggle' => true,
+                    'visible_label' => 'Afficher',
+                    'hidden_label' => 'Masquer',
                 ],
             ]);
     }

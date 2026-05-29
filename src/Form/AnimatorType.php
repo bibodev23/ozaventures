@@ -57,9 +57,15 @@ class AnimatorType extends AbstractType
                 'first_options' => [
                     'label' => $isEdit ? 'Nouveau mot de passe' : 'Mot de passe initial',
                     'help' => $isEdit ? 'Laisse vide pour conserver le mot de passe actuel.' : 'L’animateur pourra le changer après sa première connexion.',
+                    'toggle' => true,
+                    'visible_label' => 'Afficher',
+                    'hidden_label' => 'Masquer',
                 ],
                 'second_options' => [
                     'label' => 'Confirmation du mot de passe',
+                    'toggle' => true,
+                    'visible_label' => 'Afficher',
+                    'hidden_label' => 'Masquer',
                 ],
             ])
             ->add('active', CheckboxType::class, [

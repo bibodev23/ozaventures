@@ -45,9 +45,15 @@ class DirectorUserType extends AbstractType
                 'first_options' => [
                     'label' => $isEdit ? 'Nouveau mot de passe' : 'Mot de passe initial',
                     'help' => $isEdit ? 'Laisse vide pour conserver le mot de passe actuel.' : 'Le compte direction pourra se connecter à la webapp et à l’app mobile.',
+                    'toggle' => true,
+                    'visible_label' => 'Afficher',
+                    'hidden_label' => 'Masquer',
                 ],
                 'second_options' => [
                     'label' => 'Confirmation du mot de passe',
+                    'toggle' => true,
+                    'visible_label' => 'Afficher',
+                    'hidden_label' => 'Masquer',
                 ],
             ])
             ->add('active', CheckboxType::class, [

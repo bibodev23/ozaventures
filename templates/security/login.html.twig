@@ -19,7 +19,19 @@
                 <input id="username" type="text" name="_username" value="{{ last_username }}" autocomplete="username" required autofocus>
 
                 <label for="password">Mot de passe</label>
-                <input id="password" type="password" name="_password" autocomplete="current-password" required>
+                <div class="toggle-password-container">
+                    <input
+                        id="password"
+                        type="password"
+                        name="_password"
+                        autocomplete="current-password"
+                        required
+                        data-controller="symfony--ux-toggle-password--toggle-password"
+                        data-symfony--ux-toggle-password--toggle-password-visible-label-value="Afficher"
+                        data-symfony--ux-toggle-password--toggle-password-hidden-label-value="Masquer"
+                        data-symfony--ux-toggle-password--toggle-password-button-classes-value="{{ ['toggle-password-button']|json_encode }}"
+                    >
+                </div>
 
                 <button class="button button-primary" type="submit">Se connecter</button>
             </form>
