@@ -18,6 +18,8 @@ services:
       APP_ADJOINT_PASSWORD_HASH: ${APP_ADJOINT_PASSWORD_HASH:?Set APP_ADJOINT_PASSWORD_HASH in your production environment}
       MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:?Set CADDY_MERCURE_JWT_SECRET in your production environment}
       MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:?Set CADDY_MERCURE_JWT_SECRET in your production environment}
+    volumes:
+      - ./config/firebase/firebase-service-account.json:/app/config/firebase/firebase-service-account.json:ro
 
   database:
     environment:
