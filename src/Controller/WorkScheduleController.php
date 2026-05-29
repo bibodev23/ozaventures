@@ -108,9 +108,23 @@ class WorkScheduleController extends AbstractController
 
                 $this->addFlash('success', 'Horaires de la semaine enregistrés.');
                 if ($request->request->getBoolean('notify_animators')) {
-                    $notificationResult = $notificationService->notifyWorkScheduleUpdated($changedAnimators, $weekStart);
-                    if ($notificationResult['sent'] > 0) {
-                        $this->addFlash('success', sprintf('%d notification(s) horaires envoyée(s).', $notificationResult['sent']));
+                    if ($changedAnimators === []) {
+                        $this->addFlash('warning', 'Aucun horaire réellement modifié : aucune notification mobile envoyée.');
+                    } else {
+                        $notificationResult = $notificationService->notifyWorkScheduleUpdated($changedAnimators, $weekStart);
+                        if ($notificationResult['sent'] > 0) {
+                            $this->addFlash('success', sprintf('%d notification(s) horaires envoyée(s).', $notificationResult['sent']));
+                        }
+
+                        if ($notificationResult['failed'] > 0) {
+                            $this->addFlash('warning', sprintf('%d notification(s) n’ont pas pu être envoyée(s). Vérifie Firebase côté serveur.', $notificationResult['failed']));
+                        }
+
+                        if ($notificationResult['sent'] === 0 && $notificationResult['failed'] === 0 && $notificationResult['skipped'] > 0) {
+                            $this->addFlash('warning', 'Aucune notification envoyée : l’animateur concerné n’a pas encore de téléphone enregistré ou les notifications sont désactivées.');
+                        } elseif ($notificationResult['skipped'] > 0) {
+                            $this->addFlash('warning', sprintf('%d animateur(s) n’ont pas de téléphone enregistré pour les notifications.', $notificationResult['skipped']));
+                        }
                     }
                 }
 
