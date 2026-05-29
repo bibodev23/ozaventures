@@ -2,51 +2,64 @@ security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        # used to reload user from session & other features (e.g. switch_user)
-        app_user_provider:
+        direction_users:
+            memory:
+                users:
+                    adjoint:
+                        password: '%env(APP_ADJOINT_PASSWORD_HASH)%'
+                        roles: ['ROLE_DIRECTION']
+                    directrice:
+                        password: '%env(APP_DIRECTRICE_PASSWORD_HASH)%'
+                        roles: ['ROLE_DIRECTION']
+        animator_users:
             entity:
-                class: App\Entity\User
+                class: App\Entity\Animator
                 property: username
+        all_users:
+            chain:
+                providers: ['direction_users', 'animator_users']
+
     firewalls:
         dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            # Ensure dev tools and static assets are always allowed
+            pattern: ^/(_profiler|_wdt|assets|build|styles)/
             security: false
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: animator_users
+            entry_point: App\Security\ApiTokenAuthenticator
+            custom_authenticators:
+                - App\Security\ApiTokenAuthenticator
         main:
             lazy: true
-            provider: app_user_provider
+            provider: all_users
             form_login:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
-                default_target_path: app_outing_index
+                default_target_path: app_after_login
             logout:
                 path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
+                target: app_login
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-    role_hierarchy:
-        ROLE_ANIMATOR: ROLE_USER
-        ROLE_MANAGER:  ROLE_ANIMATOR
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
+    # Note: Only the *first* matching rule is applied
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/api/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/api, roles: ROLE_ANIMATOR }
+        - { path: ^/connexion$, roles: PUBLIC_ACCESS }
+        - { path: ^/apres-connexion$, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/mon-mot-de-passe$, roles: ROLE_ANIMATOR }
+        - { path: ^/, roles: ROLE_DIRECTION }
 
 when@test:
     security:
         password_hashers:
-            # By default, password hashers are resource intensive and take time. This is
-            # important to generate secure password hashes. In tests however, secure hashes
-            # are not important, waste resources and increase test times. The following
-            # reduces the work factor to the lowest possible values.
+            # Password hashers are resource-intensive by design to ensure security.
+            # In tests, it's safe to reduce their cost to improve performance.
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
                 cost: 4 # Lowest possible value for bcrypt

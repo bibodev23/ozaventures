@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Enfants{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">{{ season.name }}</p>
+            <h1>Enfants inscrits</h1>
+            <p class="lead lead-compact">La base participants utilisée pour composer les sorties et les groupes.</p>
+        </div>
+        <a class="button button-primary" href="{{ path('app_child_new') }}">Ajouter un enfant</a>
+    </section>
+
+    {% if children is empty %}
+        <div class="empty-state">Ajoute les enfants inscrits pour commencer à composer les sorties.</div>
+    {% else %}
+        <div class="directory-grid">
+            {% for group in groups %}
+                <section class="section">
+                    <div class="section-title">
+                        <h2>{{ group.label }}</h2>
+                    </div>
+                    <div class="list">
+                        {% for child in children %}
+                            {% if child.ageGroup == group.value %}
+                                <a class="list-row child-list-row" href="{{ path('app_child_show', {id: child.id}) }}">
+                                    <strong>{{ child.fullName }}</strong>
+                                    <span>
+                                        {{ child.age ? child.age ~ ' ans' : child.ageGroupLabel }}
+                                        ·
+                                        {{ participation_counts[child.id]|default(0) }} sortie(s)
+                                        {% if child.hasAllergies() %} · allergie{% endif %}
+                                        ·
+                                        photo {{ child.hasPhotoPermission() ? 'OK' : 'non' }}
+                                    </span>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

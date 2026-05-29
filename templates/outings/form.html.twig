@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">Sorties</p>
+            <h1>{{ title }}</h1>
+            <p class="lead lead-compact">Prépare une sortie lisible pour la direction et exploitable directement depuis l'app mobile.</p>
+        </div>
+    </section>
+
+    <section class="form-layout">
+        <aside class="side-panel">
+            <p class="panel-kicker">Checklist</p>
+            <h2>Avant de prévenir l'équipe</h2>
+            <ol class="check-list">
+                <li>Vérifier l'horaire de départ et de retour.</li>
+                <li>Sélectionner tous les enfants concernés.</li>
+                <li>Associer au moins un animateur responsable.</li>
+                <li>Enregistrer pour notifier les animateurs sélectionnés.</li>
+            </ol>
+        </aside>
+
+        <section class="form-panel form-panel-wide">
+            {{ form_start(form, {attr: {class: 'form'}}) }}
+                <input type="hidden" name="notify_animators" value="1">
+                <section class="hint-card">
+                    <strong>Notification animateurs</strong>
+                    <span>Les animateurs sélectionnés seront prévenus uniquement après validation de ce formulaire.</span>
+                </section>
+                <div class="form-grid">
+                    {{ form_row(form.number) }}
+                    {{ form_row(form.destination) }}
+                    {{ form_row(form.departureAt) }}
+                    {{ form_row(form.returnAt) }}
+                    {{ form_row(form.transportMode) }}
+                    {{ form_row(form.picnicRequired) }}
+                </div>
+                <div class="selection-grid">
+                    <div class="selection-box">
+                        {{ form_row(form.children) }}
+                    </div>
+                    <div class="selection-box">
+                        {{ form_row(form.animators) }}
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <a class="button button-secondary" href="{{ outing.id ? path('app_outing_show', {id: outing.id}) : path('app_outings') }}">Annuler</a>
+                    <button class="button button-primary" type="submit">Enregistrer et notifier</button>
+                </div>
+            {{ form_end(form) }}
+        </section>
+    </section>
+{% endblock %}

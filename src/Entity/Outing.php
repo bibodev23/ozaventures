@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\OutingRepository;
+use App\Enum\OutingStatus;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: OutingRepository::class)]
+#[ORM\Entity]
+#[ORM\Table(name: 'outing')]
 class Outing
 {
     #[ORM\Id]
@@ -16,52 +17,80 @@ class Outing
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $title = null;
+    #[ORM\Column(length: 30)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 30)]
+    private string $number = '';
 
-    /**
-     * @var Collection<int, Kid>
-     */
-    #[ORM\ManyToMany(targetEntity: Kid::class, inversedBy: 'outings')]
-    private Collection $kids;
-
-    /**
-     * @var Collection<int, User>
-     */
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'outings')]
-    private Collection $animators;
+    #[ORM\Column(length: 180)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 180)]
+    private string $destination = '';
 
     #[ORM\Column]
-    private ?\DateTime $date = null;
+    #[Assert\NotNull]
+    private \DateTimeImmutable $departureAt;
 
-    #[ORM\Column(length: 255)]
-    private ?string $location = null;
+    #[ORM\Column]
+    #[Assert\NotNull]
+    #[Assert\GreaterThan(propertyPath: 'departureAt', message: "L'heure de retour doit être après le départ.")]
+    private \DateTimeImmutable $returnAt;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE)]
-    private ?\DateTime $timeGo = null;
+    #[ORM\Column(length: 80)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 80)]
+    private string $transportMode = '';
 
-    #[ORM\Column(type: Types::TIME_MUTABLE)]
-    private ?\DateTime $timeBack = null;
+    #[ORM\Column]
+    private bool $picnicRequired = false;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $notes = null;
+    #[ORM\Column(length: 20)]
+    private string $status = OutingStatus::Pending->value;
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-    private ?\DateTimeImmutable $created_at = null;
-
-    #[ORM\ManyToOne(inversedBy: 'outings_created')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $created_by = null;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $validationComment = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTime $updated_at = null;
+    private ?\DateTimeImmutable $validatedAt = null;
 
-    #[ORM\ManyToOne]
-    private ?User $updated_by = null;
+    #[ORM\Column]
+    private \DateTimeImmutable $createdAt;
+
+    #[ORM\Column]
+    private \DateTimeImmutable $updatedAt;
+
+    #[ORM\ManyToOne(targetEntity: Season::class, inversedBy: 'outings')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Season $season = null;
+
+    #[ORM\ManyToOne(targetEntity: Animator::class, inversedBy: 'createdOutings')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Animator $createdBy = null;
+
+    /**
+     * @var Collection<int, Child>
+     */
+    #[ORM\ManyToMany(targetEntity: Child::class, inversedBy: 'outings')]
+    #[ORM\JoinTable(name: 'outing_child')]
+    #[Assert\Count(min: 1, minMessage: 'Sélectionne au moins un enfant.')]
+    private Collection $children;
+
+    /**
+     * @var Collection<int, Animator>
+     */
+    #[ORM\ManyToMany(targetEntity: Animator::class, inversedBy: 'outings')]
+    #[ORM\JoinTable(name: 'outing_animator')]
+    #[Assert\Count(min: 1, minMessage: 'Sélectionne au moins un animateur.')]
+    private Collection $animators;
 
     public function __construct()
     {
-        $this->kids = new ArrayCollection();
+        $now = new \DateTimeImmutable();
+        $this->departureAt = $now->setTime(9, 30);
+        $this->returnAt = $now->setTime(16, 30);
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
+        $this->children = new ArrayCollection();
         $this->animators = new ArrayCollection();
     }
 
@@ -70,51 +99,182 @@ class Outing
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getNumber(): string
     {
-        return $this->title;
+        return $this->number;
     }
 
-    public function setTitle(string $title): static
+    public function setNumber(string $number): self
     {
-        $this->title = $title;
+        $this->number = trim($number);
+
+        return $this;
+    }
+
+    public function getDestination(): string
+    {
+        return $this->destination;
+    }
+
+    public function setDestination(string $destination): self
+    {
+        $this->destination = trim($destination);
+
+        return $this;
+    }
+
+    public function getDepartureAt(): \DateTimeImmutable
+    {
+        return $this->departureAt;
+    }
+
+    public function setDepartureAt(\DateTimeInterface $departureAt): self
+    {
+        $this->departureAt = \DateTimeImmutable::createFromInterface($departureAt);
+
+        return $this;
+    }
+
+    public function getReturnAt(): \DateTimeImmutable
+    {
+        return $this->returnAt;
+    }
+
+    public function setReturnAt(\DateTimeInterface $returnAt): self
+    {
+        $this->returnAt = \DateTimeImmutable::createFromInterface($returnAt);
+
+        return $this;
+    }
+
+    public function getTransportMode(): string
+    {
+        return $this->transportMode;
+    }
+
+    public function setTransportMode(string $transportMode): self
+    {
+        $this->transportMode = trim($transportMode);
+
+        return $this;
+    }
+
+    public function isPicnicRequired(): bool
+    {
+        return $this->picnicRequired;
+    }
+
+    public function setPicnicRequired(bool $picnicRequired): self
+    {
+        $this->picnicRequired = $picnicRequired;
+
+        return $this;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getStatusLabel(): string
+    {
+        return OutingStatus::from($this->status)->label();
+    }
+
+    public function getStatusBadgeClass(): string
+    {
+        return OutingStatus::from($this->status)->badgeClass();
+    }
+
+    public function getValidationComment(): ?string
+    {
+        return $this->validationComment;
+    }
+
+    public function setValidationComment(?string $validationComment): self
+    {
+        $validationComment = $validationComment !== null ? trim($validationComment) : null;
+        $this->validationComment = $validationComment !== '' ? $validationComment : null;
+
+        return $this;
+    }
+
+    public function getValidatedAt(): ?\DateTimeImmutable
+    {
+        return $this->validatedAt;
+    }
+
+    public function setValidatedAt(?\DateTimeImmutable $validatedAt): self
+    {
+        $this->validatedAt = $validatedAt;
+
+        return $this;
+    }
+
+    public function getSeason(): ?Season
+    {
+        return $this->season;
+    }
+
+    public function setSeason(?Season $season): self
+    {
+        $this->season = $season;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?Animator
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?Animator $createdBy): self
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }
 
     /**
-     * @return Collection<int, Kid>
+     * @return Collection<int, Child>
      */
-    public function getKids(): Collection
+    public function getChildren(): Collection
     {
-        return $this->kids;
+        return $this->children;
     }
 
-    public function addKid(Kid $kid): static
+    public function addChild(Child $child): self
     {
-        if (!$this->kids->contains($kid)) {
-            $this->kids->add($kid);
+        if (!$this->children->contains($child)) {
+            $this->children->add($child);
         }
 
         return $this;
     }
 
-    public function removeKid(Kid $kid): static
+    public function removeChild(Child $child): self
     {
-        $this->kids->removeElement($kid);
+        $this->children->removeElement($child);
 
         return $this;
     }
 
     /**
-     * @return Collection<int, User>
+     * @return Collection<int, Animator>
      */
     public function getAnimators(): Collection
     {
         return $this->animators;
     }
 
-    public function addAnimator(User $animator): static
+    public function addAnimator(Animator $animator): self
     {
         if (!$this->animators->contains($animator)) {
             $this->animators->add($animator);
@@ -123,117 +283,16 @@ class Outing
         return $this;
     }
 
-    public function removeAnimator(User $animator): static
+    public function removeAnimator(Animator $animator): self
     {
         $this->animators->removeElement($animator);
 
         return $this;
     }
 
-    public function getDate(): ?\DateTime
+    public function touch(): self
     {
-        return $this->date;
-    }
-
-    public function setDate(\DateTime $date): static
-    {
-        $this->date = $date;
-
-        return $this;
-    }
-
-    public function getLocation(): ?string
-    {
-        return $this->location;
-    }
-
-    public function setLocation(string $location): static
-    {
-        $this->location = $location;
-
-        return $this;
-    }
-
-    public function getTimeGo(): ?\DateTime
-    {
-        return $this->timeGo;
-    }
-
-    public function setTimeGo(\DateTime $timeGo): static
-    {
-        $this->timeGo = $timeGo;
-
-        return $this;
-    }
-
-    public function getTimeBack(): ?\DateTime
-    {
-        return $this->timeBack;
-    }
-
-    public function setTimeBack(\DateTime $timeBack): static
-    {
-        $this->timeBack = $timeBack;
-
-        return $this;
-    }
-
-    public function getNotes(): ?string
-    {
-        return $this->notes;
-    }
-
-    public function setNotes(?string $notes): static
-    {
-        $this->notes = $notes;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?User
-    {
-        return $this->created_by;
-    }
-
-    public function setCreatedBy(?User $created_by): static
-    {
-        $this->created_by = $created_by;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTime
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(?\DateTime $updated_at): static
-    {
-        $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?User
-    {
-        return $this->updated_by;
-    }
-
-    public function setUpdatedBy(?User $updated_by): static
-    {
-        $this->updated_by = $updated_by;
+        $this->updatedAt = new \DateTimeImmutable();
 
         return $this;
     }

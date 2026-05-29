@@ -1,0 +1,32 @@
+<div{{ attributes.defaults({class: 'global-search-live'}) }}>
+    <label class="global-search-field">
+        <span class="global-search-mark" aria-hidden="true">S</span>
+        <input
+            type="search"
+            value="{{ query }}"
+            data-model="debounce(220)|query"
+            placeholder="Rechercher une sortie, un enfant..."
+            autocomplete="off"
+        >
+        <kbd>Ctrl F</kbd>
+    </label>
+
+    {% if query|trim|length >= 2 %}
+        <div class="global-search-results" data-loading="addClass(is-loading)">
+            {% set results = this.results %}
+            {% if results is empty %}
+                <p class="global-search-empty">Aucun résultat pour "{{ query }}".</p>
+            {% else %}
+                {% for result in results %}
+                    <a href="{{ path(result.route, result.parameters) }}">
+                        <span class="global-search-type">{{ result.type }}</span>
+                        <span>
+                            <strong>{{ result.label }}</strong>
+                            <small>{{ result.meta }}</small>
+                        </span>
+                    </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
+</div>

@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Planning équipe{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">{{ season.name }}</p>
+            <h1>Planning du {{ date|date('d/m/Y') }}</h1>
+            <p class="lead lead-compact">Répartis les tâches visibles dans l'app mobile des animateurs.</p>
+        </div>
+        <form class="date-jump" method="get" action="{{ path('app_daily_planning') }}">
+            <label for="planning-date">Changer de jour</label>
+            <input id="planning-date" type="date" name="date" value="{{ date|date('Y-m-d') }}">
+            <button class="button button-secondary" type="submit">Ouvrir</button>
+        </form>
+    </section>
+
+    <div class="actions planning-actions">
+        <a class="button button-secondary" href="{{ path('app_daily_planning_day', {date: previous_date|date('Y-m-d')}) }}">Jour précédent</a>
+        <a class="button button-secondary" href="{{ path('app_daily_planning_day', {date: next_date|date('Y-m-d')}) }}">Jour suivant</a>
+    </div>
+
+    <section class="hint-card">
+        <strong>Validation direction</strong>
+        <span>Les animateurs ne sont prévenus qu'après validation du planning avec le bouton en bas de page.</span>
+    </section>
+
+    {% if animators is empty %}
+        <div class="empty-state">Ajoute d'abord des animateurs actifs pour pouvoir remplir le planning.</div>
+    {% else %}
+        <form method="post" class="planning-form">
+            <input type="hidden" name="_token" value="{{ csrf_token('daily_planning_' ~ date|date('Y-m-d')) }}">
+            <input type="hidden" name="notify_animators" value="1">
+
+            <section class="task-grid">
+                {% for row in task_rows %}
+                    {% set task = row.task %}
+                    <article class="task-card">
+                        <div class="task-card-header">
+                            <span class="badge {{ task.badgeClass() }}">{{ task.timeLabel() }}</span>
+                            {% if task.groupLabel() %}
+                                <span class="group-chip">{{ task.groupLabel() }}</span>
+                            {% endif %}
+                        </div>
+
+                        <h2>{{ task.label() }}</h2>
+                        <p>{{ task.description() }}</p>
+
+                        <div class="animator-picker">
+                            {% for animator in row.eligible_animators %}
+                                <label class="choice-pill">
+                                    <input
+                                        type="checkbox"
+                                        name="assignments[{{ task.value }}][]"
+                                        value="{{ animator.id }}"
+                                        {% if animator.id in row.selected_ids %}checked{% endif %}
+                                    >
+                                    <span>{{ animator.planningLabel }}</span>
+                                </label>
+                            {% else %}
+                                <span class="empty-inline">Aucun animateur disponible pour ce groupe.</span>
+                            {% endfor %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </section>
+
+            <div class="form-actions sticky-actions">
+                <button class="button button-primary" type="submit">Valider le planning</button>
+            </div>
+        </form>
+    {% endif %}
+{% endblock %}

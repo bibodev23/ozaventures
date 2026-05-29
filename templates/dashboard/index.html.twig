@@ -1,0 +1,179 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block body %}
+    <section class="dribbble-dashboard">
+        <header class="dashboard-topline">
+            <div>
+                <h1>Dashboard</h1>
+                <p>Planifier, prioriser et suivre les sorties avec une vue claire de la saison.</p>
+            </div>
+            <div class="dashboard-actions">
+                <a class="button button-primary" href="{{ path('app_outing_new') }}">+ Ajouter une sortie</a>
+                <a class="button button-secondary" href="{{ path('app_outings') }}">Voir les sorties</a>
+            </div>
+        </header>
+
+        <section class="metric-grid" aria-label="Indicateurs principaux">
+            <twig:DashboardMetric
+                href="{{ path('app_outings') }}"
+                label="Total sorties"
+                value="{{ total_outings_count }}"
+                caption="{{ season_progress }} % de saison"
+                variant="primary"
+            />
+            <twig:DashboardMetric
+                href="{{ path('app_outings', {status: 'validated'}) }}"
+                label="Sorties validées"
+                value="{{ validated_count }}"
+                caption="Prêtes à suivre"
+            />
+            <twig:DashboardMetric
+                href="{{ path('app_outings') }}"
+                label="Sorties à venir"
+                value="{{ upcoming_outings|length }}"
+                caption="Dans le calendrier"
+            />
+            <twig:DashboardMetric
+                href="{{ path('app_outings', {status: 'pending'}) }}"
+                label="À valider"
+                value="{{ pending_count }}"
+                caption="{{ pending_count > 0 ? 'En discussion' : 'Tout est clair' }}"
+            />
+        </section>
+
+        <section class="dashboard-content-grid">
+            <div class="dashboard-center-column">
+                <section class="panel-card analytics-card">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-kicker">Âges enfants</span>
+                            <h2>Répartition par âge</h2>
+                        </div>
+                        <span class="soft-chip">3 - 12 ans</span>
+                    </div>
+                    <div class="chart-shell" aria-label="Nombre d'enfants par âge">
+                        {{ render_chart(children_age_chart, {class: 'dashboard-chart'}) }}
+                    </div>
+                </section>
+
+                <section class="panel-card reminder-card">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-kicker">Rappel direction</span>
+                            <h2>{{ pending_count > 0 ? 'Valider les sorties en attente' : 'Aucune urgence sortie' }}</h2>
+                        </div>
+                    </div>
+                    <p>
+                        {% if pending_count > 0 %}
+                            {{ pending_count }} demande(s) attendent une décision avant d'être visibles comme sorties validées.
+                        {% else %}
+                            Les demandes de sortie sont à jour. Tu peux préparer la suite de la saison tranquillement.
+                        {% endif %}
+                    </p>
+                    <a class="button button-primary" href="{{ path('app_outings', {status: 'pending'}) }}">Ouvrir les validations</a>
+                </section>
+
+                <section class="panel-card collaboration-card">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-kicker">Coordination</span>
+                            <h2>Équipe et participants</h2>
+                        </div>
+                        <a class="soft-chip" href="{{ path('app_animators') }}">+ Gérer</a>
+                    </div>
+                    <div class="collab-list">
+                        <a href="{{ path('app_children') }}">
+                            <span class="avatar avatar-peach">EN</span>
+                            <span><strong>{{ children_count }} enfants inscrits</strong><small>Groupes actifs pour la saison</small></span>
+                        </a>
+                        <a href="{{ path('app_animators') }}">
+                            <span class="avatar avatar-blue">AN</span>
+                            <span><strong>{{ animators_count }} animateurs actifs</strong><small>Comptes mobiles et affectations</small></span>
+                        </a>
+                        <a href="{{ path('app_work_schedule') }}">
+                            <span class="avatar avatar-lilac">HR</span>
+                            <span><strong>Horaires de la semaine</strong><small>À contrôler avant les journées fortes</small></span>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="panel-card progress-card">
+                    <div>
+                        <span class="panel-kicker">Progression</span>
+                        <h2>Saison en cours</h2>
+                    </div>
+                    <div class="progress-arc" style="--value: {{ season_progress }}">
+                        <strong>{{ season_progress }}%</strong>
+                        <span>de saison</span>
+                    </div>
+                    <div class="legend-row">
+                        <span><i class="legend-dot is-done"></i>Écoulé</span>
+                        <span><i class="legend-dot is-next"></i>À venir</span>
+                        <span><i class="legend-dot is-pending"></i>À valider</span>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="outings-column">
+                <section class="panel-card outing-list-card">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-kicker">Sorties</span>
+                            <h2>Planning sorties</h2>
+                        </div>
+                        <a class="soft-chip" href="{{ path('app_outing_new') }}">+ New</a>
+                    </div>
+
+                    {% if upcoming_outings is empty %}
+                        <div class="empty-state empty-state-soft">
+                            <strong>Aucune sortie planifiée.</strong>
+                            <span>Ajoute une sortie pour alimenter cette colonne.</span>
+                        </div>
+                    {% else %}
+                        <div class="project-list outing-project-list">
+                            {% for outing in upcoming_outings|slice(0, 5) %}
+                                <a href="{{ path('app_outing_show', {id: outing.id}) }}">
+                                    <span class="project-icon">{{ outing.departureAt|date('d') }}</span>
+                                    <span>
+                                        <strong>{{ outing.destination }}</strong>
+                                        <small>{{ outing.departureAt|date('d/m H:i') }} · {{ outing.children|length }} enfant(s)</small>
+                                    </span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </section>
+
+                <section class="panel-card next-outing-card">
+                    <span class="panel-kicker">Prochaine sortie</span>
+                    {% if next_outing %}
+                        <h2>{{ next_outing.destination }}</h2>
+                        <p>{{ next_outing.departureAt|date('d/m/Y H:i') }} - {{ next_outing.returnAt|date('H:i') }}</p>
+                        <div class="next-outing-meta">
+                            <span>{{ next_outing.children|length }} enfant(s)</span>
+                            <span>{{ next_outing.animators|length }} anim.</span>
+                            <span class="badge {{ next_outing.statusBadgeClass }}">{{ next_outing.statusLabel }}</span>
+                        </div>
+                        <a class="button button-primary" href="{{ path('app_outing_show', {id: next_outing.id}) }}">Préparer</a>
+                    {% else %}
+                        <h2>Aucune sortie à venir</h2>
+                        <p>Crée la prochaine sortie pour lancer le suivi.</p>
+                        <a class="button button-primary" href="{{ path('app_outing_new') }}">Créer une sortie</a>
+                    {% endif %}
+                </section>
+
+                <section class="panel-card season-timer-card">
+                    <span class="panel-kicker">Saison</span>
+                    <strong>{{ season_days_remaining }}</strong>
+                    <span>jour(s) restant(s)</span>
+                    <div class="timer-actions">
+                        <a href="{{ path('app_daily_planning') }}">Planning</a>
+                        <a href="{{ path('app_work_schedule') }}">Horaires</a>
+                    </div>
+                </section>
+            </aside>
+        </section>
+    </section>
+{% endblock %}

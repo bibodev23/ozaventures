@@ -1,19 +1,9 @@
-import './bootstrap.js';
-/*
- * Welcome to your app's main JavaScript file!
- *
- * This file will be included onto the page via the importmap() Twig function,
- * which should already be in your base.html.twig.
- */
-import './styles/app.css';
+import { config } from '@hotwired/turbo';
+import { startStimulusApp } from '@symfony/stimulus-bundle';
 
+// Keep Turbo navigation, but do not add page-transition or loading animations.
+config.drive.progressBarDelay = 999999;
 
-
-  document.addEventListener("DOMContentLoaded", function () {
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
-    const menuMobile = document.querySelector(".toggle")
-    const nav = document.querySelector("nav")
-    menuMobile.addEventListener("click", () => {
-        nav.classList.toggle("active")
-    })
-});
+const app = startStimulusApp();
+window.OZStimulusApp = app;
+import('./stimulus_bootstrap.js');

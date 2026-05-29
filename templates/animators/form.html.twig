@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">Animateurs</p>
+            <h1>{{ title }}</h1>
+        </div>
+    </section>
+
+    <section class="form-panel">
+        {{ form_start(form, {attr: {class: 'form'}}) }}
+            {{ form_row(form.firstName) }}
+            {{ form_row(form.lastName) }}
+            {{ form_row(form.ageGroup) }}
+            {{ form_row(form.username) }}
+            {{ form_row(form.phone) }}
+            {{ form_row(form.plainPassword) }}
+            {{ form_row(form.active) }}
+            <div class="form-actions">
+                <a class="button button-secondary" href="{{ path('app_animators') }}">Annuler</a>
+                <button class="button button-primary" type="submit">Enregistrer</button>
+            </div>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

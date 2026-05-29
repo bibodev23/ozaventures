@@ -1,7 +1,5 @@
 
 ###> symfony/framework-bundle ###
-/.env
-/.env.dev
 /.env.local
 /.env.local.php
 /.env.*.local
@@ -11,7 +9,10 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
+# Firebase server credentials must stay private.
+/config/firebase/*.json
+
 ###> symfony/asset-mapper ###
+/public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
-je 

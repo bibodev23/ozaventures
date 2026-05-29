@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Animateurs{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">Équipe</p>
+            <h1>Animateurs</h1>
+            <p class="lead lead-compact">Comptes mobiles, groupes d'âge et disponibilité opérationnelle de l'équipe.</p>
+        </div>
+        <a class="button button-primary" href="{{ path('app_animator_new') }}">Ajouter un animateur</a>
+    </section>
+
+    {% if animators is empty %}
+        <div class="empty-state">Ajoute les animateurs pour pouvoir les associer aux sorties.</div>
+    {% else %}
+        <section class="section">
+            <div class="list">
+                {% for animator in animators %}
+                    <a class="list-row" href="{{ path('app_animator_edit', {id: animator.id}) }}">
+                        <strong>{{ animator.fullName }}</strong>
+                        <span>
+                            {{ animator.ageGroupLabel }}
+                            ·
+                            Identifiant : {{ animator.username }}
+                            {% if animator.phone %} · {{ animator.phone }}{% endif %}
+                            ·
+                            {{ animator.active ? 'Actif' : 'Inactif' }}
+                            {% if animator.mustChangePassword %} · mot de passe à changer{% endif %}
+                        </span>
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}

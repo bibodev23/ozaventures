@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sorties{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">{{ season.name }}</p>
+            <h1>Sorties</h1>
+            <p class="lead lead-compact">Toutes les demandes, validations et affiches A3 au même endroit.</p>
+        </div>
+        <a class="button button-primary" href="{{ path('app_outing_new') }}">Créer une sortie</a>
+    </section>
+
+    <section class="mini-stats">
+        <a class="{{ selected_status == 'pending' ? 'is-active' : '' }}" href="{{ path('app_outings', {status: 'pending'}) }}">
+            <span>En attente</span>
+            <strong>{{ pending_count }}</strong>
+        </a>
+        <a class="{{ selected_status == 'validated' ? 'is-active' : '' }}" href="{{ path('app_outings', {status: 'validated'}) }}">
+            <span>Validées</span>
+            <strong>{{ validated_count }}</strong>
+        </a>
+        <a class="{{ selected_status == 'refused' ? 'is-active' : '' }}" href="{{ path('app_outings', {status: 'refused'}) }}">
+            <span>Refusées</span>
+            <strong>{{ refused_count }}</strong>
+        </a>
+    </section>
+
+    {% if selected_status %}
+        <div class="filter-bar">
+            <span>
+                Filtre actif :
+                {% if selected_status == 'pending' %}
+                    sorties en attente
+                {% elseif selected_status == 'validated' %}
+                    sorties validées
+                {% else %}
+                    sorties refusées
+                {% endif %}
+            </span>
+            <a class="button button-secondary" href="{{ path('app_outings') }}">Afficher toutes les sorties</a>
+        </div>
+    {% endif %}
+
+    <section class="hint-card">
+        <strong>Parcours de sortie</strong>
+        <span>Une sortie créée depuis la webapp ou l'app mobile arrive en attente. La direction vérifie les participants, valide ou refuse, puis les animateurs reçoivent la notification.</span>
+    </section>
+
+    {% if outings is empty %}
+        <div class="empty-state empty-state-large">
+            <strong>{{ selected_status ? 'Aucune sortie dans ce filtre.' : 'Aucune sortie créée.' }}</strong>
+            <span>{{ selected_status ? 'Tu peux revenir à toutes les sorties ou créer une nouvelle sortie.' : 'Commence par une première sortie test pour vérifier le parcours webapp, API et mobile.' }}</span>
+            <a class="button button-primary" href="{{ path('app_outing_new') }}">Créer la première sortie</a>
+        </div>
+    {% else %}
+        <div class="outing-grid">
+            {% for outing in outings %}
+                <article class="outing-card {{ outing.status == 'pending' ? 'outing-card-priority' : '' }}">
+                    <div class="outing-card-top">
+                        <span class="badge {{ outing.statusBadgeClass }}">{{ outing.statusLabel }}</span>
+                        <span class="outing-number">Sortie {{ outing.number }}</span>
+                    </div>
+
+                    <div>
+                        <h2>{{ outing.destination }}</h2>
+                        <p>{{ outing.departureAt|date('d/m/Y') }} · {{ outing.departureAt|date('H:i') }} - {{ outing.returnAt|date('H:i') }}</p>
+                    </div>
+
+                    <dl class="outing-card-meta">
+                        <div><dt>Transport</dt><dd>{{ outing.transportMode }}</dd></div>
+                        <div><dt>Enfants</dt><dd>{{ outing.children|length }}</dd></div>
+                        <div><dt>Animateurs</dt><dd>{{ outing.animators|length }}</dd></div>
+                        <div><dt>Pique-nique</dt><dd>{{ outing.picnicRequired ? 'Oui' : 'Non' }}</dd></div>
+                    </dl>
+
+                    <div class="outing-card-actions">
+                        <a class="button button-secondary" href="{{ path('app_outing_show', {id: outing.id}) }}">Ouvrir</a>
+                        {% if outing.status == 'pending' %}
+                            <span class="action-hint">Décision attendue</span>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

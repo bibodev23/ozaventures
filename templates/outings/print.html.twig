@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Affiche A3 sortie {{ outing.number }}</title>
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    </head>
+    <body class="print-page">
+        <main class="a3-sheet">
+            <header class="print-header">
+                <div>
+                    <p>Centre aéré · Sortie {{ outing.number }}</p>
+                    <h1>{{ outing.destination }}</h1>
+                </div>
+                <span class="print-badge">{{ outing.statusLabel }}</span>
+            </header>
+
+            <section class="print-info">
+                <div>
+                    <span>Départ</span>
+                    <strong>{{ outing.departureAt|date('d/m/Y H:i') }}</strong>
+                </div>
+                <div>
+                    <span>Retour</span>
+                    <strong>{{ outing.returnAt|date('H:i') }}</strong>
+                </div>
+                <div>
+                    <span>Transport</span>
+                    <strong>{{ outing.transportMode }}</strong>
+                </div>
+                <div>
+                    <span>Pique-nique</span>
+                    <strong>{{ outing.picnicRequired ? 'Oui' : 'Non' }}</strong>
+                </div>
+            </section>
+
+            <section class="print-columns">
+                <article>
+                    <h2>Enfants participants</h2>
+                    <div class="print-list">
+                        {% for child in outing.children %}
+                            <span>{{ child.fullName }} · {{ child.ageGroupLabel }}</span>
+                        {% endfor %}
+                    </div>
+                </article>
+                <article>
+                    <h2>Animateurs</h2>
+                    <div class="print-list">
+                        {% for animator in outing.animators %}
+                            <span>{{ animator.planningLabel }}</span>
+                        {% endfor %}
+                    </div>
+                </article>
+            </section>
+
+            <footer class="print-footer">
+                <span>Document direction</span>
+                <span>Généré le {{ 'now'|date('d/m/Y H:i') }}</span>
+            </footer>
+        </main>
+    </body>
+</html>

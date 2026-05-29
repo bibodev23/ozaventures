@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ child.fullName }}{% endblock %}
+
+{% block body %}
+    <section class="page-heading child-profile-heading">
+        <div>
+            <p class="eyebrow">Fiche enfant · {{ season.name }}</p>
+            <h1>{{ child.fullName }}</h1>
+            <p class="lead lead-compact">Informations importantes, vigilance direction et historique des sorties.</p>
+            <div class="profile-badges">
+                {% if child.age %}
+                    <span class="badge badge-blue">{{ child.age }} ans</span>
+                {% endif %}
+                <span class="badge badge-blue">{{ child.ageGroupLabel }}</span>
+                <span class="badge {{ child.hasAllergies() ? 'badge-danger' : 'badge-success' }}">{{ child.hasAllergies() ? 'Allergie / vigilance' : 'Aucune allergie renseignée' }}</span>
+                <span class="badge {{ child.hasPhotoPermission() ? 'badge-success' : 'badge-waiting' }}">Photo {{ child.hasPhotoPermission() ? 'autorisée' : 'non autorisée' }}</span>
+            </div>
+        </div>
+        <div class="actions">
+            <a class="button button-secondary" href="{{ path('app_children') }}">Retour enfants</a>
+            <a class="button button-primary" href="{{ path('app_child_edit', {id: child.id}) }}">Modifier la fiche</a>
+        </div>
+    </section>
+
+    <section class="child-profile-grid">
+        <article class="panel-card child-info-card">
+            <div class="panel-heading">
+                <div>
+                    <span class="panel-kicker">Infos essentielles</span>
+                    <h2>À connaître avant une sortie</h2>
+                </div>
+            </div>
+
+            <div class="fact-list">
+                <div class="fact-card">
+                    <span>Responsables légaux</span>
+                    <strong>{{ child.legalGuardians ? child.legalGuardians|nl2br : 'Non renseigné' }}</strong>
+                </div>
+                <div class="fact-card">
+                    <span>Téléphones</span>
+                    <strong>{{ child.legalGuardianPhones ?: 'Non renseigné' }}</strong>
+                </div>
+                <div class="fact-card {{ child.hasAllergies() ? 'is-warning' : 'is-ok' }}">
+                    <span>Allergies / vigilance</span>
+                    <strong>{{ child.allergies ? child.allergies|nl2br : 'Aucune allergie connue renseignée' }}</strong>
+                </div>
+                <div class="fact-card {{ child.hasPhotoPermission() ? 'is-ok' : 'is-warning' }}">
+                    <span>Droit à l'image</span>
+                    <strong>{{ child.hasPhotoPermission() ? 'Autorisation photo accordée' : 'Pas d’autorisation photo renseignée' }}</strong>
+                </div>
+                <div class="fact-card fact-card-wide">
+                    <span>Notes importantes</span>
+                    <strong>{{ child.importantNotes ? child.importantNotes|nl2br : 'Aucune note particulière' }}</strong>
+                </div>
+            </div>
+        </article>
+
+        <aside class="panel-card child-summary-card">
+            <span class="panel-kicker">Suivi sorties</span>
+            <h2>Résumé de participation</h2>
+            <div class="summary-number">
+                <strong>{{ stats.effective_count }}</strong>
+                <span>sortie(s) retenue(s)</span>
+            </div>
+            <div class="summary-status-grid">
+                <span><strong>{{ stats.validated_count }}</strong> validée(s)</span>
+                <span><strong>{{ stats.pending_count }}</strong> en attente</span>
+                <span><strong>{{ stats.refused_count }}</strong> refusée(s)</span>
+            </div>
+            <dl class="summary-facts">
+                <div><dt>Dernière sortie</dt><dd>{{ stats.last_outing ? stats.last_outing.departureAt|date('d/m/Y') : 'Jamais' }}</dd></div>
+                <div><dt>Total historique</dt><dd>{{ stats.total_count }} sortie(s)</dd></div>
+            </dl>
+        </aside>
+    </section>
+
+    <section class="child-stat-grid">
+        <article class="metric-card">
+            <span>Validées</span>
+            <strong>{{ stats.validated_count }}</strong>
+            <small>Sorties confirmées</small>
+        </article>
+        <article class="metric-card">
+            <span>En attente</span>
+            <strong>{{ stats.pending_count }}</strong>
+            <small>Demandes possibles</small>
+        </article>
+        <article class="metric-card">
+            <span>Refusées</span>
+            <strong>{{ stats.refused_count }}</strong>
+            <small>Non comptées dans l'équilibrage</small>
+        </article>
+        <article class="metric-card metric-card-primary">
+            <span>Sorties retenues</span>
+            <strong>{{ stats.effective_count }}</strong>
+            <small>Validées ou en attente</small>
+        </article>
+    </section>
+
+    <section class="panel-card outing-history-card">
+        <div class="panel-heading">
+            <div>
+                <span class="panel-kicker">Historique</span>
+                <h2>Sorties de {{ child.firstName }}</h2>
+            </div>
+            <a class="soft-chip" href="{{ path('app_outings') }}">Toutes les sorties</a>
+        </div>
+
+        {% if outings is empty %}
+            <div class="empty-state empty-state-soft">
+                <strong>Aucune sortie pour le moment.</strong>
+                <span>Cet enfant pourra être priorisé lors des prochaines propositions.</span>
+            </div>
+        {% else %}
+            <div class="outing-history-list">
+                {% for outing in outings %}
+                    <a class="history-row" href="{{ path('app_outing_show', {id: outing.id}) }}">
+                        <span class="date-tile">
+                            <strong>{{ outing.departureAt|date('d') }}</strong>
+                            <small>{{ outing.departureAt|date('M') }}</small>
+                        </span>
+                        <span class="history-main">
+                            <strong>{{ outing.destination }}</strong>
+                            <small>Sortie {{ outing.number }} · {{ outing.departureAt|date('d/m/Y H:i') }} - {{ outing.returnAt|date('H:i') }} · {{ outing.transportMode }}</small>
+                        </span>
+                        <span class="history-meta">
+                            <span class="badge {{ outing.statusBadgeClass }}">{{ outing.statusLabel }}</span>
+                            <small>{{ outing.animators|length }} animateur(s)</small>
+                        </span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

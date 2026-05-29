@@ -1,0 +1,251 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Horaires animateurs{% endblock %}
+
+{% block body %}
+    {% set previous_week_params = {'week': previous_week|date('Y-m-d')}|merge(schedule_query) %}
+    {% set next_week_params = {'week': next_week|date('Y-m-d')}|merge(schedule_query) %}
+
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">{{ season.name }}</p>
+            <h1>Horaires semaine du {{ week_start|date('d/m/Y') }}</h1>
+        </div>
+        <form class="date-jump" method="get" action="{{ path('app_work_schedule') }}">
+            <label for="schedule-week">Choisir une semaine</label>
+            <input id="schedule-week" type="date" name="week" value="{{ week_start|date('Y-m-d') }}">
+            {% if selected_age_group %}
+                <input type="hidden" name="group" value="{{ selected_age_group }}">
+            {% endif %}
+            <button class="button button-secondary" type="submit">Ouvrir</button>
+        </form>
+    </section>
+
+    <div class="actions planning-actions">
+        <a class="button button-secondary" href="{{ path('app_work_schedule_week', previous_week_params) }}">Semaine précédente</a>
+        <a class="button button-secondary" href="{{ path('app_work_schedule_week', next_week_params) }}">Semaine suivante</a>
+    </div>
+
+    <section class="schedule-filter-panel" aria-label="Choisir les animateurs à planifier">
+        <div>
+            <p class="eyebrow">Equipe à planifier</p>
+            <h2>Filtrer les horaires par groupe</h2>
+            <p>Affiche uniquement les animateurs concernés. À l'enregistrement, les groupes masqués ne sont pas modifiés.</p>
+        </div>
+
+        <div class="schedule-filter-options">
+            {% for filter in age_group_filters %}
+                <a
+                    class="schedule-filter-option {{ filter.active ? 'is-active' : '' }}"
+                    href="{{ path('app_work_schedule_week', {'week': week_start|date('Y-m-d')}|merge(filter.query)) }}"
+                    {% if filter.active %}aria-current="true"{% endif %}
+                >
+                    <span>{{ filter.label }}</span>
+                    <strong>{{ filter.count }}</strong>
+                    <small>animateur{{ filter.count > 1 ? 's' : '' }}</small>
+                </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    {% if animators is empty %}
+        {% if active_animators_count > 0 %}
+            <div class="empty-state">Aucun animateur actif dans ce filtre. Sélectionne les deux groupes ou complète le groupe des animateurs concernés.</div>
+        {% else %}
+            <div class="empty-state">Ajoute d'abord des animateurs actifs pour pouvoir saisir leurs horaires.</div>
+        {% endif %}
+    {% else %}
+        <form method="post" class="schedule-form">
+            <input type="hidden" name="_token" value="{{ csrf_token('work_schedule_' ~ week_start|date('Y-m-d')) }}">
+            <input type="hidden" name="notify_animators" value="1">
+
+            <div class="schedule-accordion-toolbar">
+                <div>
+                    <p class="eyebrow">Saisie rapide</p>
+                    <strong>{{ rows|length }} animateur{{ rows|length > 1 ? 's' : '' }} affiché{{ rows|length > 1 ? 's' : '' }}</strong>
+                    <span>Ouvre seulement l'animateur à modifier pour garder une page courte.</span>
+                </div>
+                <div class="schedule-accordion-actions">
+                    <button class="button button-secondary" type="button" data-schedule-open-all>Tout ouvrir</button>
+                    <button class="button button-secondary" type="button" data-schedule-close-all>Tout refermer</button>
+                </div>
+            </div>
+
+            <div class="schedule-board">
+                {% for row in rows %}
+                    <details
+                        class="schedule-person-card {{ row.is_over_limit ? 'is-over-limit' : '' }}"
+                        data-schedule-person
+                        data-animator-name="{{ row.animator.fullName }}"
+                        data-animator-group="{{ row.animator.ageGroupLabel }}"
+                        {% if loop.first %}open{% endif %}
+                    >
+                        <summary class="schedule-card-summary">
+                            <div class="schedule-summary-main">
+                                <p class="eyebrow">Animateur</p>
+                                <span class="schedule-summary-title">{{ row.animator.fullName }}</span>
+                                <span class="schedule-group">{{ row.animator.ageGroupLabel }}</span>
+                            </div>
+
+                            <span class="schedule-summary-days" aria-label="Résumé de la semaine">
+                                {% for day in row.days %}
+                                    <span class="schedule-day-chip {{ day.errors is not empty ? 'has-warning' : (day.minutes_label ? 'is-filled' : '') }}">
+                                        <span>{{ day.label|slice(0, 3)|upper }}</span>
+                                        <strong>{{ day.errors is not empty ? 'À corriger' : (day.minutes_label ?? 'Repos') }}</strong>
+                                    </span>
+                                {% endfor %}
+                            </span>
+
+                            <div class="schedule-total-card">
+                                <span>Total semaine</span>
+                                <strong>{{ row.total_label }}</strong>
+                                {% if row.over_limit_label %}
+                                    <small>{{ row.over_limit_label }} au-delà de 35h</small>
+                                {% endif %}
+                            </div>
+                            <span class="schedule-accordion-indicator" aria-hidden="true">Modifier</span>
+                        </summary>
+
+                        <div class="schedule-person-body">
+                            <div class="schedule-days-grid">
+                                {% for day in row.days %}
+                                    <section
+                                        class="schedule-day-card {{ day.errors is not empty ? 'has-error' : '' }}"
+                                        data-schedule-day
+                                        data-day-label="{{ day.short_label }}"
+                                    >
+                                        <header class="schedule-day-header">
+                                            <span>{{ day.label }}</span>
+                                            <strong>{{ day.date|date('d/m') }}</strong>
+                                        </header>
+
+                                        <div class="shift-block shift-block-morning">
+                                            <div class="shift-block-title">Matin</div>
+                                            <div class="time-pair">
+                                                <label class="time-field">
+                                                    <span>{{ field_labels['start'] }}</span>
+                                                    <input
+                                                        class="schedule-time-input"
+                                                        type="time"
+                                                        name="shifts[{{ row.animator.id }}][{{ day.key }}][start]"
+                                                        value="{{ day.values.start }}"
+                                                        min="07:00"
+                                                        max="18:00"
+                                                        step="900"
+                                                        data-shift-field="start"
+                                                        aria-label="{{ row.animator.fullName }} - {{ day.label }} {{ day.date|date('d/m') }} - {{ field_labels['start'] }}"
+                                                    >
+                                                </label>
+                                                <label class="time-field">
+                                                    <span>{{ field_labels['lunch_start'] }}</span>
+                                                    <input
+                                                        class="schedule-time-input"
+                                                        type="time"
+                                                        name="shifts[{{ row.animator.id }}][{{ day.key }}][lunch_start]"
+                                                        value="{{ day.values.lunch_start }}"
+                                                        min="07:00"
+                                                        max="18:00"
+                                                        step="900"
+                                                        data-shift-field="lunch_start"
+                                                        aria-label="{{ row.animator.fullName }} - {{ day.label }} {{ day.date|date('d/m') }} - {{ field_labels['lunch_start'] }}"
+                                                    >
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="shift-block shift-block-afternoon">
+                                            <div class="shift-block-title">Après-midi</div>
+                                            <div class="time-pair">
+                                                <label class="time-field">
+                                                    <span>{{ field_labels['lunch_end'] }}</span>
+                                                    <input
+                                                        class="schedule-time-input"
+                                                        type="time"
+                                                        name="shifts[{{ row.animator.id }}][{{ day.key }}][lunch_end]"
+                                                        value="{{ day.values.lunch_end }}"
+                                                        min="07:00"
+                                                        max="18:00"
+                                                        step="900"
+                                                        data-shift-field="lunch_end"
+                                                        aria-label="{{ row.animator.fullName }} - {{ day.label }} {{ day.date|date('d/m') }} - {{ field_labels['lunch_end'] }}"
+                                                    >
+                                                </label>
+                                                <label class="time-field">
+                                                    <span>{{ field_labels['end'] }}</span>
+                                                    <input
+                                                        class="schedule-time-input"
+                                                        type="time"
+                                                        name="shifts[{{ row.animator.id }}][{{ day.key }}][end]"
+                                                        value="{{ day.values.end }}"
+                                                        min="07:00"
+                                                        max="18:00"
+                                                        step="900"
+                                                        data-shift-field="end"
+                                                        aria-label="{{ row.animator.fullName }} - {{ day.label }} {{ day.date|date('d/m') }} - {{ field_labels['end'] }}"
+                                                    >
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        {% if day.minutes_label %}
+                                            <span class="day-total">Journée : {{ day.minutes_label }}</span>
+                                        {% endif %}
+
+                                        {% for error in day.errors %}
+                                            <small class="field-error">{{ error }}</small>
+                                        {% endfor %}
+                                    </section>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </details>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions sticky-actions schedule-save-bar">
+                <button class="button button-primary" type="submit">Valider les horaires</button>
+            </div>
+
+            <div class="schedule-preview-modal" data-preview-modal hidden role="dialog" aria-modal="true" aria-labelledby="schedule-preview-title">
+                <button class="schedule-preview-backdrop" type="button" data-preview-close aria-label="Fermer l'aperçu"></button>
+                <section class="schedule-preview-panel">
+                    <header class="schedule-preview-header">
+                        <div>
+                            <p class="eyebrow">Vision large</p>
+                            <h2 id="schedule-preview-title">Aperçu de la semaine</h2>
+                        </div>
+                        <button class="button button-secondary" type="button" data-preview-close>Fermer</button>
+                    </header>
+
+                    <div class="schedule-preview-summary" data-preview-summary></div>
+
+                    <div class="table-wrap">
+                        <table class="schedule-preview-table">
+                            <thead>
+                                <tr>
+                                    <th>Animateur</th>
+                                    {% for day in week_days %}
+                                        <th>{{ day.short_label }}</th>
+                                    {% endfor %}
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody data-preview-body>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </form>
+    {% endif %}
+{% endblock %}
+
+{% block floating_actions %}
+    {% if animators is defined and animators is not empty %}
+        <button class="button button-secondary schedule-preview-fixed-button" type="button" data-preview-open>Aperçu de la semaine</button>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('scripts/schedule-preview.js') }}?v=20260529-motion" defer></script>
+{% endblock %}

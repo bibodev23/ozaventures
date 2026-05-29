@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">Enfants</p>
+            <h1>{{ title }}</h1>
+        </div>
+    </section>
+
+    <section class="form-panel">
+        {{ form_start(form, {attr: {class: 'form'}}) }}
+            <div class="form-grid">
+                {{ form_row(form.firstName) }}
+                {{ form_row(form.lastName) }}
+                {{ form_row(form.age) }}
+            </div>
+            {{ form_row(form.ageGroup) }}
+
+            <section class="hint-card">
+                <strong>Informations direction</strong>
+                <span>Ces données aident l'équipe à préparer les sorties et à repérer les vigilances importantes.</span>
+            </section>
+
+            {{ form_row(form.legalGuardians) }}
+            {{ form_row(form.legalGuardianPhones) }}
+            {{ form_row(form.allergies) }}
+            {{ form_row(form.photoPermission) }}
+            {{ form_row(form.importantNotes) }}
+            <div class="form-actions">
+                <a class="button button-secondary" href="{{ child.id ? path('app_child_show', {id: child.id}) : path('app_children') }}">Annuler</a>
+                <button class="button button-primary" type="submit">Enregistrer</button>
+            </div>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

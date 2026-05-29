@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sortie {{ outing.number }}{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">Sortie {{ outing.number }}</p>
+            <h1>{{ outing.destination }}</h1>
+            <p class="lead lead-compact">{{ outing.departureAt|date('d/m/Y') }} · {{ outing.departureAt|date('H:i') }} - {{ outing.returnAt|date('H:i') }}</p>
+        </div>
+        <div class="actions">
+            <a class="button button-secondary" href="{{ path('app_outing_print', {id: outing.id}) }}" target="_blank">Affiche A3</a>
+            <a class="button button-secondary" href="{{ path('app_outing_edit', {id: outing.id}) }}">Modifier</a>
+        </div>
+    </section>
+
+    <section class="detail-layout">
+        <article class="section status-panel">
+            <div class="section-title">
+                <div>
+                    <p class="panel-kicker">Décision direction</p>
+                    <h2>Statut de la sortie</h2>
+                </div>
+                <span class="badge {{ outing.statusBadgeClass }}">{{ outing.statusLabel }}</span>
+            </div>
+
+            <p class="muted-text">Chaque changement de statut peut prévenir les animateurs affectés via l'application mobile.</p>
+
+            <div class="status-actions">
+                <form method="post" action="{{ path('app_outing_status', {id: outing.id, status: 'validated'}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('outing_status_' ~ outing.id) }}">
+                    <input type="hidden" name="notify_animators" value="1">
+                    <button class="button button-success" type="submit">Valider</button>
+                </form>
+                <form method="post" action="{{ path('app_outing_status', {id: outing.id, status: 'refused'}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('outing_status_' ~ outing.id) }}">
+                    <input type="hidden" name="notify_animators" value="1">
+                    <button class="button button-danger" type="submit">Refuser</button>
+                </form>
+                <form method="post" action="{{ path('app_outing_status', {id: outing.id, status: 'pending'}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('outing_status_' ~ outing.id) }}">
+                    <input type="hidden" name="notify_animators" value="1">
+                    <button class="button button-secondary" type="submit">Remettre en attente</button>
+                </form>
+            </div>
+        </article>
+
+        <article class="section">
+            <div class="section-title">
+                <div>
+                    <p class="panel-kicker">Logistique</p>
+                    <h2>Détails pratiques</h2>
+                </div>
+            </div>
+            <dl class="detail-list detail-list-cards">
+                <div><dt>Départ</dt><dd>{{ outing.departureAt|date('d/m/Y H:i') }}</dd></div>
+                <div><dt>Retour</dt><dd>{{ outing.returnAt|date('d/m/Y H:i') }}</dd></div>
+                <div><dt>Transport</dt><dd>{{ outing.transportMode }}</dd></div>
+                <div><dt>Pique-nique</dt><dd>{{ outing.picnicRequired ? 'Oui' : 'Non' }}</dd></div>
+                <div><dt>Enfants</dt><dd>{{ outing.children|length }}</dd></div>
+                <div><dt>Animateurs</dt><dd>{{ outing.animators|length }}</dd></div>
+            </dl>
+        </article>
+    </section>
+
+    <section class="detail-layout">
+        <article class="section">
+            <div class="section-title">
+                <div>
+                    <p class="panel-kicker">Participants</p>
+                    <h2>Enfants</h2>
+                </div>
+            </div>
+            <div class="tag-list">
+                {% for child in outing.children %}
+                    <span>{{ child.fullName }} · {{ child.ageGroupLabel }}</span>
+                {% else %}
+                    <span>Aucun enfant sélectionné</span>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="section">
+            <div class="section-title">
+                <div>
+                    <p class="panel-kicker">Encadrement</p>
+                    <h2>Animateurs</h2>
+                </div>
+            </div>
+            <div class="tag-list">
+                {% for animator in outing.animators %}
+                    <span>{{ animator.planningLabel }}</span>
+                {% else %}
+                    <span>Aucun animateur sélectionné</span>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+{% endblock %}

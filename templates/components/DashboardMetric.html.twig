@@ -1,0 +1,8 @@
+{% props href = '#', label, value, caption, variant = '', icon = 'oz:arrow-up-right' %}
+
+<a href="{{ href }}"{{ attributes.defaults({class: 'metric-card' ~ (variant ? ' metric-card-' ~ variant : '')}) }}>
+    <span>{{ label }}</span>
+    <strong>{{ value }}</strong>
+    <small>{{ caption }}</small>
+    <span class="metric-card-icon" aria-hidden="true">{{ ux_icon(icon) }}</span>
+</a>

@@ -2,21 +2,27 @@
 
 namespace App\Enum;
 
-/**
- * Enum class representing tkid's ageGroup
- */
-
-
 enum AgeGroup: string
 {
-    case BABIES = "3-5";
-    case CHILDREN = "6-12";
+    case Little = '3-5';
+    case Big = '6-12';
 
-    public function getLabel(): string
+    public function label(): string
     {
         return match ($this) {
-            self::BABIES => "3-5 ans",
-            self::CHILDREN => "6-12 ans",
+            self::Little => '3-5 ans',
+            self::Big => '6-12 ans',
         };
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function choices(): array
+    {
+        return [
+            self::Little->label() => self::Little->value,
+            self::Big->label() => self::Big->value,
+        ];
     }
 }
