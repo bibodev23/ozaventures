@@ -8,6 +8,7 @@ use App\Entity\Child;
 use App\Entity\DailyTaskAssignment;
 use App\Entity\MobileDeviceToken;
 use App\Entity\Outing;
+use App\Entity\OutingLocationPing;
 use App\Entity\Season;
 use App\Entity\User;
 use App\Enum\OutingStatus;
@@ -320,6 +321,75 @@ class MobileApiController extends AbstractController
         ]);
     }
 
+    #[Route('/outings/{id}/locations', name: 'api_outing_locations', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function outingLocations(Outing $outing): JsonResponse
+    {
+        $user = $this->currentUser();
+        if (!$user->isDirector() && !$this->animatorCanSeeOuting($this->currentAnimator(), $outing)) {
+            return $this->apiError('forbidden', 'Localisation inaccessible.', Response::HTTP_FORBIDDEN);
+        }
+
+        $locations = $this->entityManager->getRepository(OutingLocationPing::class)->findBy(
+            ['outing' => $outing],
+            ['recordedAt' => 'DESC'],
+        );
+
+        return $this->json([
+            'locationTrackingEnabled' => $outing->isLocationTrackingEnabled(),
+            'locations' => array_map(fn (OutingLocationPing $location): array => $this->serializeLocationPing($location), $locations),
+        ]);
+    }
+
+    #[Route('/outings/{id}/location', name: 'api_outing_location_update', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[IsGranted('ROLE_ANIMATOR')]
+    public function updateOutingLocation(Outing $outing, Request $request): JsonResponse
+    {
+        $animator = $this->currentAnimator();
+        if (!$outing->isLocationTrackingEnabled()) {
+            return $this->apiError('location_disabled', 'Le suivi localisation n’est pas activé pour cette sortie.', Response::HTTP_CONFLICT);
+        }
+
+        if (!$outing->getAnimators()->contains($animator)) {
+            return $this->apiError('forbidden', 'Seuls les animateurs affectés peuvent partager leur position.', Response::HTTP_FORBIDDEN);
+        }
+
+        $payload = $this->jsonPayload($request);
+        $latitude = $this->floatFromPayload($payload['latitude'] ?? null);
+        $longitude = $this->floatFromPayload($payload['longitude'] ?? null);
+        if ($latitude === null || $longitude === null || $latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
+            return $this->apiError('invalid_location', 'Coordonnées GPS invalides.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $location = $this->entityManager->getRepository(OutingLocationPing::class)->findOneBy([
+            'outing' => $outing,
+            'animator' => $animator,
+        ]);
+
+        if (!$location instanceof OutingLocationPing) {
+            $location = (new OutingLocationPing())
+                ->setOuting($outing)
+                ->setAnimator($animator);
+            $this->entityManager->persist($location);
+        }
+
+        $location
+            ->setLatitude($latitude)
+            ->setLongitude($longitude)
+            ->setAccuracy($this->floatFromPayload($payload['accuracy'] ?? null))
+            ->setHeading($this->floatFromPayload($payload['heading'] ?? null))
+            ->setSpeed($this->floatFromPayload($payload['speed'] ?? null))
+            ->setRecordedAt(new \DateTimeImmutable())
+            ->touch();
+
+        $this->entityManager->flush();
+
+        return $this->json([
+            'message' => 'Position envoyée.',
+            'location' => $this->serializeLocationPing($location),
+        ]);
+    }
+
     #[Route('/daily-planning', name: 'api_daily_planning', methods: ['GET'])]
     #[IsGranted('ROLE_ANIMATOR')]
     public function dailyPlanning(Request $request): JsonResponse
@@ -417,12 +487,19 @@ class MobileApiController extends AbstractController
             return $this->apiError('invalid_datetime', 'Les dates doivent être au format ISO 8601.', Response::HTTP_BAD_REQUEST);
         }
 
+        $routeDurationMinutes = null;
+        if (array_key_exists('routeDurationMinutes', $payload) && $payload['routeDurationMinutes'] !== null && $payload['routeDurationMinutes'] !== '') {
+            $routeDurationMinutes = (int) $payload['routeDurationMinutes'];
+        }
+
         $outing
             ->setDestination((string) $payload['destination'])
             ->setDepartureAt($departureAt)
             ->setReturnAt($returnAt)
             ->setTransportMode((string) $payload['transportMode'])
             ->setPicnicRequired((bool) ($payload['picnicRequired'] ?? false))
+            ->setRouteDurationMinutes($routeDurationMinutes)
+            ->setLocationTrackingEnabled((bool) ($payload['locationTrackingEnabled'] ?? false))
             ->touch();
 
         $childIds = $payload['childIds'] ?? [];
@@ -587,6 +664,19 @@ class MobileApiController extends AbstractController
         }
     }
 
+    private function floatFromPayload(mixed $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_int($value) || is_float($value) || (is_string($value) && is_numeric($value))) {
+            return (float) $value;
+        }
+
+        return null;
+    }
+
     private function dateFromQuery(Request $request, string $key): ?\DateTimeImmutable
     {
         $value = (string) $request->query->get($key, '');
@@ -742,6 +832,9 @@ class MobileApiController extends AbstractController
             'returnAt' => $outing->getReturnAt()->format(\DateTimeInterface::ATOM),
             'transportMode' => $outing->getTransportMode(),
             'picnicRequired' => $outing->isPicnicRequired(),
+            'routeDurationMinutes' => $outing->getRouteDurationMinutes(),
+            'routeDurationLabel' => $outing->getRouteDurationLabel(),
+            'locationTrackingEnabled' => $outing->isLocationTrackingEnabled(),
             'status' => $outing->getStatus(),
             'statusLabel' => $outing->getStatusLabel(),
             'validationComment' => $outing->getValidationComment(),
@@ -749,6 +842,25 @@ class MobileApiController extends AbstractController
             'createdBy' => $outing->getCreatedBy() instanceof Animator ? $this->serializeAnimator($outing->getCreatedBy()) : null,
             'children' => $this->serializeCollection($outing->getChildren(), fn (Child $child): array => $this->serializeChild($child)),
             'animators' => $this->serializeCollection($outing->getAnimators(), fn (Animator $animator): array => $this->serializeAnimator($animator)),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serializeLocationPing(OutingLocationPing $location): array
+    {
+        $animator = $location->getAnimator();
+
+        return [
+            'id' => $location->getId(),
+            'latitude' => $location->getLatitude(),
+            'longitude' => $location->getLongitude(),
+            'accuracy' => $location->getAccuracy(),
+            'heading' => $location->getHeading(),
+            'speed' => $location->getSpeed(),
+            'recordedAt' => $location->getRecordedAt()->format(\DateTimeInterface::ATOM),
+            'animator' => $animator instanceof Animator ? $this->serializeAnimator($animator) : null,
         ];
     }
 

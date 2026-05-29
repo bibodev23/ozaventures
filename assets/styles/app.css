@@ -1405,6 +1405,110 @@ input[type="radio"] {
     margin-top: 22px;
 }
 
+.outing-location-section {
+    margin-bottom: 18px;
+}
+
+.outing-location-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(300px, .75fr);
+    gap: 18px;
+}
+
+.outing-map-card,
+.outing-location-panel {
+    border: 1px solid rgba(255, 255, 255, .70);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, .62);
+    box-shadow: var(--shadow);
+}
+
+.outing-map-card {
+    overflow: hidden;
+}
+
+.outing-map {
+    min-height: 420px;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(190, 235, 216, .72), transparent 34%),
+        linear-gradient(135deg, rgba(199, 220, 255, .36), rgba(255, 214, 200, .30));
+}
+
+.outing-map-note {
+    margin: 0;
+    padding: 14px 16px;
+    color: var(--muted);
+    font-weight: 900;
+}
+
+.outing-location-panel {
+    padding: 20px;
+}
+
+.outing-location-panel h3 {
+    margin: 0 0 14px;
+    font-size: 1.35rem;
+}
+
+.outing-location-list {
+    display: grid;
+    gap: 10px;
+}
+
+.outing-location-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, .74);
+    border-radius: 18px;
+    background: rgba(255, 253, 250, .78);
+}
+
+.outing-location-avatar {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 16px;
+    color: #4f557e;
+    background: linear-gradient(135deg, var(--blue-soft), var(--peach));
+    font-weight: 950;
+}
+
+.outing-location-copy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.outing-location-copy small {
+    color: var(--muted);
+    font-weight: 800;
+}
+
+.outing-location-marker {
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .86);
+    box-shadow: 0 12px 30px rgba(73, 83, 108, .24);
+}
+
+.outing-location-marker span {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 3px solid #fff;
+    border-radius: 999px;
+    color: #385c52;
+    background: linear-gradient(135deg, var(--green-soft), var(--blue-soft));
+    font-size: .78rem;
+    font-weight: 950;
+}
+
 .tag-list {
     display: flex;
     flex-wrap: wrap;
@@ -2665,6 +2769,7 @@ input[type="radio"] {
     .form-grid,
     .form-layout,
     .detail-list-cards,
+    .outing-location-grid,
     .print-info,
     .print-columns,
     .task-grid {

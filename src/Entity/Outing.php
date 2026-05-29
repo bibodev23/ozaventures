@@ -44,6 +44,13 @@ class Outing
     #[ORM\Column]
     private bool $picnicRequired = false;
 
+    #[ORM\Column(nullable: true)]
+    #[Assert\Range(min: 0, max: 600)]
+    private ?int $routeDurationMinutes = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $locationTrackingEnabled = false;
+
     #[ORM\Column(length: 20)]
     private string $status = OutingStatus::Pending->value;
 
@@ -167,6 +174,51 @@ class Outing
     public function setPicnicRequired(bool $picnicRequired): self
     {
         $this->picnicRequired = $picnicRequired;
+
+        return $this;
+    }
+
+    public function getRouteDurationMinutes(): ?int
+    {
+        return $this->routeDurationMinutes;
+    }
+
+    public function setRouteDurationMinutes(?int $routeDurationMinutes): self
+    {
+        $this->routeDurationMinutes = $routeDurationMinutes !== null ? max(0, $routeDurationMinutes) : null;
+
+        return $this;
+    }
+
+    public function getRouteDurationLabel(): string
+    {
+        if ($this->routeDurationMinutes === null) {
+            return 'Non renseigné';
+        }
+
+        $hours = intdiv($this->routeDurationMinutes, 60);
+        $minutes = $this->routeDurationMinutes % 60;
+
+        if ($hours === 0) {
+            return sprintf('%d min', $minutes);
+        }
+
+        return sprintf('%dh%02d', $hours, $minutes);
+    }
+
+    public function isLongRoute(): bool
+    {
+        return $this->routeDurationMinutes !== null && $this->routeDurationMinutes >= 60;
+    }
+
+    public function isLocationTrackingEnabled(): bool
+    {
+        return $this->locationTrackingEnabled;
+    }
+
+    public function setLocationTrackingEnabled(bool $locationTrackingEnabled): self
+    {
+        $this->locationTrackingEnabled = $locationTrackingEnabled;
 
         return $this;
     }

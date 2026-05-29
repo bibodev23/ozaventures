@@ -11,6 +11,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -51,6 +52,21 @@ class OutingType extends AbstractType
             ->add('picnicRequired', CheckboxType::class, [
                 'label' => 'Pique-nique prévu',
                 'required' => false,
+            ])
+            ->add('routeDurationMinutes', IntegerType::class, [
+                'label' => 'Temps de trajet estimé (minutes)',
+                'required' => false,
+                'attr' => [
+                    'min' => 0,
+                    'max' => 600,
+                    'placeholder' => 'Ex : 75',
+                ],
+                'help' => 'À partir de 60 minutes, le suivi localisation est recommandé.',
+            ])
+            ->add('locationTrackingEnabled', CheckboxType::class, [
+                'label' => 'Activer le suivi localisation pour cette sortie',
+                'required' => false,
+                'help' => 'Les animateurs affectés devront lancer le partage depuis l’app mobile.',
             ])
             ->add('children', EntityType::class, [
                 'label' => 'Enfants participants',

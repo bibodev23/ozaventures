@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Outing;
+use App\Entity\OutingLocationPing;
 use App\Entity\Season;
 use App\Enum\OutingStatus;
 use App\Form\OutingType;
@@ -10,6 +11,7 @@ use App\Service\ActiveSeasonProvider;
 use App\Service\MobileNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -95,6 +97,20 @@ class OutingController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/localisations', name: 'app_outing_locations', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function locations(Outing $outing, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $locations = $entityManager->getRepository(OutingLocationPing::class)->findBy(
+            ['outing' => $outing],
+            ['recordedAt' => 'DESC'],
+        );
+
+        return $this->json([
+            'locationTrackingEnabled' => $outing->isLocationTrackingEnabled(),
+            'locations' => array_map(fn (OutingLocationPing $location): array => $this->serializeLocation($location), $locations),
+        ]);
+    }
+
     #[Route('/{id}/modifier', name: 'app_outing_edit', requirements: ['id' => '\d+'])]
     public function edit(Outing $outing, Request $request, EntityManagerInterface $entityManager, MobileNotificationService $notificationService): Response
     {
@@ -176,5 +192,26 @@ class OutingController extends AbstractController
         $count = $entityManager->getRepository(Outing::class)->count(['season' => $season]);
 
         return (string) ($count + 1);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serializeLocation(OutingLocationPing $location): array
+    {
+        $animator = $location->getAnimator();
+
+        return [
+            'latitude' => $location->getLatitude(),
+            'longitude' => $location->getLongitude(),
+            'accuracy' => $location->getAccuracy(),
+            'recordedAt' => $location->getRecordedAt()->format(\DateTimeInterface::ATOM),
+            'animator' => [
+                'id' => $animator?->getId(),
+                'firstName' => $animator?->getFirstName(),
+                'lastName' => $animator?->getLastName(),
+                'fullName' => $animator?->getFullName(),
+            ],
+        ];
     }
 }

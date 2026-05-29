@@ -66,10 +66,63 @@
                 <div><dt>Retour</dt><dd>{{ outing.returnAt|date('d/m/Y H:i') }}</dd></div>
                 <div><dt>Transport</dt><dd>{{ outing.transportMode }}</dd></div>
                 <div><dt>Pique-nique</dt><dd>{{ outing.picnicRequired ? 'Oui' : 'Non' }}</dd></div>
+                <div><dt>Trajet estimé</dt><dd>{{ outing.routeDurationLabel }}</dd></div>
+                <div><dt>Suivi GPS</dt><dd>{{ outing.locationTrackingEnabled ? 'Activé' : 'Non activé' }}</dd></div>
                 <div><dt>Enfants</dt><dd>{{ outing.children|length }}</dd></div>
                 <div><dt>Animateurs</dt><dd>{{ outing.animators|length }}</dd></div>
             </dl>
         </article>
+    </section>
+
+    <section class="section outing-location-section">
+        <div class="section-title">
+            <div>
+                <p class="panel-kicker">Localisation</p>
+                <h2>Suivi terrain en direct</h2>
+            </div>
+            {% if outing.locationTrackingEnabled %}
+                <span class="badge badge-success">Suivi activé</span>
+            {% elseif outing.longRoute %}
+                <span class="badge badge-waiting">Recommandé</span>
+            {% else %}
+                <span class="badge badge-blue">Optionnel</span>
+            {% endif %}
+        </div>
+
+        {% if outing.locationTrackingEnabled %}
+            <div
+                class="outing-location-grid"
+                data-controller="outing-location-map"
+                data-outing-location-map-url-value="{{ path('app_outing_locations', {id: outing.id}) }}"
+                data-outing-location-map-interval-value="10000"
+            >
+                <div class="outing-map-card">
+                    <div class="outing-map" data-outing-location-map-target="map"></div>
+                    <p class="outing-map-note" data-outing-location-map-target="status">
+                        En attente du premier partage de position depuis l'app mobile.
+                    </p>
+                </div>
+                <aside class="outing-location-panel">
+                    <p class="panel-kicker">Animateurs localisés</p>
+                    <h3>Dernières positions</h3>
+                    <div class="outing-location-list" data-outing-location-map-target="list">
+                        <div class="empty-state empty-state-soft">
+                            <strong>Aucune position pour le moment.</strong>
+                            <span>Un animateur affecté doit ouvrir la sortie dans l'app mobile puis lancer le partage.</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        {% else %}
+            <div class="empty-state empty-state-large">
+                <strong>{{ outing.longRoute ? 'Trajet de plus d’une heure : suivi conseillé.' : 'Suivi localisation désactivé pour cette sortie.' }}</strong>
+                <span>
+                    Active le suivi dans le formulaire de sortie si la direction doit géolocaliser l'équipe terrain.
+                    Les animateurs gardent la main : ils devront lancer le partage depuis l'app mobile.
+                </span>
+                <a class="button button-secondary" href="{{ path('app_outing_edit', {id: outing.id}) }}">Configurer la localisation</a>
+            </div>
+        {% endif %}
     </section>
 
     <section class="detail-layout">
