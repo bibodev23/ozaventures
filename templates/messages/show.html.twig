@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Message{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">Messagerie</p>
+            <h1>{{ message.subject ?: 'Message sans objet' }}</h1>
+            <p class="lead lead-compact">
+                {{ is_sender ? 'Envoyé' : 'Reçu' }} le {{ message.createdAt|date('d/m/Y à H:i') }}
+                · {{ message.audienceLabel }}
+            </p>
+        </div>
+        <div class="actions">
+            <a class="button button-secondary" href="{{ path('app_messages') }}">Reçus</a>
+            <a class="button button-primary" href="{{ path('app_message_new') }}">Répondre</a>
+        </div>
+    </section>
+
+    <section class="message-detail-grid">
+        <article class="section message-detail-card">
+            <div class="message-detail-header">
+                <span class="message-avatar">{{ message.sender.firstName|slice(0, 1)|upper }}{{ message.sender.lastName|slice(0, 1)|upper }}</span>
+                <div>
+                    <strong>{{ message.sender.displayName }}</strong>
+                    <small>{{ message.sender.role.label() }} · {{ message.sender.username }}</small>
+                </div>
+            </div>
+
+            {% if message.outing %}
+                <a class="message-outing-link" href="{{ path('app_outing_show', {id: message.outing.id}) }}">
+                    Sortie liée : {{ message.outing.destination }} · {{ message.outing.departureAt|date('d/m H:i') }}
+                </a>
+            {% endif %}
+
+            <div class="message-body">
+                {{ message.body|nl2br }}
+            </div>
+        </article>
+
+        <aside class="section message-recipients-card">
+            <p class="panel-kicker">Destinataires</p>
+            <h2>{{ message.recipients|length }} personne(s)</h2>
+            <div class="message-recipient-list">
+                {% for recipient in message.recipients %}
+                    <span>
+                        <strong>{{ recipient.recipient.displayName }}</strong>
+                        <small>{{ recipient.read ? 'Lu' : 'Non lu' }}</small>
+                    </span>
+                {% endfor %}
+            </div>
+        </aside>
+    </section>
+{% endblock %}

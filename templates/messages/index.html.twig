@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Messages{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">Messagerie</p>
+            <h1>Messages</h1>
+            <p class="lead lead-compact">Échanges internes entre direction et animateurs.</p>
+        </div>
+        <div class="actions">
+            <a class="button button-primary" href="{{ path('app_message_new') }}">+ Nouveau message</a>
+        </div>
+    </section>
+
+    <nav class="message-tabs" aria-label="Boîtes de messagerie">
+        <a class="{{ mode == 'inbox' ? 'is-active' : '' }}" href="{{ path('app_messages') }}">
+            Reçus
+            {% if unread_count > 0 %}
+                <span>{{ unread_count }}</span>
+            {% endif %}
+        </a>
+        <a class="{{ mode == 'sent' ? 'is-active' : '' }}" href="{{ path('app_messages_sent') }}">Envoyés</a>
+    </nav>
+
+    <section class="message-list section">
+        {% if mode == 'inbox' %}
+            {% for row in recipient_rows %}
+                {% set message = row.message %}
+                <a class="message-row {{ row.read ? '' : 'is-unread' }}" href="{{ path('app_message_show', {id: message.id}) }}">
+                    <span class="message-avatar">{{ message.sender.firstName|slice(0, 1)|upper }}{{ message.sender.lastName|slice(0, 1)|upper }}</span>
+                    <span class="message-main">
+                        <strong>{{ message.subject ?: 'Message sans objet' }}</strong>
+                        <small>De {{ message.sender.displayName }} · {{ message.audienceLabel }} · {{ message.createdAt|date('d/m/Y H:i') }}</small>
+                        {% set preview = message.body|striptags %}
+                        <em>{{ preview|slice(0, 120) }}{{ preview|length > 120 ? '...' : '' }}</em>
+                    </span>
+                    {% if not row.read %}
+                        <span class="message-unread-dot" aria-label="Non lu"></span>
+                    {% endif %}
+                </a>
+            {% else %}
+                <div class="empty-state empty-state-large">
+                    <strong>Aucun message reçu.</strong>
+                    <span>Les messages internes apparaîtront ici.</span>
+                </div>
+            {% endfor %}
+        {% else %}
+            {% for message in messages %}
+                <a class="message-row" href="{{ path('app_message_show', {id: message.id}) }}">
+                    <span class="message-avatar message-avatar-sent">→</span>
+                    <span class="message-main">
+                        <strong>{{ message.subject ?: 'Message sans objet' }}</strong>
+                        <small>{{ message.audienceLabel }} · {{ message.recipients|length }} destinataire(s) · {{ message.createdAt|date('d/m/Y H:i') }}</small>
+                        {% set preview = message.body|striptags %}
+                        <em>{{ preview|slice(0, 120) }}{{ preview|length > 120 ? '...' : '' }}</em>
+                    </span>
+                </a>
+            {% else %}
+                <div class="empty-state empty-state-large">
+                    <strong>Aucun message envoyé.</strong>
+                    <span>Écris un premier message à l’équipe ou à la direction.</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </section>
+{% endblock %}

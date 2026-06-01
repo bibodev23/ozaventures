@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Animator;
+use App\Entity\Message;
 use App\Entity\MobileDeviceToken;
 use App\Entity\Outing;
 use App\Entity\User;
@@ -106,6 +107,31 @@ class MobileNotificationService
     }
 
     /**
+     * @return array{sent:int, failed:int, skipped:int}
+     */
+    public function notifyMessage(Message $message): array
+    {
+        $recipients = [];
+        foreach ($message->getRecipients() as $recipient) {
+            $user = $recipient->getRecipient();
+            if ($user instanceof User) {
+                $recipients[] = $user;
+            }
+        }
+
+        $title = $message->getSubject() ?: sprintf('Message de %s', $message->getSender()?->getDisplayName() ?? 'Oz’Aventure');
+        $body = trim(preg_replace('/\s+/', ' ', $message->getBody()) ?? '');
+        if (mb_strlen($body) > 110) {
+            $body = mb_substr($body, 0, 107) . '...';
+        }
+
+        return $this->sendToUsers($recipients, $title, $body, [
+            'type' => 'internal_message',
+            'messageId' => (string) $message->getId(),
+        ]);
+    }
+
+    /**
      * @param iterable<Animator> $animators
      * @param array<string, string> $data
      *
@@ -166,6 +192,56 @@ class MobileNotificationService
     }
 
     /**
+     * @param iterable<User> $users
+     * @param array<string, string> $data
+     *
+     * @return array{sent:int, failed:int, skipped:int}
+     */
+    private function sendToUsers(iterable $users, string $title, string $body, array $data): array
+    {
+        $sent = 0;
+        $failed = 0;
+        $skipped = 0;
+        $shouldFlush = false;
+
+        foreach ($this->uniqueUsers($users) as $user) {
+            $tokens = $this->entityManager->getRepository(MobileDeviceToken::class)->findBy([
+                'enabled' => true,
+                'user' => $user,
+            ]);
+
+            if ($tokens === []) {
+                ++$skipped;
+                continue;
+            }
+
+            foreach ($tokens as $token) {
+                try {
+                    $this->firebase->sendToToken($token->getToken(), $title, $body, $data);
+                    ++$sent;
+                } catch (\Throwable $exception) {
+                    if (str_contains($exception->getMessage(), 'UNREGISTERED')) {
+                        $token->setEnabled(false)->touch();
+                        $shouldFlush = true;
+                    }
+
+                    ++$failed;
+                }
+            }
+        }
+
+        if ($shouldFlush) {
+            $this->entityManager->flush();
+        }
+
+        return [
+            'sent' => $sent,
+            'failed' => $failed,
+            'skipped' => $skipped,
+        ];
+    }
+
+    /**
      * @param iterable<Animator> $animators
      *
      * @return list<Animator>
@@ -180,6 +256,26 @@ class MobileNotificationService
             }
 
             $unique[$animator->getId()] = $animator;
+        }
+
+        return array_values($unique);
+    }
+
+    /**
+     * @param iterable<User> $users
+     *
+     * @return list<User>
+     */
+    private function uniqueUsers(iterable $users): array
+    {
+        $unique = [];
+
+        foreach ($users as $user) {
+            if (!$user instanceof User || $user->getId() === null || !$user->isActive()) {
+                continue;
+            }
+
+            $unique[$user->getId()] = $user;
         }
 
         return array_values($unique);

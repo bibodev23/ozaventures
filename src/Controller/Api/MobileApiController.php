@@ -6,6 +6,8 @@ use App\Entity\Animator;
 use App\Entity\AnimatorWorkShift;
 use App\Entity\Child;
 use App\Entity\DailyTaskAssignment;
+use App\Entity\Message;
+use App\Entity\MessageRecipient;
 use App\Entity\MobileDeviceToken;
 use App\Entity\Outing;
 use App\Entity\OutingLocationPing;
@@ -14,6 +16,8 @@ use App\Entity\User;
 use App\Enum\OutingStatus;
 use App\Service\ActiveSeasonProvider;
 use App\Service\ApiTokenManager;
+use App\Service\InternalMessageService;
+use App\Service\MobileNotificationService;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -206,6 +210,102 @@ class MobileApiController extends AbstractController
         ]);
     }
 
+    #[Route('/messages', name: 'api_messages', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function messages(InternalMessageService $messageService): JsonResponse
+    {
+        $user = $this->currentUser();
+
+        $recipientRows = $this->entityManager->getRepository(MessageRecipient::class)->createQueryBuilder('recipient')
+            ->innerJoin('recipient.message', 'message')
+            ->addSelect('message')
+            ->innerJoin('message.sender', 'sender')
+            ->addSelect('sender')
+            ->andWhere('recipient.recipient = :user')
+            ->setParameter('user', $user)
+            ->orderBy('message.createdAt', 'DESC')
+            ->setMaxResults(50)
+            ->getQuery()
+            ->getResult();
+
+        $sentMessages = $this->entityManager->getRepository(Message::class)->findBy(
+            ['sender' => $user],
+            ['createdAt' => 'DESC'],
+            30,
+        );
+
+        return $this->json([
+            'unreadCount' => $this->unreadMessageCount($user),
+            'audiences' => $messageService->audienceChoices($user),
+            'contacts' => array_map(fn (User $contact): array => $this->serializeUser($contact), $this->messageContacts($user)),
+            'outings' => array_map(fn (Outing $outing): array => $this->serializeOutingSummary($outing), $this->messageOutings($user)),
+            'inbox' => array_map(fn (MessageRecipient $recipient): array => $this->serializeMessageRecipient($recipient), $recipientRows),
+            'sent' => array_map(fn (Message $message): array => $this->serializeMessage($message), $sentMessages),
+        ]);
+    }
+
+    #[Route('/messages', name: 'api_message_create', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function createMessage(Request $request, InternalMessageService $messageService, MobileNotificationService $notificationService): JsonResponse
+    {
+        $user = $this->currentUser();
+        $payload = $this->jsonPayload($request);
+        $audience = (string) ($payload['audience'] ?? Message::AUDIENCE_ALL_DIRECTORS);
+        $recipientIds = $payload['recipientIds'] ?? [];
+        if (!is_array($recipientIds)) {
+            return $this->apiError('invalid_recipients', 'recipientIds doit être un tableau.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $outing = null;
+        if (isset($payload['outingId']) && (int) $payload['outingId'] > 0) {
+            $outing = $this->entityManager->getRepository(Outing::class)->find((int) $payload['outingId']);
+        }
+
+        if ($audience === Message::AUDIENCE_OUTING && !$this->canMessageOuting($user, $outing)) {
+            return $this->apiError('forbidden', 'Sortie inaccessible pour la messagerie.', Response::HTTP_FORBIDDEN);
+        }
+
+        try {
+            $message = $messageService->createMessage(
+                $user,
+                $audience,
+                (string) ($payload['subject'] ?? ''),
+                (string) ($payload['body'] ?? ''),
+                array_map('intval', $recipientIds),
+                $outing,
+            );
+        } catch (\InvalidArgumentException $exception) {
+            return $this->apiError('invalid_message', $exception->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->entityManager->flush();
+        $notificationService->notifyMessage($message);
+
+        return $this->json([
+            'message' => 'Message envoyé.',
+            'item' => $this->serializeMessage($message),
+        ], Response::HTTP_CREATED);
+    }
+
+    #[Route('/messages/{id}/read', name: 'api_message_read', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function markMessageRead(Message $message): JsonResponse
+    {
+        $recipient = $this->messageRecipientFor($message, $this->currentUser());
+        if (!$recipient instanceof MessageRecipient) {
+            return $this->apiError('forbidden', 'Message inaccessible.', Response::HTTP_FORBIDDEN);
+        }
+
+        $recipient->markRead();
+        $this->entityManager->flush();
+
+        return $this->json([
+            'message' => 'Message marqué comme lu.',
+            'item' => $this->serializeMessageRecipient($recipient),
+            'unreadCount' => $this->unreadMessageCount($this->currentUser()),
+        ]);
+    }
+
     #[Route('/outings', name: 'api_outings', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function outings(): JsonResponse
@@ -391,12 +491,21 @@ class MobileApiController extends AbstractController
     }
 
     #[Route('/daily-planning', name: 'api_daily_planning', methods: ['GET'])]
-    #[IsGranted('ROLE_ANIMATOR')]
+    #[IsGranted('ROLE_USER')]
     public function dailyPlanning(Request $request): JsonResponse
     {
-        $animator = $this->currentAnimator();
+        $user = $this->currentUser();
         $season = $this->seasonProvider->getActiveSeason();
         $date = $this->dateFromQuery($request, 'date') ?? new \DateTimeImmutable('today');
+
+        if ($user->isDirector()) {
+            return $this->json([
+                'date' => $date->format('Y-m-d'),
+                'tasks' => [],
+            ]);
+        }
+
+        $animator = $this->currentAnimator();
 
         $assignments = $this->entityManager->getRepository(DailyTaskAssignment::class)
             ->createQueryBuilder('assignment')
@@ -427,13 +536,24 @@ class MobileApiController extends AbstractController
     }
 
     #[Route('/work-schedule', name: 'api_work_schedule', methods: ['GET'])]
-    #[IsGranted('ROLE_ANIMATOR')]
+    #[IsGranted('ROLE_USER')]
     public function workSchedule(Request $request): JsonResponse
     {
-        $animator = $this->currentAnimator();
+        $user = $this->currentUser();
         $season = $this->seasonProvider->getActiveSeason();
         $weekDate = $this->dateFromQuery($request, 'week') ?? $this->defaultWorkScheduleWeek($season);
         $weekStart = $this->weekStart($weekDate);
+
+        if ($user->isDirector()) {
+            return $this->json([
+                'weekStart' => $weekStart->format('Y-m-d'),
+                'totalMinutes' => 0,
+                'totalLabel' => $this->formatMinutes(0),
+                'shifts' => [],
+            ]);
+        }
+
+        $animator = $this->currentAnimator();
 
         $shifts = $this->entityManager->getRepository(AnimatorWorkShift::class)
             ->createQueryBuilder('shift')
@@ -758,6 +878,134 @@ class MobileApiController extends AbstractController
             'ageGroup' => $animator->getAgeGroup(),
             'ageGroupLabel' => $animator->getAgeGroupLabel(),
             'mustChangePassword' => $animator->mustChangePassword(),
+        ];
+    }
+
+    /**
+     * @return list<User>
+     */
+    private function messageContacts(User $currentUser): array
+    {
+        return $this->entityManager->getRepository(User::class)->createQueryBuilder('user')
+            ->andWhere('user.active = true')
+            ->andWhere('user.id != :currentUserId')
+            ->setParameter('currentUserId', $currentUser->getId())
+            ->orderBy('user.role', 'ASC')
+            ->addOrderBy('user.firstName', 'ASC')
+            ->addOrderBy('user.lastName', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return list<Outing>
+     */
+    private function messageOutings(User $currentUser): array
+    {
+        $season = $this->seasonProvider->getActiveSeason();
+        $queryBuilder = $this->entityManager->getRepository(Outing::class)->createQueryBuilder('outing')
+            ->leftJoin('outing.animators', 'animator')
+            ->addSelect('animator')
+            ->andWhere('outing.season = :season')
+            ->setParameter('season', $season)
+            ->orderBy('outing.departureAt', 'DESC')
+            ->setMaxResults(30);
+
+        if (!$currentUser->isDirector()) {
+            $animator = $currentUser->getAnimator();
+            if (!$animator instanceof Animator) {
+                return [];
+            }
+
+            $queryBuilder
+                ->andWhere('outing.createdBy = :animator OR animator = :animator')
+                ->setParameter('animator', $animator);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    private function canMessageOuting(User $user, ?Outing $outing): bool
+    {
+        if (!$outing instanceof Outing) {
+            return false;
+        }
+
+        if ($user->isDirector()) {
+            return true;
+        }
+
+        $animator = $user->getAnimator();
+
+        return $animator instanceof Animator && ($outing->getCreatedBy() === $animator || $outing->getAnimators()->contains($animator));
+    }
+
+    private function messageRecipientFor(Message $message, User $user): ?MessageRecipient
+    {
+        foreach ($message->getRecipients() as $recipient) {
+            if ($recipient->getRecipient() === $user) {
+                return $recipient;
+            }
+        }
+
+        return null;
+    }
+
+    private function unreadMessageCount(User $user): int
+    {
+        return (int) $this->entityManager->getRepository(MessageRecipient::class)->createQueryBuilder('recipient')
+            ->select('COUNT(recipient.id)')
+            ->andWhere('recipient.recipient = :user')
+            ->andWhere('recipient.readAt IS NULL')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serializeMessageRecipient(MessageRecipient $recipient): array
+    {
+        return [
+            'id' => $recipient->getId(),
+            'readAt' => $recipient->getReadAt()?->format(\DateTimeInterface::ATOM),
+            'read' => $recipient->isRead(),
+            'message' => $recipient->getMessage() instanceof Message ? $this->serializeMessage($recipient->getMessage()) : null,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serializeMessage(Message $message): array
+    {
+        return [
+            'id' => $message->getId(),
+            'subject' => $message->getSubject(),
+            'body' => $message->getBody(),
+            'audience' => $message->getAudience(),
+            'audienceLabel' => $message->getAudienceLabel(),
+            'createdAt' => $message->getCreatedAt()->format(\DateTimeInterface::ATOM),
+            'sender' => $message->getSender() instanceof User ? $this->serializeUser($message->getSender()) : null,
+            'outing' => $message->getOuting() instanceof Outing ? $this->serializeOutingSummary($message->getOuting()) : null,
+            'recipientCount' => $message->getRecipients()->count(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serializeOutingSummary(Outing $outing): array
+    {
+        return [
+            'id' => $outing->getId(),
+            'number' => $outing->getNumber(),
+            'destination' => $outing->getDestination(),
+            'departureAt' => $outing->getDepartureAt()->format(\DateTimeInterface::ATOM),
+            'returnAt' => $outing->getReturnAt()->format(\DateTimeInterface::ATOM),
+            'status' => $outing->getStatus(),
+            'statusLabel' => $outing->getStatusLabel(),
         ];
     }
 

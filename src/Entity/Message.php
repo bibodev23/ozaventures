@@ -15,6 +15,19 @@ class Message
     public const AUDIENCE_ALL_ANIMATORS = 'all_animators';
     public const AUDIENCE_ALL_DIRECTORS = 'all_directors';
     public const AUDIENCE_EVERYONE = 'everyone';
+    public const AUDIENCE_GROUP_LITTLE = 'group_little';
+    public const AUDIENCE_GROUP_BIG = 'group_big';
+    public const AUDIENCE_OUTING = 'outing';
+
+    public const AUDIENCES = [
+        self::AUDIENCE_PRIVATE,
+        self::AUDIENCE_ALL_ANIMATORS,
+        self::AUDIENCE_ALL_DIRECTORS,
+        self::AUDIENCE_EVERYONE,
+        self::AUDIENCE_GROUP_LITTLE,
+        self::AUDIENCE_GROUP_BIG,
+        self::AUDIENCE_OUTING,
+    ];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -26,8 +39,12 @@ class Message
     private ?User $sender = null;
 
     #[ORM\Column(length: 30)]
-    #[Assert\Choice(choices: [self::AUDIENCE_PRIVATE, self::AUDIENCE_ALL_ANIMATORS, self::AUDIENCE_ALL_DIRECTORS, self::AUDIENCE_EVERYONE])]
+    #[Assert\Choice(choices: self::AUDIENCES)]
     private string $audience = self::AUDIENCE_PRIVATE;
+
+    #[ORM\ManyToOne(targetEntity: Outing::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Outing $outing = null;
 
     #[ORM\Column(length: 160, nullable: true)]
     #[Assert\Length(max: 160)]
@@ -77,6 +94,31 @@ class Message
     public function setAudience(string $audience): self
     {
         $this->audience = $audience;
+
+        return $this;
+    }
+
+    public function getAudienceLabel(): string
+    {
+        return match ($this->audience) {
+            self::AUDIENCE_ALL_ANIMATORS => 'Tous les animateurs',
+            self::AUDIENCE_ALL_DIRECTORS => 'Direction',
+            self::AUDIENCE_EVERYONE => 'Toute l’équipe',
+            self::AUDIENCE_GROUP_LITTLE => 'Animateurs 3-5 ans',
+            self::AUDIENCE_GROUP_BIG => 'Animateurs 6-12 ans',
+            self::AUDIENCE_OUTING => 'Équipe sortie',
+            default => 'Message privé',
+        };
+    }
+
+    public function getOuting(): ?Outing
+    {
+        return $this->outing;
+    }
+
+    public function setOuting(?Outing $outing): self
+    {
+        $this->outing = $outing;
 
         return $this;
     }

@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau message{% endblock %}
+
+{% block body %}
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">Messagerie</p>
+            <h1>Nouveau message</h1>
+            <p class="lead lead-compact">Choisis une cible claire : personne, groupe, direction ou équipe de sortie.</p>
+        </div>
+    </section>
+
+    <section class="form-layout message-compose-layout">
+        <aside class="side-panel message-help-panel">
+            <p class="panel-kicker">Règle simple</p>
+            <h2>Un message = une action</h2>
+            <p>Garde les messages courts et exploitables. Pour une sortie, cible l’équipe de sortie afin que l’historique reste facile à retrouver.</p>
+        </aside>
+
+        <section class="form-panel form-panel-wide message-compose-panel">
+            {% if error %}
+                <div class="flash flash-error">{{ error }}</div>
+            {% endif %}
+
+            <form class="form" method="post">
+                <div class="form-grid">
+                    <div>
+                        <label for="message-audience">Destinataires</label>
+                        <select id="message-audience" name="audience">
+                            {% for value, label in audience_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="field-help">Pour “message privé”, sélectionne les personnes ci-dessous.</small>
+                    </div>
+
+                    <div>
+                        <label for="message-outing">Sortie liée</label>
+                        <select id="message-outing" name="outingId">
+                            <option value="">Aucune sortie</option>
+                            {% for outing in outings %}
+                                <option value="{{ outing.id }}">{{ outing.departureAt|date('d/m') }} · {{ outing.destination }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="field-help">Utilisé uniquement avec “Équipe d’une sortie”.</small>
+                    </div>
+                </div>
+
+                <div class="message-recipient-picker">
+                    <label for="message-recipients">Personnes en privé</label>
+                    <select id="message-recipients" name="recipientIds[]" multiple size="8">
+                        {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.displayName }} · {{ user.role.label() }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="message-subject">Objet</label>
+                    <input id="message-subject" name="subject" maxlength="160" placeholder="Ex : Rappel pique-nique sortie piscine">
+                </div>
+
+                <div>
+                    <label for="message-body">Message</label>
+                    <textarea id="message-body" name="body" rows="8" required placeholder="Écris ton message ici..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <a class="button button-secondary" href="{{ path('app_messages') }}">Annuler</a>
+                    <button class="button button-primary" type="submit">Envoyer le message</button>
+                </div>
+            </form>
+        </section>
+    </section>
+{% endblock %}
