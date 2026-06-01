@@ -7,7 +7,7 @@
         <header class="dashboard-topline">
             <div>
                 <h1>Tableau de bord</h1>
-                <p>Planifier, prioriser et suivre les sorties avec une vue claire de la saison.</p>
+                <p>Planifier, prioriser et suivre les sorties avec une vue claire des urgences du centre.</p>
             </div>
             <div class="dashboard-actions">
                 <a class="button button-primary" href="{{ path('app_outing_new') }}">+ Ajouter une sortie</a>
@@ -20,7 +20,7 @@
                 href="{{ path('app_outings') }}"
                 label="Total sorties"
                 value="{{ total_outings_count }}"
-                caption="{{ season_state.metric_caption }}"
+                caption="{{ pending_count > 0 ? pending_count ~ ' à valider' : 'Suivi à jour' }}"
                 variant="primary"
             />
             <twig:DashboardMetric
@@ -102,22 +102,6 @@
                         </a>
                     </div>
                 </section>
-
-                <section class="panel-card progress-card">
-                    <div>
-                        <span class="panel-kicker">Progression</span>
-                        <h2>{{ season_state.label }}</h2>
-                    </div>
-                    <div class="progress-arc" style="--value: {{ season_progress }}">
-                        <strong>{{ season_progress }}%</strong>
-                        <span>{{ season_state.caption }}</span>
-                    </div>
-                    <div class="legend-row">
-                        <span><i class="legend-dot is-done"></i>Écoulé</span>
-                        <span><i class="legend-dot is-next"></i>À venir</span>
-                        <span><i class="legend-dot is-pending"></i>À valider</span>
-                    </div>
-                </section>
             </div>
 
             <aside class="outings-column">
@@ -179,15 +163,6 @@
                     {% endif %}
                 </section>
 
-                <section class="panel-card season-timer-card">
-                    <span class="panel-kicker">Saison</span>
-                    <strong>{{ season_days_remaining }}</strong>
-                    <span>jour(s) restant(s)</span>
-                    <div class="timer-actions">
-                        <a href="{{ path('app_daily_planning') }}">Planning</a>
-                        <a href="{{ path('app_work_schedule') }}">Horaires</a>
-                    </div>
-                </section>
             </aside>
         </section>
     </section>

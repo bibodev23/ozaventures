@@ -1264,8 +1264,61 @@ dd {
     padding: 22px;
 }
 
+.outing-checklist-panel {
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .78);
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at 102% -8%, rgba(199, 220, 255, .70), transparent 42%),
+        radial-gradient(circle at -8% 100%, rgba(255, 214, 200, .78), transparent 46%),
+        linear-gradient(145deg, rgba(255, 253, 250, .96), rgba(223, 243, 236, .72));
+    box-shadow: 0 22px 58px rgba(119, 91, 105, .12);
+}
+
+.outing-checklist-panel::before {
+    content: "";
+    width: 54px;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ffd6c8, #c7dcff, #9edbc3);
+}
+
+.checklist-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.checklist-heading .panel-kicker {
+    margin-bottom: 0;
+}
+
+.checklist-heading span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 255, 255, .82);
+    border-radius: 999px;
+    color: #4f557e;
+    background: rgba(255, 255, 255, .62);
+    font-size: .76rem;
+    font-weight: 900;
+}
+
 .side-panel h2 {
-    font-size: 1.35rem;
+    color: var(--ink);
+    font-size: 1.45rem;
+    line-height: 1.05;
+}
+
+.checklist-intro {
+    margin: -4px 0 2px;
+    color: #625f69;
+    font-size: .92rem;
+    font-weight: 800;
+    line-height: 1.38;
 }
 
 .check-list {
@@ -1277,6 +1330,61 @@ dd {
 
 .check-list li {
     color: var(--muted);
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.check-list-prominent {
+    gap: 10px;
+    padding-left: 0;
+    list-style: none;
+    counter-reset: outing-checklist;
+}
+
+.check-list-prominent li {
+    counter-increment: outing-checklist;
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px 12px;
+    padding: 13px 14px;
+    border: 1px solid rgba(255, 255, 255, .82);
+    border-radius: 18px;
+    color: var(--ink);
+    background: rgba(255, 255, 255, .68);
+    box-shadow: 0 12px 26px rgba(119, 91, 105, .07);
+}
+
+.check-list-prominent li::before {
+    content: counter(outing-checklist);
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 12px;
+    color: #4f557e;
+    background: linear-gradient(135deg, #edf5ff, #f2efff);
+    font-size: .86rem;
+    font-weight: 950;
+}
+
+.check-list-prominent strong,
+.check-list-prominent span {
+    grid-column: 2;
+    display: block;
+}
+
+.check-list-prominent strong {
+    margin-top: 1px;
+    color: #302b3d;
+    font-size: .95rem;
+    line-height: 1.15;
+}
+
+.check-list-prominent span {
+    margin-top: -5px;
+    color: #625f69;
+    font-size: .78rem;
     font-weight: 800;
     line-height: 1.35;
 }
@@ -3408,6 +3516,7 @@ body {
 }
 
 .collaboration-card {
+    grid-column: 1 / -1;
     min-height: 235px;
 }
 
@@ -3456,55 +3565,13 @@ body {
     background: var(--lilac);
 }
 
-.progress-card {
-    display: grid;
-    justify-items: center;
-    gap: 16px;
-    min-height: 235px;
-}
-
-.progress-arc {
-    --value: 0;
-    display: grid;
-    place-items: center;
-    width: 178px;
-    height: 178px;
-    border-radius: 50%;
-    background:
-        radial-gradient(circle, #fff 0 49%, transparent 50%),
-        conic-gradient(var(--accent) calc(var(--value) * 1%), #d8e0d8 0);
-}
-
-.progress-arc strong,
-.progress-arc span {
-    grid-area: 1 / 1;
-}
-
-.progress-arc strong {
-    color: #111a16;
-    font-size: 2.6rem;
-}
-
-.progress-arc span {
-    width: 110px;
-    margin-top: 66px;
-    color: #625f69;
-    font-size: .72rem;
-    font-weight: 900;
-    line-height: 1.15;
-    text-align: center;
-}
-
-.legend-row,
-.next-outing-meta,
-.timer-actions {
+.next-outing-meta {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
 }
 
-.legend-row span,
 .next-outing-meta span {
     display: inline-flex;
     align-items: center;
@@ -3512,25 +3579,6 @@ body {
     color: #65716a;
     font-size: .78rem;
     font-weight: 900;
-}
-
-.legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #d8e0d8;
-}
-
-.legend-dot.is-done {
-    background: var(--accent);
-}
-
-.legend-dot.is-next {
-    background: var(--accent-dark);
-}
-
-.legend-dot.is-pending {
-    background: repeating-linear-gradient(-45deg, #aab6ad 0 2px, transparent 2px 4px);
 }
 
 .outings-column {
@@ -3621,39 +3669,6 @@ body {
 .next-outing-card .button-primary {
     color: var(--accent-dark);
     background: #fff;
-}
-
-.season-timer-card {
-    display: grid;
-    gap: 8px;
-    overflow: hidden;
-    color: #fff;
-    background:
-        repeating-radial-gradient(circle at 90% 40%, rgba(255, 255, 255, .12) 0 2px, transparent 2px 10px),
-        linear-gradient(135deg, #073c2c, var(--accent-dark));
-}
-
-.season-timer-card .panel-kicker,
-.season-timer-card span {
-    color: rgba(255, 255, 255, .72);
-}
-
-.season-timer-card strong {
-    font-size: 3rem;
-    line-height: 1;
-}
-
-.timer-actions {
-    justify-content: flex-start;
-    margin-top: 8px;
-}
-
-.timer-actions a {
-    padding: 8px 10px;
-    border-radius: 999px;
-    color: #fff;
-    background: rgba(255, 255, 255, .14);
-    font-weight: 900;
 }
 
 @media (max-width: 1180px) {
@@ -3830,8 +3845,6 @@ body {
 .dashboard-topline p,
 .collab-list small,
 .project-list small,
-.progress-arc span,
-.legend-row span,
 .next-outing-meta span {
     color: var(--muted);
 }
@@ -3909,30 +3922,7 @@ body {
     box-shadow: inset 0 0 0 1px #ece4ed;
 }
 
-.progress-arc {
-    background:
-        radial-gradient(circle, #fffdfa 0 49%, transparent 50%),
-        conic-gradient(#c7dcff calc(var(--value) * 1%), #f0e8e2 0);
-}
-
-.legend-dot {
-    background: #f0e8e2;
-}
-
-.legend-dot.is-done {
-    background: #c7dcff;
-}
-
-.legend-dot.is-next {
-    background: #9edbc3;
-}
-
-.legend-dot.is-pending {
-    background: repeating-linear-gradient(-45deg, #d8cde6 0 2px, transparent 2px 4px);
-}
-
-.next-outing-card,
-.season-timer-card {
+.next-outing-card {
     color: var(--ink);
     border-color: rgba(255, 255, 255, .76);
     background:
@@ -3943,9 +3933,7 @@ body {
 .next-outing-card .panel-kicker,
 .next-outing-card p,
 .next-outing-card .next-outing-meta span,
-.next-outing-card h2,
-.season-timer-card .panel-kicker,
-.season-timer-card span {
+.next-outing-card h2 {
     color: var(--ink);
 }
 
@@ -3973,15 +3961,6 @@ body {
 
 .next-outing-card .check-row small {
     color: #524e73;
-}
-
-.season-timer-card strong {
-    color: #524e73;
-}
-
-.timer-actions a {
-    color: #524e73;
-    background: rgba(255, 255, 255, .58);
 }
 
 .avatar-peach {

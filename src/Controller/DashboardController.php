@@ -118,15 +118,6 @@ class DashboardController extends AbstractController
             ],
         ]);
 
-        $totalSeasonDays = max(1, ((int) $season->getStartsAt()->diff($season->getEndsAt())->format('%a')) + 1);
-        if ($today < $season->getStartsAt()) {
-            $elapsedSeasonDays = 0;
-        } elseif ($today > $season->getEndsAt()) {
-            $elapsedSeasonDays = $totalSeasonDays;
-        } else {
-            $elapsedSeasonDays = ((int) $season->getStartsAt()->diff($today)->format('%a')) + 1;
-        }
-
         $childrenCount = $entityManager->getRepository(Child::class)->count(['season' => $season]);
         $animatorsCount = $entityManager->getRepository(Animator::class)->count(['active' => true]);
         $totalOutingsCount = $outingRepository->count(['season' => $season]);
@@ -144,8 +135,6 @@ class DashboardController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
-        $seasonProgress = (int) round(($elapsedSeasonDays / $totalSeasonDays) * 100);
-        $seasonState = $this->seasonState($today, $season->getStartsAt(), $season->getEndsAt(), $seasonProgress);
         $nextOuting = $upcomingOutings[0] ?? null;
         $nextOutingChecklist = $nextOuting instanceof Outing ? $this->nextOutingChecklist($nextOuting) : null;
         $operationalAlerts = $this->operationalAlerts($pendingCount, $animatorsCount, $nextOuting, $nextOutingChecklist);
@@ -159,9 +148,6 @@ class DashboardController extends AbstractController
             'validated_count' => $validatedCount,
             'refused_count' => $refusedCount,
             'completed_validated_count' => (int) $completedValidatedCount,
-            'season_progress' => $seasonProgress,
-            'season_state' => $seasonState,
-            'season_days_remaining' => $today <= $season->getEndsAt() ? (int) $today->diff($season->getEndsAt())->format('%a') : 0,
             'pending_outings' => $pendingOutings,
             'upcoming_outings' => $upcomingOutings,
             'next_outing' => $nextOuting,
@@ -169,34 +155,6 @@ class DashboardController extends AbstractController
             'operational_alerts' => $operationalAlerts,
             'children_age_chart' => $childrenAgeChart,
         ]);
-    }
-
-    /**
-     * @return array{label:string, caption:string, metric_caption:string}
-     */
-    private function seasonState(\DateTimeImmutable $today, \DateTimeImmutable $startsAt, \DateTimeImmutable $endsAt, int $progress): array
-    {
-        if ($today < $startsAt) {
-            return [
-                'label' => 'Saison non commencée',
-                'caption' => sprintf('Début le %s', $startsAt->format('d/m/Y')),
-                'metric_caption' => 'Préparation de saison',
-            ];
-        }
-
-        if ($today > $endsAt) {
-            return [
-                'label' => 'Saison terminée',
-                'caption' => sprintf('Bilan depuis le %s', $endsAt->format('d/m/Y')),
-                'metric_caption' => 'Bilan de saison',
-            ];
-        }
-
-        return [
-            'label' => 'Progression juillet',
-            'caption' => sprintf('%d %% du séjour écoulé', $progress),
-            'metric_caption' => sprintf('%d %% de séjour écoulé', $progress),
-        ];
     }
 
     /**
