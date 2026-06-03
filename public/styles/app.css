@@ -5667,3 +5667,190 @@ body {
         width: 100%;
     }
 }
+
+/* Hard mobile overflow guard for connected workspaces */
+@media (max-width: 760px) {
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .app-shell,
+    .app-workspace,
+    .app-workspace .page,
+    .dribbble-dashboard,
+    .dashboard-topline,
+    .dashboard-topline > *,
+    .dashboard-actions,
+    .metric-grid,
+    .dashboard-content-grid,
+    .dashboard-center-column,
+    .outings-column,
+    .panel-card,
+    .metric-card,
+    .form-panel,
+    .section,
+    .side-panel,
+    .outing-card,
+    .task-card,
+    .animator-dashboard,
+    .animator-panel-card,
+    .animator-alert-card,
+    .outing-list-card,
+    .empty-state,
+    .hint-card {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .app-workspace .page,
+    .dribbble-dashboard {
+        overflow-x: hidden;
+    }
+
+    .workspace-topbar {
+        grid-template-columns: minmax(0, 1fr) auto;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .search-pill,
+    .global-search-field,
+    .workspace-actions,
+    .user-menu,
+    .user-chip {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .search-pill {
+        overflow: hidden;
+    }
+
+    .search-pill span:last-child,
+    .global-search-field input {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .dashboard-topline {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        align-items: start;
+        justify-items: stretch;
+    }
+
+    .dashboard-actions,
+    .form-actions,
+    .status-actions,
+    .outing-card-actions {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        width: 100%;
+    }
+
+    .button,
+    .dashboard-actions .button,
+    .form-actions .button,
+    .status-actions .button {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        justify-content: center;
+        white-space: normal;
+        text-align: center;
+        overflow-wrap: anywhere;
+    }
+
+    h1,
+    h2,
+    h3,
+    p,
+    .lead,
+    .dashboard-topline p,
+    .metric-card span,
+    .metric-card strong,
+    .metric-card small,
+    .panel-card h2,
+    .panel-heading,
+    .panel-heading > *,
+    .soft-chip,
+    .empty-state strong,
+    .empty-state span,
+    .animator-outing-card strong,
+    .animator-outing-card small,
+    .animator-task-row strong,
+    .animator-task-row small {
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: normal;
+    }
+
+    .dashboard-topline h1 {
+        font-size: clamp(2.15rem, 11vw, 3rem);
+        line-height: .98;
+    }
+
+    .dashboard-topline p {
+        display: block;
+        white-space: normal;
+    }
+
+    .metric-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .metric-card {
+        overflow: hidden;
+    }
+
+    .metric-card strong {
+        font-size: clamp(2.45rem, 13vw, 3.4rem);
+    }
+
+    .metric-card-icon,
+    .metric-card::after {
+        right: 12px;
+    }
+
+    .panel-heading {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .soft-chip {
+        justify-self: start;
+        white-space: normal;
+    }
+
+    .animator-week-grid {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .animator-day-card,
+    .animator-task-row,
+    .animator-outing-card {
+        min-width: 0;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .dashboard-topline h1 {
+        font-size: clamp(2rem, 10vw, 2.75rem);
+    }
+
+    .metric-card strong {
+        font-size: clamp(2.2rem, 12vw, 3.05rem);
+    }
+}
