@@ -61,12 +61,7 @@ class OutingType extends AbstractType
                     'max' => 600,
                     'placeholder' => 'Ex : 75',
                 ],
-                'help' => 'À partir de 60 minutes, le suivi localisation est recommandé.',
-            ])
-            ->add('locationTrackingEnabled', CheckboxType::class, [
-                'label' => 'Activer le suivi localisation pour cette sortie',
-                'required' => false,
-                'help' => 'Les animateurs affectés devront lancer le partage depuis l’app mobile.',
+                'help' => 'Utile pour anticiper l’organisation, le transport et le retour au centre.',
             ])
             ->add('children', EntityType::class, [
                 'label' => 'Enfants participants',

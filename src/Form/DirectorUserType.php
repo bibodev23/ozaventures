@@ -44,7 +44,7 @@ class DirectorUserType extends AbstractType
                 'constraints' => $passwordConstraints,
                 'first_options' => [
                     'label' => $isEdit ? 'Nouveau mot de passe' : 'Mot de passe initial',
-                    'help' => $isEdit ? 'Laisse vide pour conserver le mot de passe actuel.' : 'Le compte direction pourra se connecter à la webapp et à l’app mobile.',
+                    'help' => $isEdit ? 'Laisse vide pour conserver le mot de passe actuel.' : 'Le compte direction pourra se connecter à la webapp.',
                     'toggle' => true,
                     'visible_label' => 'Afficher',
                     'hidden_label' => 'Masquer',

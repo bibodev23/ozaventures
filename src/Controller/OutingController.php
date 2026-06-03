@@ -3,15 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Outing;
-use App\Entity\OutingLocationPing;
 use App\Entity\Season;
 use App\Enum\OutingStatus;
 use App\Form\OutingType;
 use App\Service\ActiveSeasonProvider;
-use App\Service\MobileNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -57,7 +54,7 @@ class OutingController extends AbstractController
     }
 
     #[Route('/nouvelle', name: 'app_outing_new')]
-    public function new(Request $request, ActiveSeasonProvider $seasonProvider, EntityManagerInterface $entityManager, MobileNotificationService $notificationService): Response
+    public function new(Request $request, ActiveSeasonProvider $seasonProvider, EntityManagerInterface $entityManager): Response
     {
         $season = $seasonProvider->getActiveSeason();
         $outing = (new Outing())
@@ -72,12 +69,6 @@ class OutingController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Sortie créée.');
-            if ($request->request->getBoolean('notify_animators')) {
-                $notificationResult = $notificationService->notifyOutingAssigned($outing);
-                if ($notificationResult['sent'] > 0) {
-                    $this->addFlash('success', sprintf('%d notification(s) envoyée(s) aux animateurs.', $notificationResult['sent']));
-                }
-            }
 
             return $this->redirectToRoute('app_outing_show', ['id' => $outing->getId()]);
         }
@@ -97,22 +88,8 @@ class OutingController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/localisations', name: 'app_outing_locations', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function locations(Outing $outing, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $locations = $entityManager->getRepository(OutingLocationPing::class)->findBy(
-            ['outing' => $outing],
-            ['recordedAt' => 'DESC'],
-        );
-
-        return $this->json([
-            'locationTrackingEnabled' => $outing->isLocationTrackingEnabled(),
-            'locations' => array_map(fn (OutingLocationPing $location): array => $this->serializeLocation($location), $locations),
-        ]);
-    }
-
     #[Route('/{id}/modifier', name: 'app_outing_edit', requirements: ['id' => '\d+'])]
-    public function edit(Outing $outing, Request $request, EntityManagerInterface $entityManager, MobileNotificationService $notificationService): Response
+    public function edit(Outing $outing, Request $request, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(OutingType::class, $outing, ['season' => $outing->getSeason()]);
         $form->handleRequest($request);
@@ -122,12 +99,6 @@ class OutingController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Sortie mise à jour.');
-            if ($request->request->getBoolean('notify_animators')) {
-                $notificationResult = $notificationService->notifyOutingUpdated($outing);
-                if ($notificationResult['sent'] > 0) {
-                    $this->addFlash('success', sprintf('%d notification(s) envoyée(s) aux animateurs.', $notificationResult['sent']));
-                }
-            }
 
             return $this->redirectToRoute('app_outing_show', ['id' => $outing->getId()]);
         }
@@ -155,7 +126,7 @@ class OutingController extends AbstractController
     }
 
     #[Route('/{id}/statut/{status}', name: 'app_outing_status', requirements: ['id' => '\d+', 'status' => 'pending|validated|refused'], methods: ['POST'])]
-    public function status(Outing $outing, string $status, Request $request, EntityManagerInterface $entityManager, MobileNotificationService $notificationService): Response
+    public function status(Outing $outing, string $status, Request $request, EntityManagerInterface $entityManager): Response
     {
         if (!$this->isCsrfTokenValid('outing_status_' . $outing->getId(), (string) $request->request->get('_token'))) {
             throw $this->createAccessDeniedException();
@@ -169,12 +140,6 @@ class OutingController extends AbstractController
         $entityManager->flush();
 
         $this->addFlash('success', 'Statut de la sortie mis à jour.');
-        if ($request->request->getBoolean('notify_animators')) {
-            $notificationResult = $notificationService->notifyOutingStatusUpdated($outing);
-            if ($notificationResult['sent'] > 0) {
-                $this->addFlash('success', sprintf('%d notification(s) envoyée(s) aux animateurs.', $notificationResult['sent']));
-            }
-        }
 
         return $this->redirectToRoute('app_outing_show', ['id' => $outing->getId()]);
     }
@@ -192,26 +157,5 @@ class OutingController extends AbstractController
         $count = $entityManager->getRepository(Outing::class)->count(['season' => $season]);
 
         return (string) ($count + 1);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function serializeLocation(OutingLocationPing $location): array
-    {
-        $animator = $location->getAnimator();
-
-        return [
-            'latitude' => $location->getLatitude(),
-            'longitude' => $location->getLongitude(),
-            'accuracy' => $location->getAccuracy(),
-            'recordedAt' => $location->getRecordedAt()->format(\DateTimeInterface::ATOM),
-            'animator' => [
-                'id' => $animator?->getId(),
-                'firstName' => $animator?->getFirstName(),
-                'lastName' => $animator?->getLastName(),
-                'fullName' => $animator?->getFullName(),
-            ],
-        ];
     }
 }

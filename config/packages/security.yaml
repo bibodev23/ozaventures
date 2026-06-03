@@ -41,7 +41,8 @@ security:
         - { path: ^/connexion$, roles: PUBLIC_ACCESS }
         - { path: ^/apres-connexion$, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/mon-mot-de-passe$, roles: ROLE_USER }
-        - { path: ^/messages, roles: ROLE_USER }
+        # Messaging is kept in code for a future mobile-enabled V2, but hidden in the webapp V1.
+        - { path: ^/messages, roles: ROLE_MESSAGING_DISABLED }
         - { path: ^/, roles: ROLE_DIRECTOR }
 
 when@test:

@@ -8,7 +8,6 @@ use App\Entity\Season;
 use App\Enum\AgeGroup;
 use App\Enum\DailyTaskType;
 use App\Service\ActiveSeasonProvider;
-use App\Service\MobileNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +39,7 @@ class DailyPlanningController extends AbstractController
     }
 
     #[Route('/{date}', name: 'app_daily_planning_day', requirements: ['date' => '\d{4}-\d{2}-\d{2}'])]
-    public function day(string $date, Request $request, ActiveSeasonProvider $seasonProvider, EntityManagerInterface $entityManager, MobileNotificationService $notificationService): Response
+    public function day(string $date, Request $request, ActiveSeasonProvider $seasonProvider, EntityManagerInterface $entityManager): Response
     {
         $season = $seasonProvider->getActiveSeason();
         $planningDate = \DateTimeImmutable::createFromFormat('!Y-m-d', $date);
@@ -62,16 +61,10 @@ class DailyPlanningController extends AbstractController
                 throw $this->createAccessDeniedException();
             }
 
-            $changedAnimators = $this->saveAssignments($request, $entityManager, $season, $planningDate, $animators, $assignments);
+            $this->saveAssignments($request, $entityManager, $season, $planningDate, $animators, $assignments);
             $entityManager->flush();
 
             $this->addFlash('success', 'Planning du jour enregistré.');
-            if ($request->request->getBoolean('notify_animators')) {
-                $notificationResult = $notificationService->notifyDailyPlanningUpdated($changedAnimators, $planningDate);
-                if ($notificationResult['sent'] > 0) {
-                    $this->addFlash('success', sprintf('%d notification(s) planning envoyée(s).', $notificationResult['sent']));
-                }
-            }
 
             return $this->redirectToRoute('app_daily_planning_day', ['date' => $planningDate->format('Y-m-d')]);
         }

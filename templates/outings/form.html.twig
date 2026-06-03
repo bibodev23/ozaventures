@@ -7,7 +7,7 @@
         <div>
             <p class="eyebrow">Sorties</p>
             <h1>{{ title }}</h1>
-            <p class="lead lead-compact">Prépare une sortie lisible pour la direction et exploitable directement depuis l'app mobile.</p>
+            <p class="lead lead-compact">Prépare une sortie claire pour la direction, les affiches et le suivi de saison.</p>
         </div>
     </section>
 
@@ -17,8 +17,8 @@
                 <p class="panel-kicker">Checklist</p>
                 <span>5 points</span>
             </div>
-            <h2>Avant de prévenir l'équipe</h2>
-            <p class="checklist-intro">Les points clés à verrouiller avant l'envoi aux animateurs.</p>
+            <h2>Avant de valider la sortie</h2>
+            <p class="checklist-intro">Les points clés à verrouiller pour une sortie lisible et sécurisée.</p>
             <ol class="check-list check-list-prominent">
                 <li>
                     <strong>Sac pharmacie</strong>
@@ -26,7 +26,7 @@
                 </li>
                 <li>
                     <strong>Horaires</strong>
-                    <span>Vérifie le départ et le retour avant notification.</span>
+                    <span>Vérifie le départ et le retour avant validation.</span>
                 </li>
                 <li>
                     <strong>Enfants</strong>
@@ -37,18 +37,17 @@
                     <span>Associe au moins un animateur responsable.</span>
                 </li>
                 <li>
-                    <strong>Notification</strong>
-                    <span>L'équipe est prévenue après l'enregistrement.</span>
+                    <strong>Décision</strong>
+                    <span>Garde la sortie en attente tant que les informations ne sont pas complètes.</span>
                 </li>
             </ol>
         </aside>
 
         <section class="form-panel form-panel-wide">
             {{ form_start(form, {attr: {class: 'form'}}) }}
-                <input type="hidden" name="notify_animators" value="1">
                 <section class="hint-card">
-                    <strong>Notification animateurs</strong>
-                    <span>Les animateurs sélectionnés seront prévenus uniquement après validation de ce formulaire.</span>
+                    <strong>Préparation direction</strong>
+                    <span>La sortie sera enregistrée pour validation, suivi des participants et impression de l'affiche.</span>
                 </section>
                 <div class="form-grid">
                     {{ form_row(form.number) }}
@@ -58,7 +57,6 @@
                     {{ form_row(form.transportMode) }}
                     {{ form_row(form.picnicRequired) }}
                     {{ form_row(form.routeDurationMinutes) }}
-                    {{ form_row(form.locationTrackingEnabled) }}
                 </div>
                 <div class="selection-grid">
                     <div class="selection-box outing-selection-box">
@@ -70,7 +68,7 @@
                 </div>
                 <div class="form-actions">
                     <a class="button button-secondary" href="{{ outing.id ? path('app_outing_show', {id: outing.id}) : path('app_outings') }}">Annuler</a>
-                    <button class="button button-primary" type="submit">Enregistrer et notifier</button>
+                    <button class="button button-primary" type="submit">Enregistrer</button>
                 </div>
             {{ form_end(form) }}
         </section>

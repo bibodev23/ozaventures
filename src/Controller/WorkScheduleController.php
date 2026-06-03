@@ -7,7 +7,6 @@ use App\Entity\AnimatorWorkShift;
 use App\Entity\Season;
 use App\Enum\AgeGroup;
 use App\Service\ActiveSeasonProvider;
-use App\Service\MobileNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -64,7 +63,7 @@ class WorkScheduleController extends AbstractController
     }
 
     #[Route('/{week}', name: 'app_work_schedule_week', requirements: ['week' => '\d{4}-\d{2}-\d{2}'])]
-    public function week(string $week, Request $request, ActiveSeasonProvider $seasonProvider, EntityManagerInterface $entityManager, MobileNotificationService $notificationService): Response
+    public function week(string $week, Request $request, ActiveSeasonProvider $seasonProvider, EntityManagerInterface $entityManager): Response
     {
         $season = $seasonProvider->getActiveSeason();
         $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $week);
@@ -107,30 +106,10 @@ class WorkScheduleController extends AbstractController
             $weeklyTotals = $validation['weekly_totals'];
 
             if ($errors === []) {
-                $changedAnimators = $this->saveSchedule($submittedValues, $validation['parsed'], $animators, $weekDays, $existingShifts, $season, $entityManager);
+                $this->saveSchedule($submittedValues, $validation['parsed'], $animators, $weekDays, $existingShifts, $season, $entityManager);
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Horaires de la semaine enregistrés.');
-                if ($request->request->getBoolean('notify_animators')) {
-                    if ($changedAnimators === []) {
-                        $this->addFlash('warning', 'Aucun horaire réellement modifié : aucune notification mobile envoyée.');
-                    } else {
-                        $notificationResult = $notificationService->notifyWorkScheduleUpdated($changedAnimators, $weekStart);
-                        if ($notificationResult['sent'] > 0) {
-                            $this->addFlash('success', sprintf('%d notification(s) horaires envoyée(s).', $notificationResult['sent']));
-                        }
-
-                        if ($notificationResult['failed'] > 0) {
-                            $this->addFlash('warning', sprintf('%d notification(s) n’ont pas pu être envoyée(s). Vérifie Firebase côté serveur.', $notificationResult['failed']));
-                        }
-
-                        if ($notificationResult['sent'] === 0 && $notificationResult['failed'] === 0 && $notificationResult['skipped'] > 0) {
-                            $this->addFlash('warning', 'Aucune notification envoyée : l’animateur concerné n’a pas encore de téléphone enregistré ou les notifications sont désactivées.');
-                        } elseif ($notificationResult['skipped'] > 0) {
-                            $this->addFlash('warning', sprintf('%d animateur(s) n’ont pas de téléphone enregistré pour les notifications.', $notificationResult['skipped']));
-                        }
-                    }
-                }
 
                 $overLimitNames = $this->overLimitNames($animators, $weeklyTotals);
                 if ($overLimitNames !== []) {

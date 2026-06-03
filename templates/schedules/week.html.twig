@@ -57,7 +57,6 @@
     {% else %}
         <form method="post" class="schedule-form">
             <input type="hidden" name="_token" value="{{ csrf_token('work_schedule_' ~ week_start|date('Y-m-d')) }}">
-            <input type="hidden" name="notify_animators" value="1">
 
             <div class="schedule-accordion-toolbar">
                 <div>

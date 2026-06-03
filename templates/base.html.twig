@@ -33,7 +33,6 @@
                                     {label: 'Sorties', icon: 'SO', route: 'app_outings', match: 'app_outing'},
                                     {label: 'Enfants', icon: 'EN', route: 'app_children', match: 'app_child'},
                                     {label: 'Animateurs', icon: 'AN', route: 'app_animators', match: 'app_animator'},
-                                    {label: 'Messages', icon: 'MS', route: 'app_messages', match: 'app_message'},
                                     {label: 'Direction', icon: 'DI', route: 'app_directors', match: 'app_director'}
                                 ] %}
                                 {% for item in nav_items %}
@@ -49,10 +48,6 @@
                                     </a>
                                 {% endfor %}
                             {% elseif is_granted('ROLE_ANIMATOR') %}
-                                <a class="{{ current_route starts with 'app_message' ? 'is-active' : '' }}" href="{{ path('app_messages') }}">
-                                    <span class="nav-icon">MS</span>
-                                    <span>Messages</span>
-                                </a>
                                 <a class="{{ current_route starts with 'app_account' ? 'is-active' : '' }}" href="{{ path('app_account_password') }}">
                                     <span class="nav-icon">MP</span>
                                     <span>Mot de passe</span>

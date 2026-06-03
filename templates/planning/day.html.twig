@@ -7,7 +7,7 @@
         <div>
             <p class="eyebrow">{{ season.name }}</p>
             <h1>Planning du {{ date|date('d/m/Y') }}</h1>
-            <p class="lead lead-compact">Répartis les tâches visibles dans l'app mobile des animateurs.</p>
+            <p class="lead lead-compact">Répartis les tâches de la journée pour garder une organisation lisible côté direction.</p>
         </div>
         <form class="date-jump" method="get" action="{{ path('app_daily_planning') }}">
             <label for="planning-date">Changer de jour</label>
@@ -23,7 +23,7 @@
 
     <section class="hint-card">
         <strong>Validation direction</strong>
-        <span>Les animateurs ne sont prévenus qu'après validation du planning avec le bouton en bas de page.</span>
+        <span>Enregistre le planning une fois les affectations vérifiées par la direction.</span>
     </section>
 
     {% if animators is empty %}
@@ -31,7 +31,6 @@
     {% else %}
         <form method="post" class="planning-form">
             <input type="hidden" name="_token" value="{{ csrf_token('daily_planning_' ~ date|date('Y-m-d')) }}">
-            <input type="hidden" name="notify_animators" value="1">
 
             <section class="task-grid">
                 {% for row in task_rows %}

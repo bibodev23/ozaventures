@@ -45,13 +45,13 @@
 
     <section class="hint-card">
         <strong>Parcours de sortie</strong>
-        <span>Une sortie créée depuis la webapp ou l'app mobile arrive en attente. La direction vérifie les participants, valide ou refuse, puis les animateurs reçoivent la notification.</span>
+        <span>Une sortie créée depuis la webapp arrive en attente. La direction vérifie les participants, puis valide ou refuse la demande.</span>
     </section>
 
     {% if outings is empty %}
         <div class="empty-state empty-state-large">
             <strong>{{ selected_status ? 'Aucune sortie dans ce filtre.' : 'Aucune sortie créée.' }}</strong>
-            <span>{{ selected_status ? 'Tu peux revenir à toutes les sorties ou créer une nouvelle sortie.' : 'Commence par une première sortie test pour vérifier le parcours webapp, API et mobile.' }}</span>
+            <span>{{ selected_status ? 'Tu peux revenir à toutes les sorties ou créer une nouvelle sortie.' : 'Commence par une première sortie test pour vérifier le parcours direction.' }}</span>
             <a class="button button-primary" href="{{ path('app_outing_new') }}">Créer la première sortie</a>
         </div>
     {% else %}
