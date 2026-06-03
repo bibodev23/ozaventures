@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Centre aéré{% endblock %}</title>
-        <link rel="stylesheet" href="{{ asset('styles/app.css') }}?v=20260603-mobile-webapp">
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}?v=20260603-animator-portal">
         {% block importmap %}{{ importmap('app') }}{% endblock %}
     </head>
     <body>
@@ -14,11 +14,12 @@
         <div class="{{ app.user ? 'app-shell' : 'auth-shell' }}">
             {% if app.user %}
                 <aside class="app-sidebar">
-                    <a class="brand" href="{{ path('app_dashboard') }}">
+                    {% set brand_route = is_granted('ROLE_DIRECTOR') ? 'app_dashboard' : 'app_animator_portal' %}
+                    <a class="brand" href="{{ path(brand_route) }}">
                         <span class="brand-mark">OZ</span>
                         <span>
                             <strong>Oz'Aventure</strong>
-                            <small>Pilotage direction</small>
+                            <small>{{ is_granted('ROLE_DIRECTOR') ? 'Pilotage direction' : 'Espace animateur' }}</small>
                         </span>
                     </a>
 
@@ -48,10 +49,21 @@
                                     </a>
                                 {% endfor %}
                             {% elseif is_granted('ROLE_ANIMATOR') %}
-                                <a class="{{ current_route starts with 'app_account' ? 'is-active' : '' }}" href="{{ path('app_account_password') }}">
-                                    <span class="nav-icon">MP</span>
-                                    <span>Mot de passe</span>
-                                </a>
+                                {% set nav_items = [
+                                    {label: 'Mon espace', icon: 'ME', route: 'app_animator_portal', match: 'app_animator_portal'},
+                                    {label: 'Mot de passe', icon: 'MP', route: 'app_account_password', match: 'app_account'}
+                                ] %}
+                                {% for item in nav_items %}
+                                    <a
+                                        class="{{ current_route starts with item.match ? 'is-active' : '' }}"
+                                        href="{{ path(item.route) }}"
+                                        data-turbo-preload
+                                        {% if current_route starts with item.match %}aria-current="page"{% endif %}
+                                    >
+                                        <span class="nav-icon">{{ item.icon }}</span>
+                                        <span>{{ item.label }}</span>
+                                    </a>
+                                {% endfor %}
                             {% endif %}
                         </nav>
                     </div>
@@ -70,9 +82,8 @@
                             <twig:GlobalSearch />
                         {% else %}
                             <div class="search-pill" aria-label="Recherche visuelle">
-                                <span>S</span>
-                                <span>Rechercher une sortie, un enfant...</span>
-                                <kbd>Ctrl F</kbd>
+                                <span>AN</span>
+                                <span>Espace animateur</span>
                             </div>
                         {% endif %}
                         <div class="workspace-actions">

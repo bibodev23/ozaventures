@@ -19,7 +19,6 @@ use Symfony\UX\Chartjs\Model\Chart;
 #[IsGranted('ROLE_DIRECTOR')]
 class DashboardController extends AbstractController
 {
-    #[Route('/', name: 'app_home')]
     #[Route('/dashboard', name: 'app_dashboard')]
     public function index(ActiveSeasonProvider $seasonProvider, EntityManagerInterface $entityManager, ChartBuilderInterface $chartBuilder): Response
     {

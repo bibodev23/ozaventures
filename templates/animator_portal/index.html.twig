@@ -1,0 +1,151 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon espace animateur{% endblock %}
+
+{% block body %}
+    <section class="dribbble-dashboard animator-dashboard">
+        <header class="dashboard-topline">
+            <div>
+                <p class="eyebrow">Espace animateur</p>
+                <h1>Bonjour {{ animator.firstName }}</h1>
+                <p>Retrouve tes horaires, tes sorties et tes missions du jour sans passer par l'application mobile.</p>
+            </div>
+            <div class="dashboard-actions">
+                <a class="button button-secondary" href="{{ path('app_account_password') }}">Modifier mon mot de passe</a>
+            </div>
+        </header>
+
+        {% if user.mustChangePassword %}
+            <section class="panel-card animator-alert-card">
+                <span class="panel-kicker">Sécurité du compte</span>
+                <h2>Mot de passe initial à remplacer</h2>
+                <p>Ton compte utilise encore le mot de passe donné par la direction. Change-le dès que possible.</p>
+                <a class="button button-primary" href="{{ path('app_account_password') }}">Changer mon mot de passe</a>
+            </section>
+        {% endif %}
+
+        <section class="metric-grid" aria-label="Résumé animateur">
+            <twig:DashboardMetric
+                href="#horaires-animateur"
+                label="Semaine"
+                value="{{ weekly_total_label }}"
+                caption="Du {{ week_start|date('d/m') }} au {{ week_end|date('d/m') }}"
+                variant="primary"
+            />
+            <twig:DashboardMetric
+                href="#sorties-animateur"
+                label="Sorties à venir"
+                value="{{ upcoming_outings_count }}"
+                caption="Où tu es affecté"
+            />
+            <twig:DashboardMetric
+                href="#planning-animateur"
+                label="Missions du jour"
+                value="{{ today_tasks|length }}"
+                caption="{{ today|date('d/m/Y') }}"
+            />
+            <twig:DashboardMetric
+                href="#sorties-animateur"
+                label="Validées"
+                value="{{ validated_outings_count }}"
+                caption="{{ pending_outings_count }} en attente"
+            />
+        </section>
+
+        <section class="dashboard-content-grid">
+            <div class="dashboard-center-column">
+                <section id="horaires-animateur" class="panel-card animator-panel-card">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-kicker">Horaires</span>
+                            <h2>Ma semaine</h2>
+                        </div>
+                        <span class="soft-chip">{{ weekly_total_label }}</span>
+                    </div>
+
+                    <div class="animator-week-grid">
+                        {% for day in week_days %}
+                            {% set shift = day.shift %}
+                            <article class="animator-day-card {{ shift ? 'has-shift' : '' }}">
+                                <span>{{ day.label }}</span>
+                                <strong>{{ day.date|date('d/m') }}</strong>
+                                {% if shift %}
+                                    <small>{{ shift.startTime|date('H:i') }} - {{ shift.lunchStartTime|date('H:i') }}</small>
+                                    <small>{{ shift.lunchEndTime|date('H:i') }} - {{ shift.endTime|date('H:i') }}</small>
+                                    <em>{{ shift.workedHoursLabel }}</em>
+                                {% else %}
+                                    <small>Repos</small>
+                                {% endif %}
+                            </article>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section id="planning-animateur" class="panel-card animator-panel-card">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-kicker">Planning</span>
+                            <h2>Mes missions du jour</h2>
+                        </div>
+                        <span class="soft-chip">{{ today|date('d/m') }}</span>
+                    </div>
+
+                    {% if today_tasks is empty %}
+                        <div class="empty-state empty-state-soft">
+                            <strong>Aucune mission assignée aujourd'hui.</strong>
+                            <span>La direction peut encore mettre à jour le planning.</span>
+                        </div>
+                    {% else %}
+                        <div class="project-list animator-task-list">
+                            {% for assignment in today_tasks %}
+                                <div class="animator-task-row">
+                                    <span class="avatar avatar-blue">PL</span>
+                                    <span>
+                                        <strong>{{ assignment.taskLabel }}</strong>
+                                        <small>{{ assignment.task.timeLabel }}{% if assignment.task.groupLabel %} · {{ assignment.task.groupLabel }}{% endif %}</small>
+                                    </span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </section>
+            </div>
+
+            <aside id="sorties-animateur" class="outings-column">
+                <section class="panel-card outing-list-card">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-kicker">Sorties</span>
+                            <h2>Mes prochaines sorties</h2>
+                        </div>
+                        <span class="soft-chip">{{ upcoming_outings|length }} affichée(s)</span>
+                    </div>
+
+                    {% if upcoming_outings is empty %}
+                        <div class="empty-state empty-state-soft">
+                            <strong>Aucune sortie à venir.</strong>
+                            <span>Quand la direction t'affectera à une sortie, elle apparaîtra ici.</span>
+                        </div>
+                    {% else %}
+                        <div class="project-list animator-outing-list">
+                            {% for outing in upcoming_outings %}
+                                <article class="animator-outing-card">
+                                    <div>
+                                        <span class="badge {{ outing.statusBadgeClass }}">{{ outing.statusLabel }}</span>
+                                        <strong>{{ outing.destination }}</strong>
+                                        <small>{{ outing.departureAt|date('d/m/Y') }} · {{ outing.departureAt|date('H:i') }} - {{ outing.returnAt|date('H:i') }}</small>
+                                    </div>
+                                    <dl>
+                                        <div><dt>Enfants</dt><dd>{{ outing.children|length }}</dd></div>
+                                        <div><dt>Transport</dt><dd>{{ outing.transportMode ?: 'À préciser' }}</dd></div>
+                                        <div><dt>Pique-nique</dt><dd>{{ outing.picnicRequired ? 'Oui' : 'Non' }}</dd></div>
+                                    </dl>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </section>
+            </aside>
+        </section>
+    </section>
+{% endblock %}

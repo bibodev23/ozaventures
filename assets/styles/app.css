@@ -5462,3 +5462,208 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* Animator web portal */
+.animator-dashboard {
+    display: grid;
+    gap: 18px;
+}
+
+.animator-alert-card {
+    display: grid;
+    gap: 12px;
+    border-color: rgba(255, 190, 176, .55);
+    background:
+        radial-gradient(circle at 95% 0%, rgba(199, 220, 255, .52), transparent 16rem),
+        linear-gradient(135deg, rgba(255, 240, 230, .92), rgba(255, 253, 250, .96));
+}
+
+.animator-alert-card p {
+    max-width: 58rem;
+    margin: 0;
+    color: #625f69;
+    font-weight: 800;
+    line-height: 1.45;
+}
+
+.animator-panel-card {
+    min-height: auto;
+}
+
+.animator-week-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.animator-day-card {
+    display: grid;
+    gap: 5px;
+    min-height: 146px;
+    padding: 14px;
+    border: 1px solid rgba(239, 228, 220, .9);
+    border-radius: 20px;
+    background: rgba(255, 253, 250, .78);
+    box-shadow: 0 14px 30px rgba(119, 91, 105, .06);
+}
+
+.animator-day-card.has-shift {
+    border-color: rgba(158, 219, 195, .58);
+    background: linear-gradient(135deg, rgba(223, 243, 236, .78), rgba(237, 245, 255, .72));
+}
+
+.animator-day-card span,
+.animator-day-card small,
+.animator-day-card em {
+    color: #777281;
+    font-size: .78rem;
+    font-weight: 900;
+}
+
+.animator-day-card strong {
+    color: #403a4e;
+    font-size: 1.25rem;
+    font-weight: 1000;
+}
+
+.animator-day-card em {
+    align-self: end;
+    width: fit-content;
+    margin-top: 4px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    color: #4f6490;
+    background: rgba(255, 255, 255, .72);
+    font-style: normal;
+}
+
+.animator-task-list {
+    gap: 10px;
+}
+
+.animator-task-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 13px;
+    border: 1px solid rgba(239, 228, 220, .86);
+    border-radius: 18px;
+    background: rgba(255, 253, 250, .74);
+}
+
+.animator-task-row strong,
+.animator-task-row small {
+    display: block;
+}
+
+.animator-task-row small {
+    margin-top: 3px;
+    color: #625f69;
+    font-size: .78rem;
+    font-weight: 800;
+}
+
+.animator-outing-list {
+    gap: 12px;
+}
+
+.animator-outing-card {
+    display: grid;
+    gap: 14px;
+    padding: 15px;
+    border: 1px solid rgba(239, 228, 220, .86);
+    border-radius: 20px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(233, 225, 255, .45), transparent 10rem),
+        rgba(255, 253, 250, .78);
+}
+
+.animator-outing-card strong,
+.animator-outing-card small {
+    display: block;
+}
+
+.animator-outing-card strong {
+    margin-top: 8px;
+    color: #403a4e;
+    font-size: 1.05rem;
+    font-weight: 1000;
+}
+
+.animator-outing-card small {
+    margin-top: 4px;
+    color: #625f69;
+    font-size: .8rem;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.animator-outing-card dl {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+}
+
+.animator-outing-card dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .68);
+}
+
+.animator-outing-card dt,
+.animator-outing-card dd {
+    margin: 0;
+    font-size: .75rem;
+    font-weight: 900;
+}
+
+.animator-outing-card dt {
+    color: #777281;
+    text-transform: uppercase;
+}
+
+.animator-outing-card dd {
+    color: #403a4e;
+    text-align: right;
+}
+
+@media (max-width: 980px) {
+    .animator-week-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .animator-dashboard {
+        gap: 14px;
+    }
+
+    .animator-week-grid {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(138px, 62%);
+        grid-template-columns: none;
+        overflow-x: auto;
+        padding-bottom: 3px;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .animator-week-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .animator-day-card {
+        min-height: 138px;
+        scroll-snap-align: start;
+    }
+
+    .animator-alert-card .button {
+        width: 100%;
+    }
+}

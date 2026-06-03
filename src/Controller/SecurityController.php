@@ -9,6 +9,20 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+    #[Route('/', name: 'app_home')]
+    public function home(): Response
+    {
+        if ($this->isGranted('ROLE_DIRECTOR')) {
+            return $this->redirectToRoute('app_dashboard');
+        }
+
+        if ($this->isGranted('ROLE_ANIMATOR')) {
+            return $this->redirectToRoute('app_animator_portal');
+        }
+
+        return $this->redirectToRoute('app_login');
+    }
+
     #[Route('/connexion', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -26,7 +40,7 @@ class SecurityController extends AbstractController
         }
 
         if ($this->isGranted('ROLE_ANIMATOR')) {
-            return $this->redirectToRoute('app_account_password');
+            return $this->redirectToRoute('app_animator_portal');
         }
 
         return $this->redirectToRoute('app_login');
