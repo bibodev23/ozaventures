@@ -41,6 +41,77 @@ const initAccountMenus = () => {
     });
 };
 
+const isTouchPickerViewport = () => window.matchMedia('(pointer: coarse), (max-width: 900px)').matches;
+
+const prepareMobilePicker = (select) => {
+    const tomSelect = select.tomselect;
+
+    if (!tomSelect || !tomSelect.control || !tomSelect.control_input) {
+        return false;
+    }
+
+    const controlInput = tomSelect.control_input;
+    const applyMobileMode = () => {
+        if (!isTouchPickerViewport()) {
+            tomSelect.wrapper?.classList.remove('ts-touch-picker');
+            controlInput.removeAttribute('readonly');
+            controlInput.removeAttribute('inputmode');
+            return;
+        }
+
+        tomSelect.wrapper?.classList.add('ts-touch-picker');
+        controlInput.setAttribute('readonly', 'readonly');
+        controlInput.setAttribute('inputmode', 'none');
+        controlInput.setAttribute('autocomplete', 'off');
+        controlInput.setAttribute('aria-label', 'Selectionner dans la liste');
+    };
+
+    const openPicker = (event) => {
+        if (!isTouchPickerViewport()) {
+            return;
+        }
+
+        if (event?.target instanceof Element && event.target.closest('.remove')) {
+            return;
+        }
+
+        applyMobileMode();
+
+        window.setTimeout(() => {
+            tomSelect.focus();
+
+            if (tomSelect.settings.load && Object.keys(tomSelect.options).length === 0) {
+                tomSelect.load('');
+            }
+
+            tomSelect.refreshOptions(false);
+            tomSelect.open();
+        }, 0);
+    };
+
+    applyMobileMode();
+
+    if (!tomSelect.__ozTouchPickerReady) {
+        tomSelect.__ozTouchPickerReady = true;
+        tomSelect.control.addEventListener('pointerdown', openPicker, { passive: true });
+        controlInput.addEventListener('focus', openPicker);
+    }
+
+    return true;
+};
+
+const initMobilePickers = () => {
+    document.querySelectorAll('select.mobile-picker-no-keyboard').forEach((select) => {
+        if (prepareMobilePicker(select)) {
+            return;
+        }
+
+        [40, 160, 420].forEach((delay) => {
+            window.setTimeout(() => prepareMobilePicker(select), delay);
+        });
+    });
+};
+
 document.addEventListener('click', (event) => {
     if (!(event.target instanceof Element) || event.target.closest('details.user-menu')) {
         return;
@@ -52,4 +123,7 @@ document.addEventListener('click', (event) => {
 });
 
 document.addEventListener('turbo:load', initAccountMenus);
+document.addEventListener('turbo:load', initMobilePickers);
 document.addEventListener('DOMContentLoaded', initAccountMenus);
+document.addEventListener('DOMContentLoaded', initMobilePickers);
+window.addEventListener('resize', initMobilePickers);

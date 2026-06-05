@@ -80,6 +80,9 @@ class OutingType extends AbstractType
                     'hideSelected' => true,
                     'placeholder' => 'Rechercher puis sélectionner les enfants',
                 ],
+                'attr' => [
+                    'class' => 'mobile-picker-no-keyboard',
+                ],
                 'query_builder' => fn (EntityRepository $repository) => $repository->createQueryBuilder('child')
                     ->andWhere('child.season = :season')
                     ->setParameter('season', $season)
@@ -102,6 +105,9 @@ class OutingType extends AbstractType
                     'dropdownParent' => 'body',
                     'hideSelected' => true,
                     'placeholder' => 'Rechercher puis sélectionner les animateurs',
+                ],
+                'attr' => [
+                    'class' => 'mobile-picker-no-keyboard',
                 ],
                 'query_builder' => fn (EntityRepository $repository) => $repository->createQueryBuilder('animator')
                     ->andWhere('animator.active = true')
