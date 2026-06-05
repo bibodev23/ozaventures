@@ -10,7 +10,7 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
         <link rel="manifest" href="{{ asset('site.webmanifest') }}">
         <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
-        <link rel="stylesheet" href="{{ asset('styles/app.css') }}?v=20260605-clean-animator-copy">
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}?v=20260605-account-menu-mobile">
         {% block importmap %}{{ importmap('app') }}{% endblock %}
     </head>
     <body>
@@ -97,21 +97,21 @@
                         <div class="workspace-actions">
                             {% set user_display_name = app.user.firstName|default('') ?: app.user.userIdentifier %}
                             {% set user_avatar = (app.user.firstName|default('')|slice(0, 1) ~ app.user.lastName|default('')|slice(0, 1))|trim ?: app.user.userIdentifier|slice(0, 2) %}
-                            <span class="user-menu">
-                                <span class="user-chip">
+                            <details class="user-menu">
+                                <summary class="user-chip" aria-label="Ouvrir le menu du compte">
                                     <span class="avatar">{{ user_avatar|upper }}</span>
                                     <span>
                                         <strong>{{ user_display_name }}</strong>
                                         <small>Compte connecté</small>
                                     </span>
-                                </span>
-                                <span class="workspace-logout-link workspace-account-menu">
+                                </summary>
+                                <nav class="workspace-logout-link workspace-account-menu" aria-label="Menu du compte">
                                     {% if is_granted('ROLE_ANIMATOR') %}
                                         <a href="{{ path('app_account_password') }}">Mot de passe</a>
                                     {% endif %}
-                                    <a href="{{ path('app_logout') }}">Déconnexion</a>
-                                </span>
-                            </span>
+                                    <a href="{{ path('app_logout') }}" data-turbo="false">Déconnexion</a>
+                                </nav>
+                            </details>
                         </div>
                     </header>
             {% endif %}

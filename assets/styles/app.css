@@ -6831,3 +6831,54 @@ body {
         height: 30px;
     }
 }
+
+/* Account menu: native tap-friendly dropdown, especially for mobile/PWA. */
+.user-menu {
+    position: relative;
+    z-index: 1000;
+}
+
+.user-menu summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+.user-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.user-menu .workspace-logout-link {
+    display: grid;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+}
+
+.user-menu[open] .workspace-logout-link,
+.user-menu:hover .workspace-logout-link,
+.user-menu:focus-within .workspace-logout-link {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+@media (max-width: 760px) {
+    .workspace-topbar,
+    .workspace-actions,
+    .user-menu {
+        overflow: visible;
+    }
+
+    .user-menu .workspace-logout-link {
+        position: fixed;
+        top: calc(74px + env(safe-area-inset-top));
+        right: 14px;
+        left: auto;
+        z-index: 9999;
+        min-width: min(220px, calc(100vw - 28px));
+        border: 1px solid #e8eaed;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, .98);
+        box-shadow: 0 18px 46px rgba(60, 64, 67, .22);
+    }
+}
