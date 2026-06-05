@@ -81,18 +81,6 @@ class Animator implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $workShifts;
 
     /**
-     * @var Collection<int, ApiToken>
-     */
-    #[ORM\OneToMany(mappedBy: 'animator', targetEntity: ApiToken::class)]
-    private Collection $apiTokens;
-
-    /**
-     * @var Collection<int, MobileDeviceToken>
-     */
-    #[ORM\OneToMany(mappedBy: 'animator', targetEntity: MobileDeviceToken::class)]
-    private Collection $mobileDeviceTokens;
-
-    /**
      * @var Collection<int, Outing>
      */
     #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Outing::class)]
@@ -104,8 +92,6 @@ class Animator implements UserInterface, PasswordAuthenticatedUserInterface
         $this->outings = new ArrayCollection();
         $this->dailyTaskAssignments = new ArrayCollection();
         $this->workShifts = new ArrayCollection();
-        $this->apiTokens = new ArrayCollection();
-        $this->mobileDeviceTokens = new ArrayCollection();
         $this->createdOutings = new ArrayCollection();
     }
 
@@ -280,22 +266,6 @@ class Animator implements UserInterface, PasswordAuthenticatedUserInterface
     public function getWorkShifts(): Collection
     {
         return $this->workShifts;
-    }
-
-    /**
-     * @return Collection<int, ApiToken>
-     */
-    public function getApiTokens(): Collection
-    {
-        return $this->apiTokens;
-    }
-
-    /**
-     * @return Collection<int, MobileDeviceToken>
-     */
-    public function getMobileDeviceTokens(): Collection
-    {
-        return $this->mobileDeviceTokens;
     }
 
     /**

@@ -48,9 +48,6 @@ class Outing
     #[Assert\Range(min: 0, max: 600)]
     private ?int $routeDurationMinutes = null;
 
-    #[ORM\Column(options: ['default' => false])]
-    private bool $locationTrackingEnabled = false;
-
     #[ORM\Column(length: 20)]
     private string $status = OutingStatus::Pending->value;
 
@@ -209,18 +206,6 @@ class Outing
     public function isLongRoute(): bool
     {
         return $this->routeDurationMinutes !== null && $this->routeDurationMinutes >= 60;
-    }
-
-    public function isLocationTrackingEnabled(): bool
-    {
-        return $this->locationTrackingEnabled;
-    }
-
-    public function setLocationTrackingEnabled(bool $locationTrackingEnabled): self
-    {
-        $this->locationTrackingEnabled = $locationTrackingEnabled;
-
-        return $this;
     }
 
     public function getStatus(): string

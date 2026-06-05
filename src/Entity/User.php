@@ -59,18 +59,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Animator $animator = null;
 
     /**
-     * @var Collection<int, ApiToken>
-     */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ApiToken::class)]
-    private Collection $apiTokens;
-
-    /**
-     * @var Collection<int, MobileDeviceToken>
-     */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: MobileDeviceToken::class)]
-    private Collection $mobileDeviceTokens;
-
-    /**
      * @var Collection<int, Message>
      */
     #[ORM\OneToMany(mappedBy: 'sender', targetEntity: Message::class)]
@@ -86,8 +74,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
-        $this->apiTokens = new ArrayCollection();
-        $this->mobileDeviceTokens = new ArrayCollection();
         $this->sentMessages = new ArrayCollection();
         $this->messageRecipients = new ArrayCollection();
     }

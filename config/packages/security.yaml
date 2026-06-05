@@ -15,13 +15,6 @@ security:
             # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build|styles)/
             security: false
-        api:
-            pattern: ^/api
-            stateless: true
-            provider: app_users
-            entry_point: App\Security\ApiTokenAuthenticator
-            custom_authenticators:
-                - App\Security\ApiTokenAuthenticator
         main:
             lazy: true
             provider: app_users
@@ -36,8 +29,6 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
-        - { path: ^/api/login$, roles: PUBLIC_ACCESS }
-        - { path: ^/api, roles: ROLE_USER }
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/connexion$, roles: PUBLIC_ACCESS }
         - { path: ^/(site\.webmanifest|sw\.js|offline\.html|icons/), roles: PUBLIC_ACCESS }
@@ -46,7 +37,7 @@ security:
         - { path: ^/mon-mot-de-passe$, roles: ROLE_ANIMATOR }
         - { path: ^/planning, roles: ROLE_DIRECTOR }
         - { path: ^/deconnexion$, roles: IS_AUTHENTICATED_FULLY }
-        # Messaging is kept in code for a future mobile-enabled V2, but hidden in the webapp V1.
+        # Messaging is kept in code for a future web/PWA iteration, but hidden in the webapp V1.
         - { path: ^/messages, roles: ROLE_MESSAGING_DISABLED }
         - { path: ^/, roles: ROLE_DIRECTOR }
 

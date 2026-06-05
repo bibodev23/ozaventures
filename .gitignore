@@ -11,8 +11,7 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
-# Firebase server credentials must stay private.
-/config/firebase/*.json
+.DS_Store
 
 ###> symfony/asset-mapper ###
 /public/assets/

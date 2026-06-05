@@ -8,7 +8,6 @@ use App\Entity\Outing;
 use App\Entity\User;
 use App\Service\ActiveSeasonProvider;
 use App\Service\InternalMessageService;
-use App\Service\MobileNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,7 +65,6 @@ class MessageController extends AbstractController
         EntityManagerInterface $entityManager,
         ActiveSeasonProvider $seasonProvider,
         InternalMessageService $messageService,
-        MobileNotificationService $notificationService,
     ): Response {
         $user = $this->currentUser();
         $error = null;
@@ -91,7 +89,6 @@ class MessageController extends AbstractController
                 );
 
                 $entityManager->flush();
-                $notificationService->notifyMessage($message);
 
                 $this->addFlash('success', 'Message envoyé.');
 
