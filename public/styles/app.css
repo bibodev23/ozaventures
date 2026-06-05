@@ -2296,11 +2296,6 @@ input[type="radio"] {
     box-shadow: 0 22px 52px rgba(126, 94, 108, .13);
 }
 
-.schedule-person-card.is-over-limit {
-    border-color: rgba(239, 160, 154, .62);
-    box-shadow: 0 18px 46px rgba(239, 160, 154, .18);
-}
-
 .schedule-card-summary {
     display: grid;
     grid-template-columns: minmax(210px, .72fr) minmax(390px, 1.35fr) minmax(138px, .32fr) 102px;
@@ -2542,10 +2537,6 @@ input[type="radio"] {
     color: var(--green-dark);
     font-size: 1.9rem;
     line-height: 1;
-}
-
-.is-over-limit .schedule-total-card strong {
-    color: var(--coral);
 }
 
 .schedule-total-card small {
@@ -2831,10 +2822,6 @@ input[type="radio"] {
     color: #9a2a1e;
     font-size: .82rem;
     font-weight: 900;
-}
-
-.schedule-preview-table tr.is-over-limit .preview-total strong {
-    color: var(--coral);
 }
 
 .schedule-table-wrap {
@@ -3468,8 +3455,7 @@ body {
     transform: translateY(-4px);
 }
 
-.user-menu:hover .workspace-logout-link,
-.user-menu:focus-within .workspace-logout-link {
+.user-menu[open] .workspace-logout-link {
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0);
@@ -6750,6 +6736,46 @@ body {
     color: #83524e;
 }
 
+.drive-hero-action {
+    justify-self: start;
+    width: fit-content;
+}
+
+.drive-accordion-section {
+    border: 1px solid var(--drive-line);
+    border-radius: 24px;
+    background: var(--drive-surface);
+}
+
+.drive-accordion-summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.drive-accordion-summary::-webkit-details-marker {
+    display: none;
+}
+
+.drive-accordion-summary::after {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: #e8f0fe;
+    color: var(--drive-blue);
+    content: '+';
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+}
+
+.drive-accordion-section[open] .drive-accordion-summary::after {
+    content: '-';
+}
+
+.drive-accordion-section:not([open]) .drive-list {
+    display: none;
+}
+
 .drive-quick-grid-compact {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -6819,6 +6845,37 @@ body {
     .nav-icon {
         width: min(54px, 100%);
     }
+
+    .drive-week-nav,
+    .drive-filter-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        overflow: visible;
+        padding-bottom: 0;
+    }
+
+    .drive-filter-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .drive-week-nav a,
+    .drive-week-nav span,
+    .drive-filter-tabs a {
+        justify-content: center;
+        min-width: 0;
+        width: 100%;
+        text-align: center;
+        white-space: normal;
+    }
+
+    .drive-hero-action {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .drive-accordion-summary {
+        align-items: center;
+    }
 }
 
 @media (max-width: 380px) {
@@ -6855,8 +6912,7 @@ body {
 }
 
 .user-menu[open] .workspace-logout-link,
-.user-menu:hover .workspace-logout-link,
-.user-menu:focus-within .workspace-logout-link {
+.user-menu[open] .workspace-logout-link {
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0);
@@ -6880,5 +6936,525 @@ body {
         border-radius: 18px;
         background: rgba(255, 255, 255, .98);
         box-shadow: 0 18px 46px rgba(60, 64, 67, .22);
+    }
+}
+
+/* Modern dashboard refresh inspired by current Dribbble/SaaS patterns, adapted for real operations. */
+:root {
+    --modern-bg: #f5f7fb;
+    --modern-surface: rgba(255, 255, 255, .92);
+    --modern-surface-solid: #ffffff;
+    --modern-ink: #202124;
+    --modern-muted: #5f6368;
+    --modern-soft: #e8f0fe;
+    --modern-blue: #1a73e8;
+    --modern-green: #137333;
+    --modern-green-soft: #e6f4ea;
+    --modern-yellow-soft: #fef7e0;
+    --modern-red-soft: #fce8e6;
+    --modern-line: #dfe3eb;
+    --modern-radius: 26px;
+    --modern-shadow: 0 18px 50px rgba(60, 64, 67, .10);
+    --modern-shadow-soft: 0 10px 28px rgba(60, 64, 67, .075);
+}
+
+html {
+    overflow-x: hidden;
+}
+
+body {
+    overflow-x: hidden;
+    color: var(--modern-ink);
+    background:
+        radial-gradient(circle at 3% 0%, rgba(232, 240, 254, .95), transparent 34rem),
+        radial-gradient(circle at 98% 2%, rgba(230, 244, 234, .82), transparent 32rem),
+        linear-gradient(180deg, #fafcff 0%, var(--modern-bg) 100%);
+    font-family: "Manrope", "Avenir Next", "Trebuchet MS", sans-serif;
+}
+
+.app-shell {
+    grid-template-columns: 264px minmax(0, 1fr);
+    width: min(1600px, calc(100% - 32px));
+    margin: 16px auto;
+    border: 1px solid rgba(223, 227, 235, .86);
+    border-radius: 34px;
+    background: rgba(255, 255, 255, .72);
+    box-shadow: 0 24px 80px rgba(60, 64, 67, .12);
+    backdrop-filter: blur(18px);
+}
+
+.app-sidebar {
+    border-right: 1px solid rgba(223, 227, 235, .90);
+    background: rgba(255, 255, 255, .84);
+}
+
+.app-sidebar .brand-mark {
+    color: #174ea6;
+    background:
+        radial-gradient(circle at 30% 24%, rgba(255, 255, 255, .86), transparent 38%),
+        linear-gradient(135deg, #e8f0fe, #d7eadf);
+    box-shadow: 0 14px 34px rgba(26, 115, 232, .14);
+}
+
+.app-sidebar .nav a,
+.sidebar-link {
+    min-height: 46px;
+    border: 1px solid transparent;
+    color: var(--modern-muted);
+    border-radius: 18px;
+    transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+.app-sidebar .nav a:hover,
+.sidebar-link:hover {
+    color: var(--modern-ink);
+    border-color: var(--modern-line);
+    background: #f8fafd;
+    transform: translateX(2px);
+}
+
+.app-sidebar .nav a.is-active {
+    color: #0b1f3a;
+    border-color: #d2e3fc;
+    background: #e8f0fe;
+}
+
+.app-sidebar .nav a::before,
+.sidebar-link::before {
+    display: none;
+}
+
+.nav-icon {
+    color: #174ea6;
+    background: #edf4ff;
+}
+
+.app-workspace {
+    background:
+        radial-gradient(circle at 88% 4%, rgba(251, 188, 4, .11), transparent 20rem),
+        transparent;
+}
+
+.workspace-topbar {
+    min-height: 84px;
+    padding: 18px 28px 8px;
+}
+
+.search-pill,
+.global-search-field {
+    border: 1px solid rgba(223, 227, 235, .90);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: var(--modern-shadow-soft);
+}
+
+.user-chip,
+.round-action,
+.avatar {
+    border: 1px solid rgba(223, 227, 235, .82);
+    background: rgba(255, 255, 255, .96);
+    box-shadow: var(--modern-shadow-soft);
+}
+
+.user-chip .avatar {
+    color: #174ea6;
+    background: linear-gradient(135deg, #e8f0fe, #fce8e6);
+}
+
+.workspace-account-menu,
+.workspace-logout-link {
+    border-color: var(--modern-line);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, .98);
+    box-shadow: 0 22px 58px rgba(60, 64, 67, .18);
+}
+
+.app-workspace .page {
+    padding: 18px 28px 32px;
+}
+
+.dashboard-topline,
+.page-heading,
+.drive-hero {
+    border: 1px solid rgba(223, 227, 235, .82);
+    border-radius: 30px;
+    background:
+        radial-gradient(circle at 92% 8%, rgba(232, 240, 254, .80), transparent 22rem),
+        radial-gradient(circle at 12% 110%, rgba(230, 244, 234, .80), transparent 18rem),
+        var(--modern-surface);
+    box-shadow: var(--modern-shadow-soft);
+}
+
+.dashboard-topline,
+.page-heading {
+    padding: 24px;
+}
+
+.drive-hero {
+    padding: clamp(20px, 4vw, 34px);
+}
+
+.dashboard-topline h1,
+.page-heading h1,
+.drive-hero h1 {
+    color: var(--modern-ink);
+    font-weight: 850;
+    letter-spacing: -.055em;
+}
+
+.dashboard-topline p,
+.page-heading .lead,
+.drive-hero p {
+    color: var(--modern-muted);
+    font-weight: 650;
+}
+
+.button {
+    min-height: 44px;
+    border-radius: 999px;
+    box-shadow: none;
+}
+
+.button-primary,
+.button-success {
+    color: #fff;
+    background: #1a73e8;
+}
+
+.button-primary:hover,
+.button-success:hover {
+    background: #1558b0;
+}
+
+.button-secondary {
+    color: #3c4043;
+    border-color: var(--modern-line);
+    background: #fff;
+}
+
+.button-danger {
+    color: #a50e0e;
+    border-color: #fad2cf;
+    background: #fce8e6;
+}
+
+.metric-grid,
+.mini-stats,
+.drive-quick-grid {
+    gap: 16px;
+}
+
+.metric-card,
+.panel-card,
+.section,
+.form-panel,
+.side-panel,
+.drive-alert-card,
+.drive-section,
+.drive-info-card,
+.drive-note-card,
+.drive-stat-card,
+.outing-card,
+.empty-state,
+.hint-card,
+.schedule-filter-panel,
+.schedule-accordion-toolbar,
+.schedule-person-card,
+.week-selector,
+.form-panel-wide,
+.detail-layout > article {
+    border: 1px solid rgba(223, 227, 235, .86);
+    border-radius: var(--modern-radius);
+    background: var(--modern-surface-solid);
+    box-shadow: var(--modern-shadow-soft);
+}
+
+.metric-card:hover,
+.panel-card:hover,
+.drive-stat-card:hover,
+.outing-card:hover,
+.drive-row:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--modern-shadow);
+}
+
+.metric-card,
+.panel-card,
+.drive-stat-card,
+.outing-card,
+.drive-row {
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.metric-card-primary,
+.drive-stat-card.is-blue {
+    border-color: #d2e3fc;
+    background: linear-gradient(135deg, #e8f0fe, #ffffff 72%);
+}
+
+.drive-stat-card.is-green,
+.operation-alert-success {
+    border-color: #ceead6;
+    background: linear-gradient(135deg, #e6f4ea, #ffffff 72%);
+}
+
+.drive-stat-card.is-yellow {
+    border-color: #feefc3;
+    background: linear-gradient(135deg, #fef7e0, #ffffff 72%);
+}
+
+.drive-stat-card.is-red,
+.operation-alert-critical {
+    border-color: #fad2cf;
+    background: linear-gradient(135deg, #fce8e6, #ffffff 72%);
+}
+
+.panel-kicker,
+.eyebrow,
+.drive-kicker {
+    color: #5f6368;
+    letter-spacing: .08em;
+}
+
+.soft-chip,
+.badge,
+.week-option,
+.drive-week-nav a,
+.drive-week-nav span,
+.drive-filter-tabs a,
+.schedule-filter-option {
+    border-radius: 999px;
+}
+
+.drive-row {
+    border: 1px solid transparent;
+    border-radius: 22px;
+}
+
+.drive-row:hover {
+    border-color: #e8eaed;
+    background: #f8fafd;
+}
+
+.drive-file-icon,
+.drive-avatar,
+.drive-date-badge,
+.project-icon {
+    border-radius: 16px;
+    color: #174ea6;
+    background: #e8f0fe;
+}
+
+.drive-week-nav,
+.drive-filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    overflow: visible;
+}
+
+.drive-week-nav a,
+.drive-week-nav span,
+.drive-filter-tabs a {
+    min-width: 0;
+    white-space: normal;
+}
+
+.drive-filter-tabs a.is-active,
+.week-option.is-active,
+.schedule-filter-option.is-active {
+    color: #0b1f3a;
+    border-color: #d2e3fc;
+    background: #e8f0fe;
+}
+
+.form input,
+.form select,
+.form textarea,
+input,
+select,
+textarea {
+    border-color: var(--modern-line);
+    border-radius: 18px;
+    background: #fff;
+}
+
+.form input:focus,
+.form select:focus,
+.form textarea:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 4px rgba(26, 115, 232, .12);
+    outline: 0;
+}
+
+.outing-checklist-panel {
+    background:
+        radial-gradient(circle at 105% -10%, rgba(232, 240, 254, .92), transparent 44%),
+        radial-gradient(circle at -12% 110%, rgba(230, 244, 234, .86), transparent 42%),
+        #fff;
+}
+
+.check-list-prominent li {
+    border-color: #e8eaed;
+    background: #f8fafd;
+}
+
+.schedule-person-card[open] {
+    border-color: #d2e3fc;
+    box-shadow: var(--modern-shadow);
+}
+
+.schedule-card-summary,
+.schedule-day-card,
+.schedule-total-card,
+.schedule-day-chip {
+    border-color: #e8eaed;
+}
+
+@media (min-width: 1200px) {
+    .dashboard-content-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 390px);
+    }
+
+    .dashboard-center-column {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .analytics-card,
+    .operations-card {
+        min-height: 360px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .app-shell {
+        grid-template-columns: 220px minmax(0, 1fr);
+        width: min(100% - 20px, 1200px);
+    }
+
+    .app-sidebar {
+        padding-inline: 14px;
+    }
+
+    .dashboard-content-grid,
+    .detail-layout,
+    .form-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .side-panel {
+        position: static;
+    }
+}
+
+@media (max-width: 760px) {
+    body {
+        background: #f8fafd;
+    }
+
+    .app-shell {
+        width: 100%;
+        margin: 0;
+    }
+
+    .app-workspace {
+        background: #f8fafd;
+    }
+
+    .workspace-topbar {
+        background: rgba(248, 250, 253, .92);
+    }
+
+    .app-workspace .page {
+        padding-inline: 14px;
+    }
+
+    .dashboard-topline,
+    .page-heading,
+    .drive-hero {
+        padding: 20px;
+        border-radius: 26px;
+    }
+
+    .dashboard-topline,
+    .page-heading,
+    .drive-alert-card {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .dashboard-actions,
+    .actions,
+    .form-actions,
+    .status-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .metric-grid,
+    .mini-stats,
+    .drive-quick-grid,
+    .drive-quick-grid-compact,
+    .schedule-filter-options {
+        grid-template-columns: 1fr;
+    }
+
+    .drive-day-strip {
+        grid-template-columns: 1fr;
+        overflow: visible;
+    }
+
+    .drive-row,
+    .drive-schedule-row {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .drive-row em,
+    .drive-schedule-row em {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .drive-week-nav,
+    .drive-filter-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        overflow: visible;
+        width: 100%;
+    }
+
+    .drive-week-nav a,
+    .drive-week-nav span,
+    .drive-filter-tabs a {
+        justify-content: center;
+        width: 100%;
+        padding-inline: 10px;
+        text-align: center;
+    }
+
+    .app-sidebar .nav {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        overflow: visible;
+        padding-bottom: 0;
+    }
+
+    .app-sidebar .nav a {
+        min-width: 0;
+        transform: none;
+    }
+}
+
+@media (max-width: 420px) {
+    .drive-week-nav,
+    .drive-filter-tabs {
+        grid-template-columns: 1fr;
+    }
+
+    .app-sidebar .nav a {
+        font-size: .68rem;
     }
 }

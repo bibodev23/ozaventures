@@ -10,7 +10,7 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
         <link rel="manifest" href="{{ asset('site.webmanifest') }}">
         <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
-        <link rel="stylesheet" href="{{ asset('styles/app.css') }}?v=20260605-account-menu-mobile">
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}?v=20260605-modern-responsive">
         {% block importmap %}{{ importmap('app') }}{% endblock %}
     </head>
     <body>
@@ -34,7 +34,7 @@
                         <nav class="nav" aria-label="Navigation principale">
                             {% if is_granted('ROLE_DIRECTOR') %}
                                 {% set nav_items = [
-                                    {label: 'Dashboard', icon: 'DB', route: 'app_dashboard', routes: ['app_home', 'app_dashboard']},
+                                    {label: 'Accueil', icon: 'DB', route: 'app_dashboard', routes: ['app_home', 'app_dashboard']},
                                     {label: 'Planning', icon: 'PL', route: 'app_daily_planning', match: 'app_daily_planning', turbo: false},
                                     {label: 'Horaires', icon: 'HR', route: 'app_work_schedule', match: 'app_work_schedule'},
                                     {label: 'Sorties', icon: 'SO', route: 'app_outings', match: 'app_outing'},

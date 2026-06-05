@@ -11,6 +11,7 @@ use App\Entity\Season;
 use App\Entity\User;
 use App\Enum\AgeGroup;
 use App\Enum\OutingStatus;
+use App\Form\OutingType;
 use App\Service\ActiveSeasonProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,7 +39,6 @@ class AnimatorPortalController extends AbstractController
         $weekEnd = $weekStart->modify('+4 days');
         $shifts = $this->findWeekShifts($entityManager, $season, $animator, $weekStart, $weekEnd);
         $weekDays = $this->buildWeekDays($weekStart, $shifts);
-        $weeklyTotalMinutes = $this->sumShiftMinutes($shifts);
 
         return $this->render('animator_portal/index.html.twig', [
             'animator' => $animator,
@@ -48,7 +48,6 @@ class AnimatorPortalController extends AbstractController
             'week_start' => $weekStart,
             'week_end' => $weekEnd,
             'week_days' => $weekDays,
-            'weekly_total_label' => $this->formatMinutes($weeklyTotalMinutes),
             'today_tasks' => $this->findDayTasks($entityManager, $season, $animator, $today),
             'upcoming_outings' => $this->findOutings($entityManager, $season, $animator, $today, 4),
             'upcoming_outings_count' => $this->outingCount($entityManager, $season, $animator, null, $today),
@@ -108,6 +107,46 @@ class AnimatorPortalController extends AbstractController
             'pending_count' => $this->outingCount($entityManager, $season, $animator, OutingStatus::Pending->value),
             'validated_count' => $this->outingCount($entityManager, $season, $animator, OutingStatus::Validated->value),
             'refused_count' => $this->outingCount($entityManager, $season, $animator, OutingStatus::Refused->value),
+        ]);
+    }
+
+    #[Route('/sorties/nouvelle', name: 'app_animator_portal_outing_new')]
+    public function outingNew(Request $request, ActiveSeasonProvider $seasonProvider, EntityManagerInterface $entityManager): Response
+    {
+        [, $animator] = $this->currentAnimator();
+        $season = $seasonProvider->getActiveSeason();
+        $outing = (new Outing())
+            ->setSeason($season)
+            ->setCreatedBy($animator)
+            ->setStatus(OutingStatus::Pending->value)
+            ->setNumber($this->nextOutingNumber($entityManager, $season))
+            ->addAnimator($animator);
+
+        $form = $this->createForm(OutingType::class, $outing, ['season' => $season]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $outing
+                ->setCreatedBy($animator)
+                ->setStatus(OutingStatus::Pending->value)
+                ->addAnimator($animator)
+                ->touch();
+
+            $entityManager->persist($outing);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Sortie proposée. Elle est maintenant en attente de validation par la direction.');
+
+            return $this->redirectToRoute('app_animator_portal_outing_show', ['id' => $outing->getId()]);
+        }
+
+        return $this->render('outings/form.html.twig', [
+            'outing' => $outing,
+            'form' => $form,
+            'title' => 'Proposer une sortie',
+            'form_context' => 'animator',
+            'cancel_route' => 'app_animator_portal_outings',
+            'show_route' => 'app_animator_portal_outing_show',
         ]);
     }
 
@@ -371,6 +410,13 @@ class AnimatorPortalController extends AbstractController
         }
 
         return false;
+    }
+
+    private function nextOutingNumber(EntityManagerInterface $entityManager, Season $season): string
+    {
+        $count = $entityManager->getRepository(Outing::class)->count(['season' => $season]);
+
+        return (string) ($count + 1);
     }
 
     private function selectedStatus(Request $request): ?string

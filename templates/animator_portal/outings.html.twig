@@ -8,6 +8,7 @@
             <p class="drive-kicker">Sorties</p>
             <h1>Mes sorties</h1>
             <p>Les sorties où tu es affecté ou que tu as proposées.</p>
+            <a class="button button-primary drive-hero-action" href="{{ path('app_animator_portal_outing_new') }}">Proposer une sortie</a>
         </header>
 
         <section class="drive-filter-tabs" aria-label="Filtrer les sorties">
@@ -23,7 +24,10 @@
                 <span>{{ outings|length }} sortie(s)</span>
             </div>
             {% if outings is empty %}
-                <div class="drive-empty">Aucune sortie dans cette sélection.</div>
+                <div class="drive-empty">
+                    Aucune sortie dans cette sélection.
+                    <a href="{{ path('app_animator_portal_outing_new') }}">Proposer une sortie</a>
+                </div>
             {% else %}
                 <div class="drive-list">
                     {% for outing in outings %}

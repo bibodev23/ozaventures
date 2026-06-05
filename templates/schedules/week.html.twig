@@ -73,7 +73,7 @@
             <div class="schedule-board">
                 {% for row in rows %}
                     <details
-                        class="schedule-person-card {{ row.is_over_limit ? 'is-over-limit' : '' }}"
+                        class="schedule-person-card"
                         data-schedule-person
                         data-animator-name="{{ row.animator.fullName }}"
                         data-animator-group="{{ row.animator.ageGroupLabel }}"
@@ -98,9 +98,6 @@
                             <div class="schedule-total-card">
                                 <span>Total semaine</span>
                                 <strong>{{ row.total_label }}</strong>
-                                {% if row.over_limit_label %}
-                                    <small>{{ row.over_limit_label }} au-delà de 35h</small>
-                                {% endif %}
                             </div>
                             <span class="schedule-accordion-indicator" aria-hidden="true">Modifier</span>
                         </summary>

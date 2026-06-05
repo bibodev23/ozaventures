@@ -17,3 +17,39 @@ if ('serviceWorker' in navigator) {
         });
     });
 }
+
+const initAccountMenus = () => {
+    document.querySelectorAll('details.user-menu').forEach((menu) => {
+        if (menu.__ozAccountMenuReady) {
+            return;
+        }
+
+        menu.__ozAccountMenuReady = true;
+        const summary = menu.querySelector('summary');
+
+        summary?.addEventListener('click', (event) => {
+            event.preventDefault();
+
+            document.querySelectorAll('details.user-menu[open]').forEach((openedMenu) => {
+                if (openedMenu !== menu) {
+                    openedMenu.removeAttribute('open');
+                }
+            });
+
+            menu.toggleAttribute('open');
+        });
+    });
+};
+
+document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element) || event.target.closest('details.user-menu')) {
+        return;
+    }
+
+    document.querySelectorAll('details.user-menu[open]').forEach((menu) => {
+        menu.removeAttribute('open');
+    });
+});
+
+document.addEventListener('turbo:load', initAccountMenus);
+document.addEventListener('DOMContentLoaded', initAccountMenus);

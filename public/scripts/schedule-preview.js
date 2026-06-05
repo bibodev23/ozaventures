@@ -6,7 +6,6 @@
 
     window.__ozScheduleUiBooted = true;
 
-    const WEEKLY_LIMIT_MINUTES = 35 * 60;
     const OPEN_MINUTES = 7 * 60;
     const CLOSE_MINUTES = 18 * 60;
     const STEP_MINUTES = 15;
@@ -126,20 +125,14 @@
         const buildPreview = () => {
             const rows = [];
             let warningCount = 0;
-            let overLimitCount = 0;
 
             scheduleForm.querySelectorAll('[data-schedule-person]').forEach((personElement) => {
                 const dayResults = Array.from(personElement.querySelectorAll('[data-schedule-day]')).map(readDay);
                 const totalMinutes = dayResults.reduce((total, day) => total + day.minutes, 0);
                 const hasWarning = dayResults.some((day) => day.status === 'warning');
-                const isOverLimit = totalMinutes > WEEKLY_LIMIT_MINUTES;
 
                 if (hasWarning) {
                     warningCount += 1;
-                }
-
-                if (isOverLimit) {
-                    overLimitCount += 1;
                 }
 
                 rows.push({
@@ -148,14 +141,12 @@
                     dayResults,
                     totalMinutes,
                     hasWarning,
-                    isOverLimit,
                 });
             });
 
             return {
                 rows,
                 warningCount,
-                overLimitCount,
             };
         };
 
@@ -173,10 +164,6 @@
 
                 if (row.hasWarning) {
                     tr.classList.add('has-warning');
-                }
-
-                if (row.isOverLimit) {
-                    tr.classList.add('is-over-limit');
                 }
 
                 const animatorCell = document.createElement('td');
@@ -211,12 +198,6 @@
                 total.textContent = formatMinutes(row.totalMinutes);
                 totalCell.append(total);
 
-                if (row.isOverLimit) {
-                    const warning = document.createElement('span');
-                    warning.textContent = `+${formatMinutes(row.totalMinutes - WEEKLY_LIMIT_MINUTES)} au-delà de 35h`;
-                    totalCell.append(warning);
-                }
-
                 tr.append(totalCell);
                 previewBody.append(tr);
             });
@@ -226,13 +207,6 @@
             const totalItem = document.createElement('span');
             totalItem.textContent = `${preview.rows.length} animateur(s)`;
             previewSummary.append(totalItem);
-
-            const overLimitItem = document.createElement('span');
-            overLimitItem.className = preview.overLimitCount > 0 ? 'is-danger' : 'is-ok';
-            overLimitItem.textContent = preview.overLimitCount > 0
-                ? `${preview.overLimitCount} dépassement(s) 35h`
-                : 'Aucun dépassement 35h';
-            previewSummary.append(overLimitItem);
 
             const warningItem = document.createElement('span');
             warningItem.className = preview.warningCount > 0 ? 'is-danger' : 'is-ok';

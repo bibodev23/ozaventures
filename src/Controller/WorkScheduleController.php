@@ -21,7 +21,6 @@ class WorkScheduleController extends AbstractController
     private const CENTER_OPEN_MINUTES = 7 * 60;
     private const CENTER_CLOSE_MINUTES = 18 * 60;
     private const TIME_STEP_MINUTES = 15;
-    private const WEEKLY_MAX_MINUTES = 35 * 60;
     private const OPENING_START_MONTH = 7;
     private const OPENING_START_DAY = 6;
     private const OPENING_END_MONTH = 8;
@@ -111,11 +110,6 @@ class WorkScheduleController extends AbstractController
 
                 $this->addFlash('success', 'Horaires de la semaine enregistrés.');
 
-                $overLimitNames = $this->overLimitNames($animators, $weeklyTotals);
-                if ($overLimitNames !== []) {
-                    $this->addFlash('warning', 'Attention : ' . implode(', ', $overLimitNames) . ' dépasse(nt) 35h cette semaine.');
-                }
-
                 return $this->redirectToRoute('app_work_schedule_week', array_merge(
                     ['week' => $weekStart->format('Y-m-d')],
                     $scheduleQuery,
@@ -139,7 +133,6 @@ class WorkScheduleController extends AbstractController
             'schedule_query' => $scheduleQuery,
             'field_labels' => self::FIELD_LABELS,
             'rows' => $this->buildRows($animators, $weekDays, $existingShifts, $submittedValues, $errors, $dayMinutes, $weeklyTotals),
-            'weekly_max_label' => $this->formatMinutes(self::WEEKLY_MAX_MINUTES),
             'center_hours_label' => sprintf('%s - %s', $this->formatClock(self::CENTER_OPEN_MINUTES), $this->formatClock(self::CENTER_CLOSE_MINUTES)),
         ]);
     }
@@ -616,34 +609,10 @@ class WorkScheduleController extends AbstractController
                 'days' => $days,
                 'total_minutes' => $totalMinutes,
                 'total_label' => $this->formatMinutes($totalMinutes),
-                'is_over_limit' => $totalMinutes > self::WEEKLY_MAX_MINUTES,
-                'over_limit_label' => $totalMinutes > self::WEEKLY_MAX_MINUTES
-                    ? sprintf('Dépassement de %s', $this->formatMinutes($totalMinutes - self::WEEKLY_MAX_MINUTES))
-                    : null,
             ];
         }
 
         return $rows;
-    }
-
-    /**
-     * @param list<Animator> $animators
-     * @param array<int, int> $weeklyTotals
-     *
-     * @return list<string>
-     */
-    private function overLimitNames(array $animators, array $weeklyTotals): array
-    {
-        $names = [];
-
-        foreach ($animators as $animator) {
-            $animatorId = (int) $animator->getId();
-            if (($weeklyTotals[$animatorId] ?? 0) > self::WEEKLY_MAX_MINUTES) {
-                $names[] = sprintf('%s (%s)', $animator->getFullName(), $this->formatMinutes($weeklyTotals[$animatorId]));
-            }
-        }
-
-        return $names;
     }
 
     /**
