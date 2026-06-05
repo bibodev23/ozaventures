@@ -54,7 +54,6 @@ class AnimatorPortalController extends AbstractController
             'upcoming_outings_count' => $this->outingCount($entityManager, $season, $animator, null, $today),
             'pending_outings_count' => $this->outingCount($entityManager, $season, $animator, OutingStatus::Pending->value),
             'validated_outings_count' => $this->outingCount($entityManager, $season, $animator, OutingStatus::Validated->value),
-            'children_count' => $entityManager->getRepository(Child::class)->count(['season' => $season]),
         ]);
     }
 
@@ -67,6 +66,7 @@ class AnimatorPortalController extends AbstractController
         $weekEnd = $weekStart->modify('+4 days');
         $shifts = $this->findWeekShifts($entityManager, $season, $animator, $weekStart, $weekEnd);
         $weekDays = $this->buildWeekDays($weekStart, $shifts);
+        $weekTasks = $this->findWeekTasks($entityManager, $season, $animator, $weekStart, $weekEnd);
 
         return $this->render('animator_portal/schedules.html.twig', [
             'animator' => $animator,
@@ -74,6 +74,7 @@ class AnimatorPortalController extends AbstractController
             'week_start' => $weekStart,
             'week_end' => $weekEnd,
             'week_days' => $weekDays,
+            'planning_days' => $this->buildPlanningDays($weekStart, $weekTasks),
             'weekly_total_label' => $this->formatMinutes($this->sumShiftMinutes($shifts)),
             'previous_week' => $this->previousWeekStart($weekStart, $season),
             'next_week' => $this->nextWeekStart($weekStart, $season),
@@ -81,23 +82,15 @@ class AnimatorPortalController extends AbstractController
     }
 
     #[Route('/planning', name: 'app_animator_portal_planning')]
-    public function planning(Request $request, ActiveSeasonProvider $seasonProvider, EntityManagerInterface $entityManager): Response
+    public function planning(Request $request): Response
     {
-        [, $animator] = $this->currentAnimator();
-        $season = $seasonProvider->getActiveSeason();
-        $weekStart = $this->selectedWeekStart($request, $season);
-        $weekEnd = $weekStart->modify('+4 days');
-        $weekTasks = $this->findWeekTasks($entityManager, $season, $animator, $weekStart, $weekEnd);
+        $week = trim((string) $request->query->get('week', ''));
 
-        return $this->render('animator_portal/planning.html.twig', [
-            'animator' => $animator,
-            'season' => $season,
-            'week_start' => $weekStart,
-            'week_end' => $weekEnd,
-            'week_days' => $this->buildPlanningDays($weekStart, $weekTasks),
-            'previous_week' => $this->previousWeekStart($weekStart, $season),
-            'next_week' => $this->nextWeekStart($weekStart, $season),
-        ]);
+        return $this->redirectToRoute(
+            'app_animator_portal_schedules',
+            $week !== '' ? ['week' => $week] : [],
+            Response::HTTP_SEE_OTHER,
+        );
     }
 
     #[Route('/sorties', name: 'app_animator_portal_outings')]

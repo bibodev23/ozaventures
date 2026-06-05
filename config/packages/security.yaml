@@ -45,6 +45,7 @@ security:
         - { path: ^/mon-espace, roles: ROLE_ANIMATOR }
         - { path: ^/mon-mot-de-passe$, roles: ROLE_ANIMATOR }
         - { path: ^/planning, roles: ROLE_DIRECTOR }
+        - { path: ^/deconnexion$, roles: IS_AUTHENTICATED_FULLY }
         # Messaging is kept in code for a future mobile-enabled V2, but hidden in the webapp V1.
         - { path: ^/messages, roles: ROLE_MESSAGING_DISABLED }
         - { path: ^/, roles: ROLE_DIRECTOR }

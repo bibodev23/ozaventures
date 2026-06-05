@@ -7,7 +7,7 @@
         <header class="drive-hero">
             <p class="drive-kicker">Espace animateur</p>
             <h1>Bonjour {{ animator.firstName }}</h1>
-            <p>Retrouve rapidement tes horaires, ton planning, tes sorties et les fiches enfants utiles.</p>
+            <p>Retrouve rapidement tes horaires, tes missions et les sorties où tu es affecté.</p>
         </header>
 
         {% if user.mustChangePassword %}
@@ -21,7 +21,7 @@
             </section>
         {% endif %}
 
-        <section class="drive-quick-grid" aria-label="Résumé animateur">
+        <section class="drive-quick-grid drive-quick-grid-compact" aria-label="Résumé animateur">
             <a class="drive-stat-card is-blue" href="{{ path('app_animator_portal_schedules') }}">
                 <span>Semaine</span>
                 <strong>{{ weekly_total_label }}</strong>
@@ -32,45 +32,11 @@
                 <strong>{{ upcoming_outings_count }}</strong>
                 <small>à venir</small>
             </a>
-            <a class="drive-stat-card is-yellow" href="{{ path('app_animator_portal_planning') }}">
+            <a class="drive-stat-card is-yellow" href="{{ path('app_animator_portal_schedules') }}">
                 <span>Missions</span>
                 <strong>{{ today_tasks|length }}</strong>
                 <small>aujourd'hui</small>
             </a>
-            <a class="drive-stat-card is-red" href="{{ path('app_animator_portal_children') }}">
-                <span>Enfants</span>
-                <strong>{{ children_count }}</strong>
-                <small>fiches</small>
-            </a>
-        </section>
-
-        <section class="drive-section">
-            <div class="drive-section-heading">
-                <h2>Accès rapide</h2>
-                <span>Comme des dossiers utiles</span>
-            </div>
-            <div class="drive-list">
-                <a class="drive-row" href="{{ path('app_animator_portal_schedules') }}">
-                    <span class="drive-folder-icon drive-folder-blue"></span>
-                    <span><strong>Mes horaires</strong><small>Semaine du {{ week_start|date('d/m') }}</small></span>
-                    <em>Ouvrir</em>
-                </a>
-                <a class="drive-row" href="{{ path('app_animator_portal_planning') }}">
-                    <span class="drive-folder-icon drive-folder-yellow"></span>
-                    <span><strong>Planning du jour</strong><small>{{ today_tasks|length }} mission(s) assignée(s)</small></span>
-                    <em>Ouvrir</em>
-                </a>
-                <a class="drive-row" href="{{ path('app_animator_portal_outings') }}">
-                    <span class="drive-folder-icon drive-folder-green"></span>
-                    <span><strong>Mes sorties</strong><small>{{ validated_outings_count }} validée(s), {{ pending_outings_count }} en attente</small></span>
-                    <em>Ouvrir</em>
-                </a>
-                <a class="drive-row" href="{{ path('app_animator_portal_children') }}">
-                    <span class="drive-folder-icon drive-folder-red"></span>
-                    <span><strong>Liste des enfants</strong><small>Consultation uniquement</small></span>
-                    <em>Ouvrir</em>
-                </a>
-            </div>
         </section>
 
         <section class="drive-section">

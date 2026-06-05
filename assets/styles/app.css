@@ -6690,3 +6690,144 @@ body {
         width: 48px;
     }
 }
+
+/* Keep account dropdown above cards, autocomplete and sticky mobile UI. */
+.workspace-topbar {
+    position: relative;
+    z-index: 240;
+    isolation: isolate;
+}
+
+.workspace-actions,
+.user-menu {
+    position: relative;
+    z-index: 260;
+}
+
+.workspace-logout-link {
+    z-index: 320;
+}
+
+.app-workspace .page {
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 760px) {
+    .workspace-topbar {
+        z-index: 240;
+    }
+
+    .workspace-logout-link {
+        z-index: 320;
+    }
+}
+
+.workspace-account-menu {
+    display: grid;
+    gap: 4px;
+    padding: 8px;
+}
+
+.workspace-account-menu a {
+    display: flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    color: #3c4043;
+    text-decoration: none;
+    font-weight: 800;
+}
+
+.workspace-account-menu a:hover,
+.workspace-account-menu a:focus-visible {
+    background: #f1f3f4;
+    outline: 0;
+}
+
+.workspace-account-menu a:last-child {
+    color: #83524e;
+}
+
+.drive-quick-grid-compact {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 760px) {
+    .drive-quick-grid-compact {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 520px) {
+    .drive-quick-grid-compact {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile/tablet navigation should never require horizontal scrolling. */
+@media (max-width: 900px) {
+    .app-sidebar .nav {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        overflow: visible;
+        padding: 0;
+        scroll-snap-type: none;
+        scrollbar-width: auto;
+    }
+
+    .app-sidebar .nav a {
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+        text-wrap: balance;
+    }
+}
+
+@media (max-width: 760px) {
+    :root {
+        --mobile-nav-height: 144px;
+    }
+
+    .app-workspace .page {
+        padding-bottom: calc(166px + env(safe-area-inset-bottom));
+    }
+
+    .app-sidebar {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+        border-radius: 0;
+    }
+
+    .app-sidebar .nav {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        align-items: stretch;
+        justify-content: stretch;
+    }
+
+    .app-sidebar .nav a {
+        flex: none;
+        min-height: 62px;
+        padding: 6px 3px;
+        scroll-snap-align: unset;
+    }
+
+    .nav-icon {
+        width: min(54px, 100%);
+    }
+}
+
+@media (max-width: 380px) {
+    .app-sidebar .nav a {
+        font-size: .62rem;
+    }
+
+    .nav-icon {
+        width: 44px;
+        height: 30px;
+    }
+}

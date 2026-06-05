@@ -10,7 +10,7 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
         <link rel="manifest" href="{{ asset('site.webmanifest') }}">
         <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
-        <link rel="stylesheet" href="{{ asset('styles/app.css') }}?v=20260605-drive-pwa">
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}?v=20260605-clean-animator-copy">
         {% block importmap %}{{ importmap('app') }}{% endblock %}
     </head>
     <body>
@@ -57,11 +57,9 @@
                             {% elseif is_granted('ROLE_ANIMATOR') %}
                                 {% set nav_items = [
                                     {label: 'Mon espace', icon: 'ME', route: 'app_animator_portal', routes: ['app_animator_portal']},
-                                    {label: 'Horaires', icon: 'HR', route: 'app_animator_portal_schedules', match: 'app_animator_portal_schedules'},
-                                    {label: 'Planning', icon: 'PL', route: 'app_animator_portal_planning', match: 'app_animator_portal_planning'},
+                                    {label: 'Semaine', icon: 'SE', route: 'app_animator_portal_schedules', routes: ['app_animator_portal_schedules', 'app_animator_portal_planning']},
                                     {label: 'Sorties', icon: 'SO', route: 'app_animator_portal_outings', match: 'app_animator_portal_outing'},
-                                    {label: 'Enfants', icon: 'EN', route: 'app_animator_portal_children', match: 'app_animator_portal_child'},
-                                    {label: 'Mot de passe', icon: 'MP', route: 'app_account_password', match: 'app_account'}
+                                    {label: 'Enfants', icon: 'EN', route: 'app_animator_portal_children', match: 'app_animator_portal_child'}
                                 ] %}
                                 {% for item in nav_items %}
                                     {% set is_active = item.routes is defined ? current_route in item.routes : current_route starts with item.match %}
@@ -107,7 +105,12 @@
                                         <small>Compte connecté</small>
                                     </span>
                                 </span>
-                                <a class="workspace-logout-link" href="{{ path('app_logout') }}">Déconnexion</a>
+                                <span class="workspace-logout-link workspace-account-menu">
+                                    {% if is_granted('ROLE_ANIMATOR') %}
+                                        <a href="{{ path('app_account_password') }}">Mot de passe</a>
+                                    {% endif %}
+                                    <a href="{{ path('app_logout') }}">Déconnexion</a>
+                                </span>
                             </span>
                         </div>
                     </header>
