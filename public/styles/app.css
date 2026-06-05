@@ -5854,3 +5854,839 @@ body {
         font-size: clamp(2.2rem, 12vw, 3.05rem);
     }
 }
+
+/* Drive-inspired web/PWA layer */
+:root {
+    --drive-bg: #f8fafd;
+    --drive-surface: #ffffff;
+    --drive-ink: #3c4043;
+    --drive-muted: #5f6368;
+    --drive-line: #e8eaed;
+    --drive-blue: #1a73e8;
+    --drive-blue-soft: #c2e7ff;
+    --drive-green: #188038;
+    --drive-yellow: #fbbc04;
+    --drive-red: #d93025;
+    --drive-radius: 28px;
+    --drive-shadow: 0 12px 34px rgba(60, 64, 67, .10);
+}
+
+.drive-page {
+    display: grid;
+    gap: 22px;
+    max-width: 1120px;
+    margin: 0 auto;
+    color: var(--drive-ink);
+}
+
+.drive-hero {
+    display: grid;
+    gap: 8px;
+    padding: 22px 0 4px;
+}
+
+.drive-hero-compact {
+    padding-top: 8px;
+}
+
+.drive-kicker {
+    margin: 0;
+    color: var(--drive-muted);
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.drive-hero h1 {
+    margin: 0;
+    color: var(--drive-ink);
+    font-size: clamp(2.2rem, 6vw, 4.8rem);
+    font-weight: 800;
+    letter-spacing: -.06em;
+    line-height: .95;
+}
+
+.drive-hero p {
+    max-width: 58rem;
+    margin: 0;
+    color: var(--drive-muted);
+    font-size: 1.05rem;
+    font-weight: 650;
+    line-height: 1.45;
+}
+
+.drive-alert-card,
+.drive-section,
+.drive-info-card,
+.drive-note-card {
+    border: 1px solid var(--drive-line);
+    border-radius: var(--drive-radius);
+    background: var(--drive-surface);
+    box-shadow: var(--drive-shadow);
+}
+
+.drive-alert-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+}
+
+.drive-alert-card strong,
+.drive-alert-card span,
+.drive-alert-card a {
+    display: block;
+}
+
+.drive-alert-card strong {
+    color: var(--drive-ink);
+    font-weight: 800;
+}
+
+.drive-alert-card span {
+    color: var(--drive-muted);
+    font-weight: 600;
+}
+
+.drive-alert-card a,
+.drive-section-heading a,
+.drive-week-nav a,
+.drive-filter-tabs a {
+    color: var(--drive-blue);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.drive-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--drive-red);
+    box-shadow: 0 0 0 8px rgba(217, 48, 37, .11);
+}
+
+.drive-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.drive-stat-card {
+    display: grid;
+    gap: 8px;
+    min-height: 134px;
+    padding: 18px;
+    border: 1px solid var(--drive-line);
+    border-radius: var(--drive-radius);
+    color: var(--drive-ink);
+    background: var(--drive-surface);
+    text-decoration: none;
+    box-shadow: var(--drive-shadow);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.drive-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 42px rgba(60, 64, 67, .14);
+}
+
+.drive-stat-card span,
+.drive-stat-card small {
+    color: var(--drive-muted);
+    font-weight: 750;
+}
+
+.drive-stat-card strong {
+    color: var(--drive-ink);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 850;
+    letter-spacing: -.05em;
+    line-height: .9;
+}
+
+.drive-stat-card.is-blue { background: linear-gradient(135deg, #e8f0fe, #fff); }
+.drive-stat-card.is-green { background: linear-gradient(135deg, #e6f4ea, #fff); }
+.drive-stat-card.is-yellow { background: linear-gradient(135deg, #fef7e0, #fff); }
+.drive-stat-card.is-red { background: linear-gradient(135deg, #fce8e6, #fff); }
+
+.drive-section {
+    display: grid;
+    gap: 12px;
+    padding: 18px;
+}
+
+.drive-section-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.drive-section-heading h2 {
+    margin: 0;
+    color: var(--drive-ink);
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -.03em;
+}
+
+.drive-section-heading span {
+    color: var(--drive-muted);
+    font-size: .9rem;
+    font-weight: 700;
+}
+
+.drive-list {
+    display: grid;
+    gap: 4px;
+}
+
+.drive-list-large {
+    gap: 10px;
+}
+
+.drive-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    min-height: 78px;
+    padding: 10px 8px;
+    border-radius: 18px;
+    color: var(--drive-ink);
+    text-decoration: none;
+    transition: background .16s ease;
+}
+
+.drive-row:hover {
+    background: #f1f3f4;
+}
+
+.drive-row strong,
+.drive-row small,
+.drive-row em {
+    display: block;
+}
+
+.drive-row strong {
+    color: var(--drive-ink);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -.02em;
+}
+
+.drive-row small,
+.drive-row em {
+    color: var(--drive-muted);
+    font-size: .88rem;
+    font-style: normal;
+    font-weight: 600;
+}
+
+.drive-row em {
+    white-space: nowrap;
+}
+
+.drive-folder-icon,
+.drive-file-icon,
+.drive-avatar,
+.drive-date-badge {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+}
+
+.drive-folder-icon {
+    position: relative;
+    width: 42px;
+    height: 32px;
+    border-radius: 6px;
+    background: #5f6368;
+}
+
+.drive-folder-icon::before {
+    position: absolute;
+    top: -7px;
+    left: 0;
+    width: 22px;
+    height: 10px;
+    border-radius: 5px 8px 0 0;
+    background: inherit;
+    content: '';
+}
+
+.drive-folder-blue { background: #4285f4; }
+.drive-folder-green { background: #34a853; }
+.drive-folder-yellow { background: #fbbc04; }
+.drive-folder-red { background: #ea4335; }
+
+.drive-file-icon,
+.drive-avatar,
+.drive-date-badge {
+    width: 46px;
+    height: 46px;
+    border-radius: 16px;
+    color: #174ea6;
+    background: #e8f0fe;
+    font-weight: 850;
+}
+
+.drive-avatar {
+    color: #3c4043;
+    background: #f1f3f4;
+}
+
+.drive-day-strip {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.drive-day-tile {
+    display: grid;
+    gap: 5px;
+    min-height: 126px;
+    padding: 14px;
+    border: 1px solid var(--drive-line);
+    border-radius: 22px;
+    background: #fff;
+}
+
+.drive-day-tile.has-shift {
+    border-color: #d7eadf;
+    background: #e6f4ea;
+}
+
+.drive-day-tile span,
+.drive-day-tile small,
+.drive-day-tile em {
+    color: var(--drive-muted);
+    font-size: .78rem;
+    font-style: normal;
+    font-weight: 750;
+}
+
+.drive-day-tile strong {
+    color: var(--drive-ink);
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.drive-day-tile em {
+    align-self: end;
+    width: fit-content;
+    padding: 5px 9px;
+    border-radius: 999px;
+    color: var(--drive-green);
+    background: #fff;
+}
+
+.drive-empty {
+    padding: 20px;
+    border: 1px dashed #dadce0;
+    border-radius: 22px;
+    color: var(--drive-muted);
+    background: #fff;
+    font-weight: 700;
+}
+
+.drive-week-nav,
+.drive-filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.drive-week-nav a,
+.drive-week-nav span,
+.drive-filter-tabs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 1px solid var(--drive-line);
+    border-radius: 999px;
+    background: #fff;
+}
+
+.drive-week-nav span {
+    color: #9aa0a6;
+    font-weight: 750;
+}
+
+.drive-filter-tabs a.is-active {
+    color: #001d35;
+    background: var(--drive-blue-soft);
+    border-color: var(--drive-blue-soft);
+}
+
+.drive-schedule-row,
+.drive-planning-day {
+    display: grid;
+    gap: 14px;
+    padding: 14px;
+    border: 1px solid var(--drive-line);
+    border-radius: 22px;
+    background: #fff;
+}
+
+.drive-schedule-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+}
+
+.drive-schedule-row.has-shift {
+    border-color: #d7eadf;
+    background: #f7fbf8;
+}
+
+.drive-schedule-row strong,
+.drive-schedule-row small,
+.drive-schedule-row em,
+.drive-planning-day strong,
+.drive-planning-day small,
+.drive-planning-day p {
+    display: block;
+}
+
+.drive-schedule-row strong,
+.drive-planning-day strong {
+    color: var(--drive-ink);
+    font-weight: 800;
+}
+
+.drive-schedule-row small,
+.drive-planning-day small,
+.drive-planning-day p {
+    margin: 0;
+    color: var(--drive-muted);
+    font-weight: 650;
+}
+
+.drive-schedule-row em {
+    color: var(--drive-green);
+    font-style: normal;
+    font-weight: 850;
+}
+
+.drive-date-badge {
+    align-content: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+}
+
+.drive-date-badge strong,
+.drive-date-badge small {
+    display: block;
+    color: inherit;
+    font-size: .78rem;
+    line-height: 1.1;
+}
+
+.drive-planning-day header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.drive-task-list {
+    display: grid;
+    gap: 10px;
+}
+
+.drive-task-list > div {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 16px;
+    background: #f8fafd;
+}
+
+.drive-task-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--drive-blue);
+}
+
+.drive-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.drive-info-card {
+    display: grid;
+    gap: 8px;
+    min-height: 116px;
+    padding: 16px;
+}
+
+.drive-info-card.is-warning {
+    border-color: #f9dedc;
+    background: #fce8e6;
+}
+
+.drive-info-card span {
+    color: var(--drive-muted);
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.drive-info-card strong {
+    color: var(--drive-ink);
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.drive-note-card {
+    padding: 18px;
+    color: var(--drive-ink);
+    font-weight: 650;
+    line-height: 1.5;
+}
+
+.drive-chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.drive-chip-list span {
+    display: inline-flex;
+    min-height: 34px;
+    align-items: center;
+    padding: 7px 12px;
+    border-radius: 999px;
+    color: var(--drive-ink);
+    background: #f1f3f4;
+    font-weight: 750;
+}
+
+.drive-burger {
+    position: relative;
+    width: 22px;
+    height: 16px;
+    border-radius: 0;
+    background: linear-gradient(var(--drive-muted), var(--drive-muted)) center/100% 2px no-repeat;
+}
+
+.drive-burger::before,
+.drive-burger::after {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--drive-muted);
+    content: '';
+}
+
+.drive-burger::before { top: 0; }
+.drive-burger::after { bottom: 0; }
+
+@media (max-width: 980px) {
+    .drive-quick-grid,
+    .drive-detail-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .drive-day-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    body {
+        background: var(--drive-bg);
+        color: var(--drive-ink);
+    }
+
+    .app-workspace {
+        background: var(--drive-bg);
+    }
+
+    .app-workspace .page {
+        padding: 10px 16px calc(112px + env(safe-area-inset-bottom));
+    }
+
+    .workspace-topbar {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        padding: 16px 18px 12px;
+        border: 0;
+        background: rgba(248, 250, 253, .94);
+        backdrop-filter: blur(16px);
+    }
+
+    .global-search-field,
+    .search-pill.drive-mobile-search {
+        min-height: 58px;
+        padding: 0 18px;
+        border: 0;
+        border-radius: 999px;
+        background: #e9eef6;
+        box-shadow: none;
+        color: var(--drive-ink);
+    }
+
+    .search-pill.drive-mobile-search span:last-child {
+        color: var(--drive-ink);
+        font-size: 1.12rem;
+        font-weight: 500;
+    }
+
+    .global-search-mark {
+        color: var(--drive-muted);
+        background: transparent;
+    }
+
+    .user-chip {
+        min-height: 58px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .user-chip .avatar {
+        width: 48px;
+        height: 48px;
+        border: 3px solid #fff;
+        font-size: .88rem;
+        box-shadow: 0 6px 16px rgba(60, 64, 67, .12);
+    }
+
+    .app-sidebar {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 7px 10px calc(7px + env(safe-area-inset-bottom));
+        border-width: 1px 0 0;
+        border-radius: 0;
+        background: rgba(248, 250, 253, .96);
+        box-shadow: 0 -8px 24px rgba(60, 64, 67, .10);
+    }
+
+    .app-sidebar .nav {
+        justify-content: space-between;
+        gap: 4px;
+        overflow-x: auto;
+        padding: 0;
+    }
+
+    .app-sidebar .nav a {
+        flex: 1 0 68px;
+        min-height: 64px;
+        max-width: 110px;
+        padding: 6px 4px;
+        border-radius: 22px;
+        color: var(--drive-ink);
+        font-size: .74rem;
+        font-weight: 600;
+        background: transparent;
+    }
+
+    .app-sidebar .nav a.is-active {
+        color: #001d35;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .app-sidebar .nav a.is-active .nav-icon {
+        background: var(--drive-blue-soft);
+        color: #001d35;
+    }
+
+    .nav-icon {
+        width: 54px;
+        height: 32px;
+        border-radius: 999px;
+        color: var(--drive-muted);
+        background: transparent;
+        font-size: .66rem;
+    }
+
+    .drive-page {
+        gap: 18px;
+        max-width: none;
+    }
+
+    .drive-hero {
+        padding: 14px 0 4px;
+    }
+
+    .drive-hero h1 {
+        font-size: clamp(2.15rem, 11vw, 3.65rem);
+        letter-spacing: -.055em;
+    }
+
+    .drive-hero p {
+        font-size: 1rem;
+        line-height: 1.35;
+    }
+
+    .drive-alert-card {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .drive-alert-card a {
+        grid-column: 1 / -1;
+        justify-self: start;
+    }
+
+    .drive-quick-grid,
+    .drive-detail-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .drive-stat-card {
+        min-height: 116px;
+        padding: 16px;
+        border-radius: 24px;
+        box-shadow: none;
+    }
+
+    .drive-stat-card strong {
+        font-size: clamp(2rem, 12vw, 3rem);
+    }
+
+    .drive-section,
+    .drive-info-card,
+    .drive-note-card {
+        border-radius: 24px;
+        box-shadow: none;
+    }
+
+    .drive-section {
+        padding: 14px;
+    }
+
+    .drive-section-heading {
+        align-items: center;
+    }
+
+    .drive-row {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        min-height: 82px;
+        padding: 10px 6px;
+        gap: 16px;
+    }
+
+    .drive-row strong {
+        font-size: 1.05rem;
+    }
+
+    .drive-row small,
+    .drive-row em {
+        font-size: .86rem;
+    }
+
+    .drive-row em {
+        max-width: 74px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .drive-day-strip {
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(136px, 62%);
+        grid-template-columns: none;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .drive-day-strip::-webkit-scrollbar {
+        display: none;
+    }
+
+    .drive-day-tile {
+        min-height: 122px;
+        scroll-snap-align: start;
+    }
+
+    .drive-week-nav,
+    .drive-filter-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .drive-week-nav::-webkit-scrollbar,
+    .drive-filter-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .drive-week-nav a,
+    .drive-week-nav span,
+    .drive-filter-tabs a {
+        flex: 0 0 auto;
+        min-height: 42px;
+        background: #fff;
+    }
+
+    .drive-schedule-row {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .drive-schedule-row em {
+        grid-column: 2;
+    }
+
+    .drive-planning-day header {
+        align-items: flex-start;
+    }
+
+    .drive-info-card {
+        min-height: 110px;
+        padding: 14px;
+    }
+}
+
+@media (max-width: 430px) {
+    .app-workspace .page {
+        padding-inline: 14px;
+    }
+
+    .workspace-topbar {
+        padding-inline: 14px;
+    }
+
+    .drive-quick-grid,
+    .drive-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .drive-row {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .drive-row em {
+        grid-column: 2;
+        max-width: none;
+    }
+
+    .app-sidebar .nav a {
+        flex-basis: 62px;
+        font-size: .68rem;
+    }
+
+    .nav-icon {
+        width: 48px;
+    }
+}

@@ -3,149 +3,116 @@
 {% block title %}Mon espace animateur{% endblock %}
 
 {% block body %}
-    <section class="dribbble-dashboard animator-dashboard">
-        <header class="dashboard-topline">
-            <div>
-                <p class="eyebrow">Espace animateur</p>
-                <h1>Bonjour {{ animator.firstName }}</h1>
-                <p>Retrouve tes horaires, tes sorties et tes missions du jour sans passer par l'application mobile.</p>
-            </div>
-            <div class="dashboard-actions">
-                <a class="button button-secondary" href="{{ path('app_account_password') }}">Modifier mon mot de passe</a>
-            </div>
+    <section class="drive-page animator-drive-page">
+        <header class="drive-hero">
+            <p class="drive-kicker">Espace animateur</p>
+            <h1>Bonjour {{ animator.firstName }}</h1>
+            <p>Retrouve rapidement tes horaires, ton planning, tes sorties et les fiches enfants utiles.</p>
         </header>
 
         {% if user.mustChangePassword %}
-            <section class="panel-card animator-alert-card">
-                <span class="panel-kicker">Sécurité du compte</span>
-                <h2>Mot de passe initial à remplacer</h2>
-                <p>Ton compte utilise encore le mot de passe donné par la direction. Change-le dès que possible.</p>
-                <a class="button button-primary" href="{{ path('app_account_password') }}">Changer mon mot de passe</a>
+            <section class="drive-alert-card">
+                <span class="drive-dot"></span>
+                <div>
+                    <strong>Mot de passe initial à remplacer</strong>
+                    <span>Change ton mot de passe pour sécuriser ton accès.</span>
+                </div>
+                <a href="{{ path('app_account_password') }}">Modifier</a>
             </section>
         {% endif %}
 
-        <section class="metric-grid" aria-label="Résumé animateur">
-            <twig:DashboardMetric
-                href="#horaires-animateur"
-                label="Semaine"
-                value="{{ weekly_total_label }}"
-                caption="Du {{ week_start|date('d/m') }} au {{ week_end|date('d/m') }}"
-                variant="primary"
-            />
-            <twig:DashboardMetric
-                href="#sorties-animateur"
-                label="Sorties à venir"
-                value="{{ upcoming_outings_count }}"
-                caption="Où tu es affecté"
-            />
-            <twig:DashboardMetric
-                href="#planning-animateur"
-                label="Missions du jour"
-                value="{{ today_tasks|length }}"
-                caption="{{ today|date('d/m/Y') }}"
-            />
-            <twig:DashboardMetric
-                href="#sorties-animateur"
-                label="Validées"
-                value="{{ validated_outings_count }}"
-                caption="{{ pending_outings_count }} en attente"
-            />
+        <section class="drive-quick-grid" aria-label="Résumé animateur">
+            <a class="drive-stat-card is-blue" href="{{ path('app_animator_portal_schedules') }}">
+                <span>Semaine</span>
+                <strong>{{ weekly_total_label }}</strong>
+                <small>{{ week_start|date('d/m') }} - {{ week_end|date('d/m') }}</small>
+            </a>
+            <a class="drive-stat-card is-green" href="{{ path('app_animator_portal_outings') }}">
+                <span>Sorties</span>
+                <strong>{{ upcoming_outings_count }}</strong>
+                <small>à venir</small>
+            </a>
+            <a class="drive-stat-card is-yellow" href="{{ path('app_animator_portal_planning') }}">
+                <span>Missions</span>
+                <strong>{{ today_tasks|length }}</strong>
+                <small>aujourd'hui</small>
+            </a>
+            <a class="drive-stat-card is-red" href="{{ path('app_animator_portal_children') }}">
+                <span>Enfants</span>
+                <strong>{{ children_count }}</strong>
+                <small>fiches</small>
+            </a>
         </section>
 
-        <section class="dashboard-content-grid">
-            <div class="dashboard-center-column">
-                <section id="horaires-animateur" class="panel-card animator-panel-card">
-                    <div class="panel-heading">
-                        <div>
-                            <span class="panel-kicker">Horaires</span>
-                            <h2>Ma semaine</h2>
-                        </div>
-                        <span class="soft-chip">{{ weekly_total_label }}</span>
-                    </div>
-
-                    <div class="animator-week-grid">
-                        {% for day in week_days %}
-                            {% set shift = day.shift %}
-                            <article class="animator-day-card {{ shift ? 'has-shift' : '' }}">
-                                <span>{{ day.label }}</span>
-                                <strong>{{ day.date|date('d/m') }}</strong>
-                                {% if shift %}
-                                    <small>{{ shift.startTime|date('H:i') }} - {{ shift.lunchStartTime|date('H:i') }}</small>
-                                    <small>{{ shift.lunchEndTime|date('H:i') }} - {{ shift.endTime|date('H:i') }}</small>
-                                    <em>{{ shift.workedHoursLabel }}</em>
-                                {% else %}
-                                    <small>Repos</small>
-                                {% endif %}
-                            </article>
-                        {% endfor %}
-                    </div>
-                </section>
-
-                <section id="planning-animateur" class="panel-card animator-panel-card">
-                    <div class="panel-heading">
-                        <div>
-                            <span class="panel-kicker">Planning</span>
-                            <h2>Mes missions du jour</h2>
-                        </div>
-                        <span class="soft-chip">{{ today|date('d/m') }}</span>
-                    </div>
-
-                    {% if today_tasks is empty %}
-                        <div class="empty-state empty-state-soft">
-                            <strong>Aucune mission assignée aujourd'hui.</strong>
-                            <span>La direction peut encore mettre à jour le planning.</span>
-                        </div>
-                    {% else %}
-                        <div class="project-list animator-task-list">
-                            {% for assignment in today_tasks %}
-                                <div class="animator-task-row">
-                                    <span class="avatar avatar-blue">PL</span>
-                                    <span>
-                                        <strong>{{ assignment.taskLabel }}</strong>
-                                        <small>{{ assignment.task.timeLabel }}{% if assignment.task.groupLabel %} · {{ assignment.task.groupLabel }}{% endif %}</small>
-                                    </span>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </section>
+        <section class="drive-section">
+            <div class="drive-section-heading">
+                <h2>Accès rapide</h2>
+                <span>Comme des dossiers utiles</span>
             </div>
+            <div class="drive-list">
+                <a class="drive-row" href="{{ path('app_animator_portal_schedules') }}">
+                    <span class="drive-folder-icon drive-folder-blue"></span>
+                    <span><strong>Mes horaires</strong><small>Semaine du {{ week_start|date('d/m') }}</small></span>
+                    <em>Ouvrir</em>
+                </a>
+                <a class="drive-row" href="{{ path('app_animator_portal_planning') }}">
+                    <span class="drive-folder-icon drive-folder-yellow"></span>
+                    <span><strong>Planning du jour</strong><small>{{ today_tasks|length }} mission(s) assignée(s)</small></span>
+                    <em>Ouvrir</em>
+                </a>
+                <a class="drive-row" href="{{ path('app_animator_portal_outings') }}">
+                    <span class="drive-folder-icon drive-folder-green"></span>
+                    <span><strong>Mes sorties</strong><small>{{ validated_outings_count }} validée(s), {{ pending_outings_count }} en attente</small></span>
+                    <em>Ouvrir</em>
+                </a>
+                <a class="drive-row" href="{{ path('app_animator_portal_children') }}">
+                    <span class="drive-folder-icon drive-folder-red"></span>
+                    <span><strong>Liste des enfants</strong><small>Consultation uniquement</small></span>
+                    <em>Ouvrir</em>
+                </a>
+            </div>
+        </section>
 
-            <aside id="sorties-animateur" class="outings-column">
-                <section class="panel-card outing-list-card">
-                    <div class="panel-heading">
-                        <div>
-                            <span class="panel-kicker">Sorties</span>
-                            <h2>Mes prochaines sorties</h2>
-                        </div>
-                        <span class="soft-chip">{{ upcoming_outings|length }} affichée(s)</span>
-                    </div>
+        <section class="drive-section">
+            <div class="drive-section-heading">
+                <h2>Cette semaine</h2>
+                <a href="{{ path('app_animator_portal_schedules') }}">Tout voir</a>
+            </div>
+            <div class="drive-day-strip">
+                {% for day in week_days %}
+                    {% set shift = day.shift %}
+                    <article class="drive-day-tile {{ shift ? 'has-shift' : '' }}">
+                        <span>{{ day.label }}</span>
+                        <strong>{{ day.date|date('d/m') }}</strong>
+                        {% if shift %}
+                            <small>{{ shift.startTime|date('H:i') }} - {{ shift.endTime|date('H:i') }}</small>
+                            <em>{{ shift.workedHoursLabel }}</em>
+                        {% else %}
+                            <small>Repos</small>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
 
-                    {% if upcoming_outings is empty %}
-                        <div class="empty-state empty-state-soft">
-                            <strong>Aucune sortie à venir.</strong>
-                            <span>Quand la direction t'affectera à une sortie, elle apparaîtra ici.</span>
-                        </div>
-                    {% else %}
-                        <div class="project-list animator-outing-list">
-                            {% for outing in upcoming_outings %}
-                                <article class="animator-outing-card">
-                                    <div>
-                                        <span class="badge {{ outing.statusBadgeClass }}">{{ outing.statusLabel }}</span>
-                                        <strong>{{ outing.destination }}</strong>
-                                        <small>{{ outing.departureAt|date('d/m/Y') }} · {{ outing.departureAt|date('H:i') }} - {{ outing.returnAt|date('H:i') }}</small>
-                                    </div>
-                                    <dl>
-                                        <div><dt>Enfants</dt><dd>{{ outing.children|length }}</dd></div>
-                                        <div><dt>Transport</dt><dd>{{ outing.transportMode ?: 'À préciser' }}</dd></div>
-                                        <div><dt>Pique-nique</dt><dd>{{ outing.picnicRequired ? 'Oui' : 'Non' }}</dd></div>
-                                    </dl>
-                                </article>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </section>
-            </aside>
+        <section class="drive-section">
+            <div class="drive-section-heading">
+                <h2>Prochaines sorties</h2>
+                <a href="{{ path('app_animator_portal_outings') }}">Tout voir</a>
+            </div>
+            {% if upcoming_outings is empty %}
+                <div class="drive-empty">Aucune sortie à venir pour le moment.</div>
+            {% else %}
+                <div class="drive-list">
+                    {% for outing in upcoming_outings %}
+                        <a class="drive-row" href="{{ path('app_animator_portal_outing_show', {id: outing.id}) }}">
+                            <span class="drive-file-icon">{{ outing.departureAt|date('d') }}</span>
+                            <span><strong>{{ outing.destination }}</strong><small>{{ outing.departureAt|date('d/m') }} · {{ outing.children|length }} enfant(s) · {{ outing.statusLabel }}</small></span>
+                            <em>Ouvrir</em>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </section>
     </section>
 {% endblock %}

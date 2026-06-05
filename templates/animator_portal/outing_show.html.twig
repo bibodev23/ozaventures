@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sortie {{ outing.number }}{% endblock %}
+
+{% block body %}
+    <section class="drive-page animator-drive-page">
+        <header class="drive-hero drive-hero-compact">
+            <p class="drive-kicker">Sortie {{ outing.number }}</p>
+            <h1>{{ outing.destination }}</h1>
+            <p>{{ outing.departureAt|date('d/m/Y') }} · {{ outing.departureAt|date('H:i') }} - {{ outing.returnAt|date('H:i') }}</p>
+        </header>
+
+        <section class="drive-detail-grid">
+            <article class="drive-info-card">
+                <span>Statut</span>
+                <strong>{{ outing.statusLabel }}</strong>
+            </article>
+            <article class="drive-info-card">
+                <span>Transport</span>
+                <strong>{{ outing.transportMode ?: 'À préciser' }}</strong>
+            </article>
+            <article class="drive-info-card">
+                <span>Pique-nique</span>
+                <strong>{{ outing.picnicRequired ? 'Oui' : 'Non' }}</strong>
+            </article>
+            <article class="drive-info-card">
+                <span>Trajet</span>
+                <strong>{{ outing.routeDurationLabel }}</strong>
+            </article>
+        </section>
+
+        <section class="drive-section">
+            <div class="drive-section-heading">
+                <h2>Enfants</h2>
+                <span>{{ outing.children|length }}</span>
+            </div>
+            <div class="drive-list">
+                {% for child in outing.children %}
+                    <a class="drive-row" href="{{ path('app_animator_portal_child_show', {id: child.id}) }}">
+                        <span class="drive-avatar">{{ child.firstName|slice(0, 1) }}{{ child.lastName|slice(0, 1) }}</span>
+                        <span><strong>{{ child.fullName }}</strong><small>{{ child.age ? child.age ~ ' ans' : child.ageGroupLabel }}{% if child.hasAllergies() %} · vigilance allergie{% endif %}</small></span>
+                        <em>Voir</em>
+                    </a>
+                {% else %}
+                    <div class="drive-empty">Aucun enfant sélectionné.</div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="drive-section">
+            <div class="drive-section-heading">
+                <h2>Équipe</h2>
+                <span>{{ outing.animators|length }}</span>
+            </div>
+            <div class="drive-chip-list">
+                {% for assigned_animator in outing.animators %}
+                    <span>{{ assigned_animator.firstName }} {{ assigned_animator.lastName|slice(0, 1)|upper }}.</span>
+                {% else %}
+                    <span>Aucun animateur sélectionné</span>
+                {% endfor %}
+            </div>
+        </section>
+    </section>
+{% endblock %}

@@ -40,8 +40,9 @@ security:
         - { path: ^/api, roles: ROLE_USER }
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/connexion$, roles: PUBLIC_ACCESS }
+        - { path: ^/(site\.webmanifest|sw\.js|offline\.html|icons/), roles: PUBLIC_ACCESS }
         - { path: ^/apres-connexion$, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/mon-espace$, roles: ROLE_ANIMATOR }
+        - { path: ^/mon-espace, roles: ROLE_ANIMATOR }
         - { path: ^/mon-mot-de-passe$, roles: ROLE_ANIMATOR }
         # Messaging is kept in code for a future mobile-enabled V2, but hidden in the webapp V1.
         - { path: ^/messages, roles: ROLE_MESSAGING_DISABLED }

@@ -9,3 +9,11 @@ const app = startStimulusApp();
 app.register('global-search', GlobalSearchController);
 window.OZStimulusApp = app;
 import('./stimulus_bootstrap.js');
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {
+            // The app must stay usable even if the browser refuses PWA registration.
+        });
+    });
+}

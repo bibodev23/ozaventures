@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes horaires{% endblock %}
+
+{% block body %}
+    <section class="drive-page animator-drive-page">
+        <header class="drive-hero drive-hero-compact">
+            <p class="drive-kicker">Horaires</p>
+            <h1>Ma semaine</h1>
+            <p>Du {{ week_start|date('d/m/Y') }} au {{ week_end|date('d/m/Y') }} · total {{ weekly_total_label }}</p>
+        </header>
+
+        <nav class="drive-week-nav" aria-label="Changer de semaine">
+            {% if previous_week %}
+                <a href="{{ path('app_animator_portal_schedules', {week: previous_week|date('Y-m-d')}) }}">Semaine précédente</a>
+            {% else %}
+                <span>Semaine précédente</span>
+            {% endif %}
+            {% if next_week %}
+                <a href="{{ path('app_animator_portal_schedules', {week: next_week|date('Y-m-d')}) }}">Semaine suivante</a>
+            {% else %}
+                <span>Semaine suivante</span>
+            {% endif %}
+        </nav>
+
+        <section class="drive-section">
+            <div class="drive-section-heading">
+                <h2>Détail des horaires</h2>
+                <span>{{ weekly_total_label }}</span>
+            </div>
+            <div class="drive-list drive-list-large">
+                {% for day in week_days %}
+                    {% set shift = day.shift %}
+                    <article class="drive-schedule-row {{ shift ? 'has-shift' : '' }}">
+                        <span class="drive-date-badge"><strong>{{ day.label }}</strong><small>{{ day.date|date('d/m') }}</small></span>
+                        <div>
+                            {% if shift %}
+                                <strong>{{ shift.startTime|date('H:i') }} - {{ shift.lunchStartTime|date('H:i') }}</strong>
+                                <small>Pause puis {{ shift.lunchEndTime|date('H:i') }} - {{ shift.endTime|date('H:i') }}</small>
+                            {% else %}
+                                <strong>Repos</strong>
+                                <small>Aucun horaire prévu.</small>
+                            {% endif %}
+                        </div>
+                        {% if shift %}<em>{{ shift.workedHoursLabel }}</em>{% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    </section>
+{% endblock %}

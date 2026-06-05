@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon planning{% endblock %}
+
+{% block body %}
+    <section class="drive-page animator-drive-page">
+        <header class="drive-hero drive-hero-compact">
+            <p class="drive-kicker">Planning</p>
+            <h1>Mes missions</h1>
+            <p>Semaine du {{ week_start|date('d/m/Y') }} au {{ week_end|date('d/m/Y') }}.</p>
+        </header>
+
+        <nav class="drive-week-nav" aria-label="Changer de semaine">
+            {% if previous_week %}
+                <a href="{{ path('app_animator_portal_planning', {week: previous_week|date('Y-m-d')}) }}">Semaine précédente</a>
+            {% else %}
+                <span>Semaine précédente</span>
+            {% endif %}
+            {% if next_week %}
+                <a href="{{ path('app_animator_portal_planning', {week: next_week|date('Y-m-d')}) }}">Semaine suivante</a>
+            {% else %}
+                <span>Semaine suivante</span>
+            {% endif %}
+        </nav>
+
+        <section class="drive-section">
+            <div class="drive-section-heading">
+                <h2>Planning de la semaine</h2>
+                <span>Lecture seule</span>
+            </div>
+            <div class="drive-list drive-list-large">
+                {% for day in week_days %}
+                    <article class="drive-planning-day">
+                        <header>
+                            <span class="drive-date-badge"><strong>{{ day.label }}</strong><small>{{ day.date|date('d/m') }}</small></span>
+                            <strong>{{ day.tasks|length }} mission(s)</strong>
+                        </header>
+                        {% if day.tasks is empty %}
+                            <p>Aucune mission assignée.</p>
+                        {% else %}
+                            <div class="drive-task-list">
+                                {% for assignment in day.tasks %}
+                                    <div>
+                                        <span class="drive-task-dot"></span>
+                                        <span><strong>{{ assignment.taskLabel }}</strong><small>{{ assignment.task.timeLabel }}{% if assignment.task.groupLabel %} · {{ assignment.task.groupLabel }}{% endif %}</small></span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    </section>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ child.fullName }}{% endblock %}
+
+{% block body %}
+    <section class="drive-page animator-drive-page">
+        <header class="drive-hero drive-hero-compact">
+            <p class="drive-kicker">Fiche enfant</p>
+            <h1>{{ child.fullName }}</h1>
+            <p>{{ child.age ? child.age ~ ' ans' : child.ageGroupLabel }} · {{ child.hasAllergies() ? 'Vigilance allergie' : 'Aucune allergie renseignée' }}</p>
+        </header>
+
+        <section class="drive-detail-grid">
+            <article class="drive-info-card">
+                <span>Responsables</span>
+                <strong>{{ child.legalGuardians ?: 'Non renseigné' }}</strong>
+            </article>
+            <article class="drive-info-card">
+                <span>Téléphones</span>
+                <strong>{{ child.legalGuardianPhones ?: 'Non renseigné' }}</strong>
+            </article>
+            <article class="drive-info-card {{ child.hasAllergies() ? 'is-warning' : '' }}">
+                <span>Allergies</span>
+                <strong>{{ child.allergies ?: 'Aucune allergie connue' }}</strong>
+            </article>
+            <article class="drive-info-card {{ child.hasPhotoPermission() ? '' : 'is-warning' }}">
+                <span>Droit photo</span>
+                <strong>{{ child.hasPhotoPermission() ? 'Autorisé' : 'Non autorisé' }}</strong>
+            </article>
+        </section>
+
+        <section class="drive-section">
+            <div class="drive-section-heading">
+                <h2>Notes importantes</h2>
+                <span>À lire avant sortie</span>
+            </div>
+            <div class="drive-note-card">{{ child.importantNotes ? child.importantNotes|nl2br : 'Aucune note particulière.' }}</div>
+        </section>
+
+        <section class="drive-section">
+            <div class="drive-section-heading">
+                <h2>Historique sorties</h2>
+                <span>{{ stats.effective_count }} retenue(s)</span>
+            </div>
+            {% if outings is empty %}
+                <div class="drive-empty">Aucune sortie pour cet enfant.</div>
+            {% else %}
+                <div class="drive-list">
+                    {% for outing in outings %}
+                        <a class="drive-row" href="{{ path('app_animator_portal_outing_show', {id: outing.id}) }}">
+                            <span class="drive-file-icon">{{ outing.departureAt|date('d') }}</span>
+                            <span><strong>{{ outing.destination }}</strong><small>{{ outing.departureAt|date('d/m/Y') }} · {{ outing.statusLabel }}</small></span>
+                            <em>Voir</em>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
+    </section>
+{% endblock %}

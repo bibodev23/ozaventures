@@ -4,7 +4,13 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Centre aéré{% endblock %}</title>
-        <link rel="stylesheet" href="{{ asset('styles/app.css') }}?v=20260603-mobile-overflow-fix">
+        <meta name="theme-color" content="#f8fafd">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-title" content="Oz'Aventure">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <link rel="manifest" href="{{ asset('site.webmanifest') }}">
+        <link rel="apple-touch-icon" href="{{ asset('icons/apple-touch-icon.png') }}">
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}?v=20260605-drive-pwa">
         {% block importmap %}{{ importmap('app') }}{% endblock %}
     </head>
     <body>
@@ -50,15 +56,20 @@
                                 {% endfor %}
                             {% elseif is_granted('ROLE_ANIMATOR') %}
                                 {% set nav_items = [
-                                    {label: 'Mon espace', icon: 'ME', route: 'app_animator_portal', match: 'app_animator_portal'},
+                                    {label: 'Mon espace', icon: 'ME', route: 'app_animator_portal', routes: ['app_animator_portal']},
+                                    {label: 'Horaires', icon: 'HR', route: 'app_animator_portal_schedules', match: 'app_animator_portal_schedules'},
+                                    {label: 'Planning', icon: 'PL', route: 'app_animator_portal_planning', match: 'app_animator_portal_planning'},
+                                    {label: 'Sorties', icon: 'SO', route: 'app_animator_portal_outings', match: 'app_animator_portal_outing'},
+                                    {label: 'Enfants', icon: 'EN', route: 'app_animator_portal_children', match: 'app_animator_portal_child'},
                                     {label: 'Mot de passe', icon: 'MP', route: 'app_account_password', match: 'app_account'}
                                 ] %}
                                 {% for item in nav_items %}
+                                    {% set is_active = item.routes is defined ? current_route in item.routes : current_route starts with item.match %}
                                     <a
-                                        class="{{ current_route starts with item.match ? 'is-active' : '' }}"
+                                        class="{{ is_active ? 'is-active' : '' }}"
                                         href="{{ path(item.route) }}"
                                         data-turbo-preload
-                                        {% if current_route starts with item.match %}aria-current="page"{% endif %}
+                                        {% if is_active %}aria-current="page"{% endif %}
                                     >
                                         <span class="nav-icon">{{ item.icon }}</span>
                                         <span>{{ item.label }}</span>
@@ -81,9 +92,9 @@
                         {% if is_granted('ROLE_DIRECTOR') %}
                             <twig:GlobalSearch />
                         {% else %}
-                            <div class="search-pill" aria-label="Recherche visuelle">
-                                <span>AN</span>
-                                <span>Espace animateur</span>
+                            <div class="search-pill drive-mobile-search" aria-label="Espace animateur">
+                                <span class="drive-burger" aria-hidden="true"></span>
+                                <span>Oz'Aventure</span>
                             </div>
                         {% endif %}
                         <div class="workspace-actions">

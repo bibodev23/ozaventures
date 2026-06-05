@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes sorties{% endblock %}
+
+{% block body %}
+    <section class="drive-page animator-drive-page">
+        <header class="drive-hero drive-hero-compact">
+            <p class="drive-kicker">Sorties</p>
+            <h1>Mes sorties</h1>
+            <p>Les sorties où tu es affecté ou que tu as proposées.</p>
+        </header>
+
+        <section class="drive-filter-tabs" aria-label="Filtrer les sorties">
+            <a class="{{ selected_status is null ? 'is-active' : '' }}" href="{{ path('app_animator_portal_outings') }}">Toutes</a>
+            <a class="{{ selected_status == 'pending' ? 'is-active' : '' }}" href="{{ path('app_animator_portal_outings', {status: 'pending'}) }}">En attente · {{ pending_count }}</a>
+            <a class="{{ selected_status == 'validated' ? 'is-active' : '' }}" href="{{ path('app_animator_portal_outings', {status: 'validated'}) }}">Validées · {{ validated_count }}</a>
+            <a class="{{ selected_status == 'refused' ? 'is-active' : '' }}" href="{{ path('app_animator_portal_outings', {status: 'refused'}) }}">Refusées · {{ refused_count }}</a>
+        </section>
+
+        <section class="drive-section">
+            <div class="drive-section-heading">
+                <h2>Liste</h2>
+                <span>{{ outings|length }} sortie(s)</span>
+            </div>
+            {% if outings is empty %}
+                <div class="drive-empty">Aucune sortie dans cette sélection.</div>
+            {% else %}
+                <div class="drive-list">
+                    {% for outing in outings %}
+                        <a class="drive-row" href="{{ path('app_animator_portal_outing_show', {id: outing.id}) }}">
+                            <span class="drive-file-icon">{{ outing.departureAt|date('d') }}</span>
+                            <span>
+                                <strong>{{ outing.destination }}</strong>
+                                <small>{{ outing.departureAt|date('d/m/Y') }} · {{ outing.departureAt|date('H:i') }} - {{ outing.returnAt|date('H:i') }} · {{ outing.children|length }} enfant(s)</small>
+                            </span>
+                            <em>{{ outing.statusLabel }}</em>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
+    </section>
+{% endblock %}

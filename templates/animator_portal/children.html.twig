@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Enfants{% endblock %}
+
+{% block body %}
+    <section class="drive-page animator-drive-page">
+        <header class="drive-hero drive-hero-compact">
+            <p class="drive-kicker">Enfants</p>
+            <h1>Liste des enfants</h1>
+            <p>Consultation uniquement: infos utiles, allergies, droit photo et historique.</p>
+        </header>
+
+        {% if children is empty %}
+            <div class="drive-empty">Aucun enfant inscrit pour le moment.</div>
+        {% else %}
+            {% for group in groups %}
+                <section class="drive-section">
+                    <div class="drive-section-heading">
+                        <h2>{{ group.label }}</h2>
+                        <span>Groupe</span>
+                    </div>
+                    <div class="drive-list">
+                        {% for child in children %}
+                            {% if child.ageGroup == group.value %}
+                                <a class="drive-row" href="{{ path('app_animator_portal_child_show', {id: child.id}) }}">
+                                    <span class="drive-avatar">{{ child.firstName|slice(0, 1) }}{{ child.lastName|slice(0, 1) }}</span>
+                                    <span><strong>{{ child.fullName }}</strong><small>{{ child.age ? child.age ~ ' ans' : child.ageGroupLabel }} · photo {{ child.hasPhotoPermission() ? 'OK' : 'non' }}{% if child.hasAllergies() %} · allergie{% endif %}</small></span>
+                                    <em>Voir</em>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endfor %}
+        {% endif %}
+    </section>
+{% endblock %}
