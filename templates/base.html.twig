@@ -35,7 +35,7 @@
                             {% if is_granted('ROLE_DIRECTOR') %}
                                 {% set nav_items = [
                                     {label: 'Dashboard', icon: 'DB', route: 'app_dashboard', routes: ['app_home', 'app_dashboard']},
-                                    {label: 'Planning', icon: 'PL', route: 'app_daily_planning', match: 'app_daily_planning'},
+                                    {label: 'Planning', icon: 'PL', route: 'app_daily_planning', match: 'app_daily_planning', turbo: false},
                                     {label: 'Horaires', icon: 'HR', route: 'app_work_schedule', match: 'app_work_schedule'},
                                     {label: 'Sorties', icon: 'SO', route: 'app_outings', match: 'app_outing'},
                                     {label: 'Enfants', icon: 'EN', route: 'app_children', match: 'app_child'},
@@ -47,7 +47,7 @@
                                     <a
                                         class="{{ is_active ? 'is-active' : '' }}"
                                         href="{{ path(item.route) }}"
-                                        data-turbo-preload
+                                        {% if item.turbo is defined and item.turbo == false %}data-turbo="false"{% endif %}
                                         {% if is_active %}aria-current="page"{% endif %}
                                     >
                                         <span class="nav-icon">{{ item.icon }}</span>
@@ -68,7 +68,6 @@
                                     <a
                                         class="{{ is_active ? 'is-active' : '' }}"
                                         href="{{ path(item.route) }}"
-                                        data-turbo-preload
                                         {% if is_active %}aria-current="page"{% endif %}
                                     >
                                         <span class="nav-icon">{{ item.icon }}</span>
